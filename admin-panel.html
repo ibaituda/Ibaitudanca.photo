@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel V7 | Ibai Tudanca</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Panel V7 | Ibai Tudanca</title>
+<meta content="noindex, nofollow" name="robots"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:#080808;--text:#f5f5f5;--muted:rgba(255,255,255,.62);--soft:rgba(255,255,255,.42);--faint:rgba(255,255,255,.28);--line:rgba(255,255,255,.10);--panel:rgba(255,255,255,.04);--panel2:rgba(255,255,255,.07);--green:#6ee28f;--yellow:#e6c46a;--red:#ff7272}
     html{scroll-behavior:smooth} body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden} a{color:inherit;text-decoration:none} button,input,select,textarea{font-family:inherit} button{cursor:pointer} img{display:block;max-width:100%}
@@ -38,263 +39,250 @@
 <body data-lang="en">
 <div class="page-grain"></div>
 <header class="nav">
-  <a class="brand" href="#">IBAI TUDANCA</a>
-  <div class="nav-right">
-    <a class="nav-link" href="client-dashboard.html">Client View</a>
-    <a class="nav-link" href="gallery-view.html">Gallery View</a>
-    <div class="language-switch"><button class="lang-btn is-active" data-set-lang="en">EN</button><button class="lang-btn" data-set-lang="es">ES</button></div>
-    <button class="logout"><span data-en>Logout</span><span data-es>Salir</span></button>
-  </div>
+<a class="brand" href="#">IBAI TUDANCA</a>
+<div class="nav-right">
+<a class="nav-link" href="client-dashboard.html">Client View</a>
+<a class="nav-link" href="gallery-view.html">Gallery View</a>
+<div class="language-switch"><button class="lang-btn is-active" data-set-lang="en">EN</button><button class="lang-btn" data-set-lang="es">ES</button></div>
+<button class="logout"><span data-en="">Logout</span><span data-es="">Salir</span></button>
+</div>
 </header>
 <main class="shell">
-  <div class="wrap admin-layout">
-    <aside class="sidebar">
-      <div class="side-title"><span data-en>Admin sections</span><span data-es>Secciones admin</span></div>
-      <button class="side-btn active" data-section="overview"><span data-en>Overview</span><span data-es>Resumen</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="clients"><span data-en>Clients</span><span data-es>Clientes</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="galleries"><span data-en>Galleries</span><span data-es>Galerías</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="calendar"><span data-en>Calendar</span><span data-es>Calendario</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="requests"><span data-en>Requests</span><span data-es>Retoques</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="downloads"><span data-en>Downloads</span><span data-es>Descargas</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="admins"><span data-en>Administrators</span><span data-es>Administradores</span><span class="side-dot"></span></button>
-      <button class="side-btn" data-section="settings"><span data-en>Settings</span><span data-es>Ajustes</span><span class="side-dot"></span></button>
-    </aside>
-    <div class="main">
-      <section id="overview" class="section active">
-        <div class="hero" style="--hero-img:url('img/hero.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Private administration</span><span data-es>Administración privada</span></div><h1><span data-en>Control <em>room</em></span><span data-es>Panel de <em>control</em></span></h1><p><span data-en>Manage clients, galleries, calendar events, retouch requests and delivery activity from one premium workspace.</span><span data-es>Gestiona clientes, galerías, calendario, solicitudes de retoque y actividad de entregas desde un espacio premium.</span></p></div><div><div class="admin-welcome"><div class="admin-welcome-text"><span data-en>Welcome, let's work</span><span data-es>Bienvenido, vamos a trabajar</span><strong id="admin-hero-name">Admin</strong></div><img id="admin-hero-avatar" class="admin-welcome-avatar" src="img/IMG_IBAI.jpg" alt="Admin profile"></div><div class="hero-actions" style="margin-top:18px"><button class="btn primary" data-section-link="clients"><span data-en>Create client</span><span data-es>Crear cliente</span></button><button class="btn" data-section-link="galleries"><span data-en>Create gallery</span><span data-es>Crear galería</span></button><button class="btn" data-section-link="calendar"><span data-en>Add event</span><span data-es>Añadir evento</span></button></div></div></div></div>
-        <div class="stat-row"><div class="stat"><strong>18</strong><span data-en>Active clients</span><span data-es>Clientes activos</span></div><div class="stat"><strong>42</strong><span data-en>Galleries</span><span data-es>Galerías</span></div><div class="stat"><strong>6</strong><span data-en>Pending uploads</span><span data-es>Subidas pendientes</span></div><div class="stat"><strong>3</strong><span data-en>Edit requests</span><span data-es>Retoques</span></div></div>
-        <div class="grid three" style="margin-top:12px">
-          <div class="compact-panel"><h4><span data-en>Publication checklist</span><span data-es>Checklist de publicación</span></h4><ul><li><span class="check-dot"></span><span data-en>Client assigned and credentials ready</span><span data-es>Cliente asignado y credenciales listas</span></li><li><span class="check-dot"></span><span data-en>Cover image and visual crop selected</span><span data-es>Portada y recorte visual seleccionados</span></li><li><span class="check-dot warn"></span><span data-en>Large files still syncing</span><span data-es>Archivos grandes sincronizando</span></li></ul></div>
-          <div class="compact-panel"><h4><span data-en>Internal notes</span><span data-es>Notas internas</span></h4><p><span data-en>Antonio prefers vertical images for Instagram. Agency deliveries need captions checked before publishing.</span><span data-es>Antonio prefiere imágenes verticales para Instagram. Las entregas de agencia necesitan captions revisados antes de publicar.</span></p></div>
-          <div class="compact-panel activity-card"><h4><span data-en>Useful activity</span><span data-es>Actividad útil</span></h4><div class="activity-row"><img src="img/IMG_IBAI.jpg"><div><strong>Antonio Blanco</strong><span data-en>Downloaded 24 selected photos</span><span data-es>Descargó 24 fotos seleccionadas</span></div></div><div class="activity-row"><img src="img/work_A.jpg"><div><strong>Alavés vs Rayo</strong><span data-en>Gallery duplicated for another player</span><span data-es>Galería duplicada para otro jugador</span></div></div></div>
-        </div>
-        <div class="section-title"><div><h2><span data-en>Latest activity</span><span data-es>Actividad reciente</span></h2><p><span data-en>Only the most useful information: last client, last gallery and next scheduled event.</span><span data-es>Solo lo útil: último cliente, última galería y próximo evento programado.</span></p></div></div>
-        <div class="overview-grid">
-          <article class="photo-card" style="--img:url('img/work_A.jpg')"><div class="content"><div class="mini-label"><span data-en>Last gallery created</span><span data-es>Última galería creada</span></div><h3>Alavés vs Rayo</h3><p><span class="pill"><span class="dot yellow"></span><span data-en>In progress</span><span data-es>En proceso</span></span></p><br><button class="btn" data-section-link="galleries"><span data-en>Edit gallery</span><span data-es>Editar galería</span></button></div></article>
-          <div class="grid">
-            <article class="photo-card" style="--img:url('img/IMG_IBAI.jpg');min-height:126px"><div class="content"><div class="mini-label"><span data-en>Last client created</span><span data-es>Último cliente creado</span></div><h3>Antonio Blanco</h3><p>Player · Deportivo Alavés</p></div></article>
-            <div class="card pad"><h3><span data-en>Next event</span><span data-es>Próximo evento</span></h3><p><strong>San Mamés · 21:00</strong><br><span data-en>Assigned to Ibai · Confirmed</span><span data-es>Asignado a Ibai · Confirmado</span></p><br><button class="btn" data-section-link="calendar"><span data-en>Open calendar</span><span data-es>Abrir calendario</span></button></div>
-          </div>
-        </div>
-      </section>
+<div class="wrap admin-layout">
+<aside class="sidebar">
+<div class="side-title"><span data-en="">Admin sections</span><span data-es="">Secciones admin</span></div>
+<button class="side-btn active" data-section="overview"><span data-en="">Overview</span><span data-es="">Resumen</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="clients"><span data-en="">Clients</span><span data-es="">Clientes</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="galleries"><span data-en="">Galleries</span><span data-es="">Galerías</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="calendar"><span data-en="">Calendar</span><span data-es="">Calendario</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="requests"><span data-en="">Requests</span><span data-es="">Retoques</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="downloads"><span data-en="">Downloads</span><span data-es="">Descargas</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="admins"><span data-en="">Administrators</span><span data-es="">Administradores</span><span class="side-dot"></span></button>
+<button class="side-btn" data-section="settings"><span data-en="">Settings</span><span data-es="">Ajustes</span><span class="side-dot"></span></button>
+</aside>
+<div class="main">
+<section class="section active" id="overview">
+<div class="hero" style="--hero-img:url('img/hero.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Private administration</span><span data-es="">Administración privada</span></div><h1><span data-en="">Control <em>room</em></span><span data-es="">Panel de <em>control</em></span></h1><p><span data-en="">Manage clients, galleries, calendar events, retouch requests and delivery activity from one premium workspace.</span><span data-es="">Gestiona clientes, galerías, calendario, solicitudes de retoque y actividad de entregas desde un espacio premium.</span></p></div><div><div class="admin-welcome"><div class="admin-welcome-text"><span data-en="">Welcome, let's work</span><span data-es="">Bienvenido, vamos a trabajar</span><strong id="admin-hero-name">Admin</strong></div><img alt="Admin profile" class="admin-welcome-avatar" id="admin-hero-avatar" src="img/IMG_IBAI.jpg"/></div><div class="hero-actions" style="margin-top:18px"><button class="btn primary" data-section-link="clients"><span data-en="">Create client</span><span data-es="">Crear cliente</span></button><button class="btn" data-section-link="galleries"><span data-en="">Create gallery</span><span data-es="">Crear galería</span></button><button class="btn" data-section-link="calendar"><span data-en="">Add event</span><span data-es="">Añadir evento</span></button></div></div></div></div>
+<div class="stat-row"><div class="stat"><strong>18</strong><span data-en="">Active clients</span><span data-es="">Clientes activos</span></div><div class="stat"><strong>42</strong><span data-en="">Galleries</span><span data-es="">Galerías</span></div><div class="stat"><strong>6</strong><span data-en="">Pending uploads</span><span data-es="">Subidas pendientes</span></div><div class="stat"><strong>3</strong><span data-en="">Edit requests</span><span data-es="">Retoques</span></div></div>
+<div class="grid three" style="margin-top:12px">
+<div class="compact-panel"><h4><span data-en="">Publication checklist</span><span data-es="">Checklist de publicación</span></h4><ul><li><span class="check-dot"></span><span data-en="">Client assigned and credentials ready</span><span data-es="">Cliente asignado y credenciales listas</span></li><li><span class="check-dot"></span><span data-en="">Cover image and visual crop selected</span><span data-es="">Portada y recorte visual seleccionados</span></li><li><span class="check-dot warn"></span><span data-en="">Large files still syncing</span><span data-es="">Archivos grandes sincronizando</span></li></ul></div>
+<div class="compact-panel"><h4><span data-en="">Internal notes</span><span data-es="">Notas internas</span></h4><p><span data-en="">Antonio prefers vertical images for Instagram. Agency deliveries need captions checked before publishing.</span><span data-es="">Antonio prefiere imágenes verticales para Instagram. Las entregas de agencia necesitan captions revisados antes de publicar.</span></p></div>
+<div class="compact-panel activity-card"><h4><span data-en="">Useful activity</span><span data-es="">Actividad útil</span></h4><div class="activity-row"><img src="img/IMG_IBAI.jpg"/><div><strong>Antonio Blanco</strong><span data-en="">Downloaded 24 selected photos</span><span data-es="">Descargó 24 fotos seleccionadas</span></div></div><div class="activity-row"><img src="img/work_A.jpg"/><div><strong>Alavés vs Rayo</strong><span data-en="">Gallery duplicated for another player</span><span data-es="">Galería duplicada para otro jugador</span></div></div></div>
+</div>
+<div class="section-title"><div><h2><span data-en="">Latest activity</span><span data-es="">Actividad reciente</span></h2><p><span data-en="">Only the most useful information: last client, last gallery and next scheduled event.</span><span data-es="">Solo lo útil: último cliente, última galería y próximo evento programado.</span></p></div></div>
+<div class="overview-grid">
+<article class="photo-card" style="--img:url('img/work_A.jpg')"><div class="content"><div class="mini-label"><span data-en="">Last gallery created</span><span data-es="">Última galería creada</span></div><h3>Alavés vs Rayo</h3><p><span class="pill"><span class="dot yellow"></span><span data-en="">In progress</span><span data-es="">En proceso</span></span></p><br/><button class="btn" data-section-link="galleries"><span data-en="">Edit gallery</span><span data-es="">Editar galería</span></button></div></article>
+<div class="grid">
+<article class="photo-card" style="--img:url('img/IMG_IBAI.jpg');min-height:126px"><div class="content"><div class="mini-label"><span data-en="">Last client created</span><span data-es="">Último cliente creado</span></div><h3>Antonio Blanco</h3><p>Player · Deportivo Alavés</p></div></article>
+<div class="card pad"><h3><span data-en="">Next event</span><span data-es="">Próximo evento</span></h3><p><strong>San Mamés · 21:00</strong><br/><span data-en="">Assigned to Ibai · Confirmed</span><span data-es="">Asignado a Ibai · Confirmado</span></p><br/><button class="btn" data-section-link="calendar"><span data-en="">Open calendar</span><span data-es="">Abrir calendario</span></button></div>
+</div>
+</div>
+</section>
+<section class="section" id="clients">
+<div class="hero" style="--hero-img:url('img/work_F.JPG')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Clients</span><span data-es="">Clientes</span></div><h1><span data-en="">Client <em>management</em></span><span data-es="">Gestión de <em>clientes</em></span></h1><p><span data-en="">Only two workflows: view existing clients or create a complete client experience from scratch.</span><span data-es="">Solo dos flujos: ver clientes existentes o crear una experiencia completa desde cero.</span></p></div></div></div>
+<div class="tabs"><button class="tab active" data-tab="clients-list"><span data-en="">Client list</span><span data-es="">Lista de clientes</span></button><button class="tab" data-tab="clients-create"><span data-en="">Create client</span><span data-es="">Crear cliente</span></button></div>
+<div class="subsection active" id="clients-list">
+<p class="row-meta" id="clients-sync-status" style="margin:0 0 12px 0">Loading Supabase clients...</p>
+<div class="list" id="clients-list-render">
+<div class="list-row"><img alt="" class="avatar" src="img/IMG_IBAI.jpg"/><div><div class="row-title">Antonio Blanco</div><div class="row-meta">Player · Deportivo Alavés · 3 galleries · antonio@example.com</div></div><div class="row-actions"><button class="btn" data-open="edit-client"><span data-en="">Edit client</span><span data-es="">Editar cliente</span></button><button class="btn"><span data-en="">Change password</span><span data-es="">Cambiar contraseña</span></button><button class="btn"><span data-en="">Duplicate</span><span data-es="">Duplicar</span></button></div></div>
+<div class="list-row"><img alt="" class="avatar" src="img/work_P.jpg"/><div><div class="row-title">Quality Sport Images</div><div class="row-meta">Agency · Editorial coverage · 12 galleries</div></div><div class="row-actions"><button class="btn" data-open="edit-client"><span data-en="">Edit client</span><span data-es="">Editar cliente</span></button><button class="btn"><span data-en="">Change password</span><span data-es="">Cambiar contraseña</span></button><button class="btn"><span data-en="">Duplicate</span><span data-es="">Duplicar</span></button></div></div>
+</div>
+<div class="card pad" id="edit-client" style="display:none;margin-top:18px">
+<div class="section-title" style="margin-top:0">
+<div>
+<h2><span data-en="">Edit full client page</span><span data-es="">Editar página completa del cliente</span></h2>
+<p><span data-en="">Everything visible in the client dashboard can be edited here: identity, password, texts, hero image, profile image and visual crop.</span><span data-es="">Todo lo visible en el dashboard del cliente se edita aquí: identidad, contraseña, textos, hero, foto de perfil y recorte visual.</span></p>
+</div>
+</div>
+<input id="edit-client-id" type="hidden"/>
+<input id="edit-client-current-profile-url" type="hidden"/>
+<input id="edit-client-current-hero-url" type="hidden"/>
+<div class="editor-grid">
+<div class="form-grid">
+<div class="field"><label>Client name</label><input id="edit-client-name" placeholder="Antonio Blanco"/></div>
+<div class="field"><label>Type</label><select id="edit-client-type"><option value="player">Player</option><option value="club">Club</option><option value="agency">Agency</option><option value="personal">Personal</option></select></div>
+<div class="field"><label>Club / League / Country</label><input id="edit-client-context" placeholder="Deportivo Alavés · LaLiga · Spain"/></div>
+<div class="field"><label>Username</label><input id="edit-client-username" placeholder="antonio-blanco"/></div>
+<div class="field"><label>New password</label><input id="edit-client-password" placeholder="Leave empty to keep current password" type="password"/></div>
+<div class="field"><label>Preferred language</label><select id="edit-client-language"><option value="en">English</option><option value="es">Spanish</option></select></div>
+<div class="field"><label>Visibility</label><select id="edit-client-publish-status"><option value="draft">Draft / Borrador</option><option value="published">Published / Publicado</option></select></div>
+<div class="field full"><label>Welcome title EN</label><input id="edit-client-welcome-title-en" placeholder="Antonio, your private galleries are ready"/></div>
+<div class="field full"><label>Título bienvenida ES</label><input id="edit-client-welcome-title-es" placeholder="Antonio, tus galerías privadas están listas"/></div>
+<div class="field full"><label>Welcome message EN</label><textarea id="edit-client-welcome-message-en" placeholder="Personalised message for the client dashboard..."></textarea></div>
+<div class="field full"><label>Mensaje bienvenida ES</label><textarea id="edit-client-welcome-message-es" placeholder="Mensaje personalizado para el dashboard del cliente..."></textarea></div>
+<div class="field full"><label>License EN</label><textarea id="edit-client-license-en" placeholder="Licensed for client use. Third-party usage requires written permission."></textarea></div>
+<div class="field full"><label>Licencia ES</label><textarea id="edit-client-license-es" placeholder="Licencia para uso del cliente. El uso por terceros requiere autorización escrita."></textarea></div>
+<div class="field full"><label>Internal notes</label><textarea id="edit-client-internal-notes" placeholder="Private notes only visible to admin..."></textarea></div>
+</div>
+<div>
+<div class="crop-editor">
+<div class="mini-label">Hero image visual crop</div>
+<div class="crop-frame hero-shape"><div class="crop-preview" id="edit-client-hero-preview" style="--crop-img:url('img/work_A.jpg')"></div><div class="crop-hint"></div></div>
+<div class="range-row"><label>X position<input data-crop="x" id="edit-client-hero-x" max="100" min="0" type="range" value="50"/></label><label>Y position<input data-crop="y" id="edit-client-hero-y" max="100" min="0" type="range" value="45"/></label></div>
+<br/><div class="field"><label><span data-en="">Change hero image</span><span data-es="">Cambiar foto hero</span></label><input accept="image/*" data-preview="edit-client-hero-preview" id="edit-client-hero-file" type="file"/></div><p class="row-meta" id="edit-client-hero-file-status">No new hero image selected.</p>
+</div>
+<br/>
+<div class="crop-editor">
+<div class="mini-label">Profile circle crop</div>
+<div class="crop-frame profile-shape"><div class="crop-preview" id="edit-client-profile-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
+<div class="range-row"><label>X<input data-crop="x" id="edit-client-profile-x" max="100" min="0" type="range" value="50"/></label><label>Y<input data-crop="y" id="edit-client-profile-y" max="100" min="0" type="range" value="45"/></label></div>
+<br/><div class="field"><label><span data-en="">Change profile image</span><span data-es="">Cambiar foto de perfil</span></label><input accept="image/*" data-preview="edit-client-profile-preview" id="edit-client-profile-file" type="file"/></div><p class="row-meta" id="edit-client-profile-file-status">No new profile image selected.</p>
+</div>
+</div>
+</div>
+<div class="divider-line"></div>
+<div class="compact-panel"><h4><span data-en="">Client publication checklist</span><span data-es="">Checklist de publicación del cliente</span></h4><ul><li><span class="check-dot"></span><span data-en="">Profile image selected</span><span data-es="">Foto de perfil seleccionada</span></li><li><span class="check-dot"></span><span data-en="">Hero crop checked</span><span data-es="">Recorte del hero revisado</span></li><li><span class="check-dot warn"></span><span data-en="">License text needs final review</span><span data-es="">Licencia pendiente de revisión final</span></li></ul></div>
+<div class="preview-actions"><button class="btn" id="preview-edit-client" type="button"><span data-en="">Preview client page</span><span data-es="">Previsualizar cliente</span></button><button class="btn"><span data-en="">Duplicate client</span><span data-es="">Duplicar cliente</span></button><button class="btn primary" id="save-edit-client" type="button"><span data-en="">Save client</span><span data-es="">Guardar cliente</span></button></div>
+<p class="row-meta" id="edit-client-status" style="margin-top:12px"></p>
+</div>
+</div>
+<div class="subsection" id="clients-create"><div class="card pad"><h2><span data-en="">Create complete client</span><span data-es="">Crear cliente completo</span></h2><p><span data-en="">Fill identity, credentials, personalised dashboard images, texts and license before publishing the account.</span><span data-es="">Rellena identidad, credenciales, imágenes del dashboard, textos y licencia antes de publicar la cuenta.</span></p><br/><div class="form-grid"><div class="field"><label>Name</label><input id="client-name" placeholder="Antonio Blanco"/></div><div class="field"><label>Client type</label><select id="client-type"><option value="player">Player</option><option value="club">Club</option><option value="agency">Agency</option><option value="personal">Personal</option></select></div><div class="field"><label>Player club / Club category / Agency type</label><input id="client-context" placeholder="Deportivo Alavés / Primera Federación / Editorial agency"/></div><div class="field"><label>Username</label><input id="client-username" placeholder="antonio-blanco"/></div><div class="field"><label>Password created by admin</label><input id="client-password" placeholder="Private-Password-2026" type="password"/></div><div class="field"><label>Preferred language</label><select id="client-language"><option value="en">English</option><option value="es">Spanish</option></select></div><div class="field full"><label>Welcome title ES</label><input id="client-welcome-title-es" placeholder="Antonio, tus galerías privadas están listas"/></div><div class="field full"><label>Welcome title EN</label><input id="client-welcome-title-en" placeholder="Antonio, your private galleries are ready"/></div><div class="field full"><label>Mensaje bienvenida ES</label><textarea id="client-welcome-message-es" placeholder="Mensaje personalizado para el dashboard del cliente..."></textarea></div><div class="field full"><label>Welcome message EN</label><textarea id="client-welcome-message-en" placeholder="Personalised message for the client dashboard..."></textarea></div></div><br/><div class="grid two"><div class="crop-editor"><div class="mini-label">Hero image preview</div><div class="crop-frame hero-shape"><div class="crop-preview" id="client-hero-preview" style="--crop-img:url('img/work_G.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input data-crop="x" id="client-hero-x" max="100" min="0" type="range" value="50"/></label><label>Y<input data-crop="y" id="client-hero-y" max="100" min="0" type="range" value="45"/></label></div><br/><div class="field"><label><span data-en="">Choose hero image</span><span data-es="">Elegir foto hero</span></label><input accept="image/*" data-preview="client-hero-preview" id="client-hero-file" type="file"/></div><p class="row-meta" id="client-hero-file-status">No hero image selected yet.</p></div><div class="crop-editor"><div class="mini-label">Profile circle preview</div><div class="crop-frame profile-shape"><div class="crop-preview" id="client-profile-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input data-crop="x" id="client-profile-x" max="100" min="0" type="range" value="50"/></label><label>Y<input data-crop="y" id="client-profile-y" max="100" min="0" type="range" value="45"/></label></div><br/><div class="field"><label><span data-en="">Choose profile image</span><span data-es="">Elegir foto de perfil</span></label><input accept="image/*" data-preview="client-profile-preview" id="client-profile-file" type="file"/></div><p class="row-meta" id="client-profile-file-status">No profile image selected yet.</p></div></div><div class="divider-line"></div><div class="status-switch"><button class="status-option active"><span data-en="">Save as draft</span><span data-es="">Guardar como borrador</span></button><button class="status-option"><span data-en="">Create and publish</span><span data-es="">Crear y publicar</span></button></div><br/><div class="preview-actions"><button class="btn" id="preview-create-client" type="button"><span data-en="">Preview client page</span><span data-es="">Previsualizar cliente</span></button><button class="btn primary" id="create-client-submit" type="button"><span data-en="">Create client</span><span data-es="">Crear cliente</span></button></div><p class="row-meta" id="client-create-status" style="margin-top:12px"></p></div></div>
+</section>
+<section class="section" id="galleries">
+<div class="hero" style="--hero-img:url('img/work_B.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Galleries</span><span data-es="">Galerías</span></div><h1><span data-en="">Gallery <em>control</em></span><span data-es="">Control de <em>galerías</em></span></h1><p><span data-en="">Create, assign, edit, upload and publish every private delivery.</span><span data-es="">Crea, asigna, edita, sube y publica cada entrega privada.</span></p></div></div></div>
+<div class="tabs"><button class="tab active" data-tab="gallery-list"><span data-en="">Gallery list</span><span data-es="">Lista de galerías</span></button><button class="tab" data-tab="gallery-create"><span data-en="">Create gallery</span><span data-es="">Crear galería</span></button></div>
+<div class="subsection active" id="gallery-list">
+<p class="row-meta" id="galleries-sync-status" style="margin:0 0 12px 0">Loading Supabase galleries...</p>
+<div class="list" id="galleries-list-render">
+<div class="list-row"><img alt="" class="thumb" src="img/work_A.jpg"/><div><div class="row-title">Loading galleries...</div><div class="row-meta">Connecting to Supabase</div></div></div>
+</div>
+<div class="card pad" id="edit-gallery" style="display:none;margin-top:18px">
+<h2><span data-en="">Edit complete gallery</span><span data-es="">Editar galería completa</span></h2>
+<p><span data-en="">Everything that appears in the client gallery can be edited here: clients, texts, cover, status, metadata and permissions.</span><span data-es="">Aquí puedes editar todo lo que aparece en la galería del cliente: clientes, textos, portada, estado, metadatos y permisos.</span></p>
+<input id="edit-gallery-id" type="hidden"/>
+<input id="edit-gallery-current-cover-url" type="hidden"/>
+<br/>
+<div class="editor-grid">
+<div>
+<div class="form-grid">
+<div class="field"><label><span data-en="">Title ES</span><span data-es="">Título ES</span></label><input id="edit-gallery-title-es"/></div>
+<div class="field"><label><span data-en="">Title EN</span><span data-es="">Título EN</span></label><input id="edit-gallery-title-en"/></div>
+<div class="field"><label><span data-en="">Date</span><span data-es="">Fecha</span></label><input id="edit-gallery-date" type="date"/></div>
+<div class="field"><label><span data-en="">Location</span><span data-es="">Lugar</span></label><input id="edit-gallery-location"/></div>
+<div class="field"><label><span data-en="">Status</span><span data-es="">Estado</span></label><select id="edit-gallery-status"><option value="created">Created / Creada</option><option value="in_progress">In progress / En proceso</option><option value="ready">Ready / Lista</option><option value="archived">Archived / Archivada</option></select></div>
+<div class="field"><label><span data-en="">Visibility</span><span data-es="">Visibilidad</span></label><select id="edit-gallery-publish-status"><option value="draft">Draft / Borrador</option><option value="published">Published / Publicada</option></select></div>
+<div class="field full"><label><span data-en="">Assigned clients</span><span data-es="">Clientes asignados</span></label><div class="selector-list" id="edit-gallery-client-picker"><div class="row-meta">Loading registered clients...</div></div></div>
+<div class="field full"><label><span data-en="">Gallery note ES</span><span data-es="">Nota de galería ES</span></label><textarea id="edit-gallery-note-es"></textarea></div>
+<div class="field full"><label><span data-en="">Gallery note EN</span><span data-es="">Nota de galería EN</span></label><textarea id="edit-gallery-note-en"></textarea></div>
+<div class="field full"><label><span data-en="">Internal gallery notes</span><span data-es="">Notas internas de galería</span></label><textarea id="edit-gallery-internal-notes"></textarea></div>
+</div>
+</div>
+<div>
+<div class="crop-editor">
+<div class="mini-label"><span data-en="">Cover image manual crop</span><span data-es="">Recorte manual de portada</span></div>
+<div class="crop-frame cover-shape"><div class="crop-preview" id="edit-gallery-cover-preview" style="--crop-img:url('img/work_A.jpg')"></div><div class="crop-hint"></div></div>
+<div class="range-row"><label>X<input data-crop="x" id="edit-gallery-cover-x" max="100" min="0" type="range" value="50"/></label><label>Y<input data-crop="y" id="edit-gallery-cover-y" max="100" min="0" type="range" value="50"/></label></div>
+<br/>
+<div class="field"><label><span data-en="">Replace cover image</span><span data-es="">Reemplazar portada</span></label><input accept="image/*" data-preview="edit-gallery-cover-preview" id="edit-gallery-cover-file" type="file"/></div>
+<p class="row-meta" id="edit-gallery-cover-file-status">Current cover loaded. Choose a new image only if you want to replace it.</p>
+</div>
+</div>
+</div>
+<div class="divider-line"></div>
+<div class="grid two">
+<div class="compact-panel"><h4><span data-en="">Gallery publication checklist</span><span data-es="">Checklist de publicación de galería</span></h4><ul><li><span class="check-dot"></span><span data-en="">Clients assigned</span><span data-es="">Clientes asignados</span></li><li><span class="check-dot"></span><span data-en="">Cover image selected</span><span data-es="">Portada seleccionada</span></li><li><span class="check-dot warn"></span><span data-en="">Photos uploaded</span><span data-es="">Fotos subidas</span></li></ul></div>
+<div class="compact-panel"><h4><span data-en="">Photo order</span><span data-es="">Orden de fotos</span></h4><p class="row-meta"><span data-en="">The uploaded photos will appear below after saving. Ordering is stored in Supabase.</span><span data-es="">Las fotos subidas aparecerán abajo después de guardar. El orden se guarda en Supabase.</span></p><div class="gallery-order" id="edit-gallery-photo-order"></div></div>
+</div>
+<div class="preview-actions"><button class="btn" id="preview-edit-gallery"><span data-en="">Preview gallery</span><span data-es="">Previsualizar galería</span></button><button class="btn"><span data-en="">Duplicate gallery</span><span data-es="">Duplicar galería</span></button><button class="btn primary" id="save-edit-gallery"><span data-en="">Save gallery</span><span data-es="">Guardar galería</span></button></div>
+<p class="row-meta" id="edit-gallery-status-msg" style="margin-top:12px"></p>
+</div>
+<div class="card pad" id="upload-gallery" style="display:none;margin-top:18px">
+<h2><span data-en="">Upload gallery photos</span><span data-es="">Subir fotos de galería</span></h2>
+<p class="row-meta"><span data-en="">Select a gallery, choose several JPG/PNG/WebP files and upload them to Supabase Storage. The photos will be linked to the selected gallery automatically.</span><span data-es="">Selecciona una galería, elige varios JPG/PNG/WebP y súbelos a Supabase Storage. Las fotos se vincularán automáticamente a la galería elegida.</span></p>
+<br/>
+<div class="form-grid">
+<div class="field full"><label><span data-en="">Gallery</span><span data-es="">Galería</span></label><select id="upload-gallery-id"><option value="">Select a gallery / Selecciona una galería</option></select></div>
+<div class="field full"><label><span data-en="">Photo files</span><span data-es="">Archivos de foto</span></label><input accept="image/*" id="gallery-photo-files" multiple="" type="file"/></div>
+<div class="field"><label><span data-en="">Default location</span><span data-es="">Lugar por defecto</span></label><input id="upload-photo-location" placeholder="Mendizorrotza, Vitoria-Gasteiz"/></div>
+<div class="field"><label><span data-en="">Default date</span><span data-es="">Fecha por defecto</span></label><input id="upload-photo-date" type="date"/></div>
+</div>
+<br/>
+<div class="grid three">
+<div class="upload-box"><strong>Original</strong><span data-en="">The uploaded file is saved as original for now.</span><span data-es="">El archivo subido se guarda como original por ahora.</span></div>
+<div class="upload-box"><strong>Large · future</strong><span data-en="">Automatic 3000px versions will be generated later.</span><span data-es="">Las versiones 3000px automáticas se generarán más adelante.</span></div>
+<div class="upload-box"><strong>Preview · future</strong><span data-en="">Automatic preview versions will be generated later.</span><span data-es="">Las versiones preview automáticas se generarán más adelante.</span></div>
+</div>
+<br/>
+<button class="btn primary" id="upload-gallery-photos-submit"><span data-en="">Upload photos</span><span data-es="">Subir fotos</span></button>
+<p class="row-meta" id="upload-gallery-status" style="margin-top:12px"></p>
+<div class="gallery-order" id="upload-gallery-preview" style="margin-top:16px"></div>
+</div>
+</div></section><section class="section" id="calendar"><div class="hero" style="--hero-img:url('img/work_H.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Calendar</span><span data-es="">Calendario</span></div><h1><span data-en="">Upcoming <em>coverage</em></span><span data-es="">Próximas <em>coberturas</em></span></h1><p><span data-en="">Plan future events, assign coverage and track their status.</span><span data-es="">Planifica eventos futuros, asigna coberturas y controla su estado.</span></p></div><button class="btn primary"><span data-en="">Add event</span><span data-es="">Añadir evento</span></button></div></div><div class="calendar-wrap"><div class="card pad"><div class="calendar-head"><h2><span data-en="">June 2026</span><span data-es="">Junio 2026</span></h2><div class="row-actions"><button class="btn"><span data-en="">Previous</span><span data-es="">Anterior</span></button><button class="btn"><span data-en="">Next</span><span data-es="">Siguiente</span></button></div></div><div class="calendar-grid"><div class="day-name"><span data-en="">Mon</span><span data-es="">Lun</span></div><div class="day-name"><span data-en="">Tue</span><span data-es="">Mar</span></div><div class="day-name"><span data-en="">Wed</span><span data-es="">Mié</span></div><div class="day-name"><span data-en="">Thu</span><span data-es="">Jue</span></div><div class="day-name"><span data-en="">Fri</span><span data-es="">Vie</span></div><div class="day-name"><span data-en="">Sat</span><span data-es="">Sáb</span></div><div class="day-name"><span data-en="">Sun</span><span data-es="">Dom</span></div>
+<div class="day past"><span class="day-num">1</span></div><div class="day past"><span class="day-num">2</span></div><div class="day past"><span class="day-num">3</span></div><div class="day past"><span class="day-num">4</span></div><div class="day past"><span class="day-num">5</span></div><div class="day past"><span class="day-num">6</span></div><div class="day today"><span class="day-num">7</span><div class="event-chip yellow"><span data-en="">Confirmed · San Mamés</span><span data-es="">Confirmado · San Mamés</span></div></div><div class="day"><span class="day-num">8</span></div><div class="day"><span class="day-num">9</span></div><div class="day"><span class="day-num">10</span></div><div class="day"><span class="day-num">11</span></div><div class="day"><span class="day-num">12</span></div><div class="day"><span class="day-num">13</span><div class="event-chip green"><span data-en="">Finished · Agency</span><span data-es="">Finalizado · Agencia</span></div></div><div class="day"><span class="day-num">14</span></div><div class="day"><span class="day-num">15</span></div><div class="day"><span class="day-num">16</span></div><div class="day"><span class="day-num">17</span></div><div class="day"><span class="day-num">18</span></div><div class="day"><span class="day-num">19</span></div><div class="day"><span class="day-num">20</span></div><div class="day"><span class="day-num">21</span><div class="event-chip red"><span data-en="">Pending · TBC</span><span data-es="">Pendiente · Por confirmar</span></div></div></div></div><div class="card pad"><h2><span data-en="">Event details</span><span data-es="">Detalles del evento</span></h2><div class="form-grid" style="grid-template-columns:1fr"><div class="field"><label><span data-en="">Event title</span><span data-es="">Título del evento</span></label><input value="Athletic Club vs Real Sociedad"/></div><div class="field"><label><span data-en="">Photographer</span><span data-es="">Fotógrafo</span></label><select><option>Ibai Tudanca</option><option>External photographer</option></select></div><div class="field"><label><span data-en="">Status</span><span data-es="">Estado</span></label><select><option>Pending / Pendiente</option><option selected="">Confirmed / Confirmado</option><option>In coverage / En cobertura</option><option>Finished / Finalizado</option><option>Cancelled / Cancelado</option></select></div><div class="field"><label><span data-en="">Notes</span><span data-es="">Notas</span></label><textarea>Arrive 90 minutes before kick-off. Ethernet position requested.</textarea></div></div></div></div></section><section class="section" id="requests"><div class="hero" style="--hero-img:url('img/work_D.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Retouch requests</span><span data-es="">Solicitudes de retoque</span></div><h1><span data-en="">Client <em>requests</em></span><span data-es="">Retoques de <em>clientes</em></span></h1><p><span data-en="">Review requested edits and replace final images from here.</span><span data-es="">Revisa retoques solicitados y reemplaza imágenes finales desde aquí.</span></p></div></div></div><div class="list"><div class="list-row"><img class="thumb" src="img/work_A.jpg"/><div><div class="row-title">IMG_240526_014 · Antonio Blanco</div><div class="row-meta">Alavés vs Rayo · <span data-en="">Crop for Instagram vertical</span><span data-es="">Recorte vertical para Instagram</span></div></div><div class="row-actions"><button class="btn"><span data-en="">Replace image</span><span data-es="">Reemplazar imagen</span></button><button class="btn primary"><span data-en="">Complete</span><span data-es="">Completar</span></button></div></div></div></section><section class="section" id="downloads"><div class="hero" style="--hero-img:url('img/work_M.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Downloads</span><span data-es="">Descargas</span></div><h1><span data-en="">Delivery <em>activity</em></span><span data-es="">Actividad de <em>entregas</em></span></h1><p><span data-en="">Track who downloads, what they download and which size they choose.</span><span data-es="">Controla quién descarga, qué descarga y qué tamaño elige.</span></p></div></div></div><div class="list"><div class="list-row"><img class="avatar" src="img/IMG_IBAI.jpg"/><div><div class="row-title">Antonio Blanco · 24 photos</div><div class="row-meta">Alavés vs Rayo · Selected photos · 3000×2000 · Today 13:42</div></div><div class="pill"><span data-en="">Selected</span><span data-es="">Seleccionadas</span></div></div><div class="list-row"><img class="avatar" src="img/work_P.jpg"/><div><div class="row-title">Quality Sport Images · 148 photos</div><div class="row-meta">Full gallery · 6000×4000 · Yesterday 21:06</div></div><div class="pill"><span data-en="">Full gallery</span><span data-es="">Galería completa</span></div></div></div></section><section class="section" id="admins">
+<div class="hero" style="--hero-img:url('img/work_N.JPG')">
+<div class="hero-inner">
+<div>
+<div class="eyebrow"><span data-en="">Administrators</span><span data-es="">Administradores</span></div>
+<h1><span data-en="">Admin <em>access</em></span><span data-es="">Acceso de <em>administradores</em></span></h1>
+<p><span data-en="">Create, edit and manage the people allowed to enter the private administration panel.</span><span data-es="">Crea, edita y gestiona las personas que pueden entrar al panel privado de administración.</span></p>
+</div>
+</div>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="admins-list"><span data-en="">Admin list</span><span data-es="">Lista de administradores</span></button>
+<button class="tab" data-tab="admin-create"><span data-en="">Create admin</span><span data-es="">Crear administrador</span></button>
+</div>
+<div class="subsection active" id="admins-list">
+<p class="row-meta" id="admins-sync-status" style="margin:10px 0 14px"></p>
+<div class="list" id="admins-list-render"></div>
+<div class="card pad admin-edit-panel" id="edit-admin" style="display:none">
+<div class="section-title" style="margin-top:0">
+<div>
+<h2><span data-en="">Edit administrator</span><span data-es="">Editar administrador</span></h2>
+<p><span data-en="">Change username, name, role, password and profile image. The profile image appears in the admin panel welcome area.</span><span data-es="">Cambia usuario, nombre, rol, contraseña y foto de perfil. La foto aparece en la bienvenida del panel admin.</span></p>
+</div>
+</div>
+<input id="edit-admin-id" type="hidden"/>
+<input id="edit-admin-current-profile-url" type="hidden"/>
+<div class="admin-section-grid">
+<div class="form-grid">
+<div class="field"><label><span data-en="">Admin name</span><span data-es="">Nombre administrador</span></label><input id="edit-admin-name" placeholder="Ibai Tudanca"/></div>
+<div class="field"><label><span data-en="">Username</span><span data-es="">Usuario</span></label><input id="edit-admin-username" placeholder="ibai-admin"/></div>
+<div class="field"><label><span data-en="">New password</span><span data-es="">Nueva contraseña</span></label><input id="edit-admin-password" placeholder="Leave empty to keep current password" type="password"/></div>
+<div class="field"><label><span data-en="">Role</span><span data-es="">Rol</span></label><select id="edit-admin-role"><option value="owner">Owner / Propietario</option><option value="editor">Editor / Editor</option></select></div>
+<div class="field"><label><span data-en="">Status</span><span data-es="">Estado</span></label><select id="edit-admin-active"><option value="true">Active / Activo</option><option value="false">Inactive / Inactivo</option></select></div>
+</div>
+<div class="crop-editor">
+<div class="mini-label"><span data-en="">Admin profile image</span><span data-es="">Foto de perfil admin</span></div>
+<div class="crop-frame profile-shape"><div class="crop-preview" id="edit-admin-profile-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
+<br/>
+<div class="field"><label><span data-en="">Choose profile image</span><span data-es="">Elegir foto de perfil</span></label><input accept="image/*" data-preview="edit-admin-profile-preview" id="edit-admin-profile-file" type="file"/></div>
+<p class="row-meta" id="edit-admin-profile-file-status">No new image selected.</p>
+</div>
+</div>
+<div class="divider-line"></div>
+<button class="btn primary" id="save-edit-admin" type="button"><span data-en="">Save administrator</span><span data-es="">Guardar administrador</span></button>
+<p class="row-meta" id="edit-admin-status" style="margin-top:12px"></p>
+</div>
+</div>
+<div class="subsection" id="admin-create">
+<div class="card pad">
+<div class="admin-lock-note"><span data-en="">Only create administrator accounts for people you fully trust. Administrators can manage clients, galleries and private delivery information.</span><span data-es="">Crea cuentas de administrador solo para personas de total confianza. Los administradores pueden gestionar clientes, galerías e información privada de entregas.</span></div>
+<div class="admin-section-grid">
+<div class="form-grid">
+<div class="field"><label><span data-en="">Admin name</span><span data-es="">Nombre administrador</span></label><input id="admin-name" placeholder="Ibai Tudanca"/></div>
+<div class="field"><label><span data-en="">Username</span><span data-es="">Usuario</span></label><input id="admin-username" placeholder="ibai-admin"/></div>
+<div class="field"><label><span data-en="">Password created by you</span><span data-es="">Contraseña creada por ti</span></label><input id="admin-password" placeholder="••••••••" type="password"/></div>
+<div class="field"><label><span data-en="">Role</span><span data-es="">Rol</span></label><select id="admin-role"><option value="owner">Owner / Propietario</option><option value="editor">Editor / Editor</option></select></div>
+</div>
+<div class="crop-editor">
+<div class="mini-label"><span data-en="">Admin profile image</span><span data-es="">Foto de perfil admin</span></div>
+<div class="crop-frame profile-shape"><div class="crop-preview" id="admin-profile-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
+<br/>
+<div class="field"><label><span data-en="">Choose profile image</span><span data-es="">Elegir foto de perfil</span></label><input accept="image/*" data-preview="admin-profile-preview" id="admin-profile-file" type="file"/></div>
+<p class="row-meta" id="admin-profile-file-status">No image selected yet.</p>
+</div>
+</div>
+<br/>
+<button class="btn primary" id="create-admin-submit"><span data-en="">Create administrator</span><span data-es="">Crear administrador</span></button>
+<p class="row-meta" id="admin-create-status" style="margin-top:12px"></p>
+</div>
+</div>
+</section><section class="section" id="settings"><div class="hero" style="--hero-img:url('img/work_Q.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en="">Settings</span><span data-es="">Ajustes</span></div><h1><span data-en="">System <em>defaults</em></span><span data-es="">Ajustes <em>base</em></span></h1><p><span data-en="">Default texts, license templates, sizes and contact details.</span><span data-es="">Textos por defecto, licencias, tamaños y datos de contacto.</span></p></div></div></div><div class="card pad"><div class="form-grid"><div class="field"><label>Default sizes</label><input value="6000x4000, 3000x2000, 1600x1067"/></div><div class="field"><label>Contact email</label><input value="ibaituda1999@gmail.com"/></div><div class="field full"><label>Default license EN</label><textarea>Images are licensed only to the assigned client account. Third-party commercial use requires written permission.</textarea></div><div class="field full"><label>Licencia por defecto ES</label><textarea>Las imágenes están licenciadas únicamente para la cuenta de cliente asignada. El uso comercial por terceros requiere autorización escrita.</textarea></div></div><br/><button class="btn primary"><span data-en="">Save settings</span><span data-es="">Guardar ajustes</span></button></div></section></div>
+<div class="subsection" id="gallery-create"><div class="card pad"><h2><span data-en="">Create full gallery</span><span data-es="">Crear galería completa</span></h2><p><span data-en="">First assign one or several clients, then create the gallery with all visual and functional options.</span><span data-es="">Primero asigna uno o varios clientes, después crea la galería con todas las opciones visuales y funcionales.</span></p><br/><div class="form-grid"><div class="field full"><label><span data-en="">Assign registered clients</span><span data-es="">Asignar clientes registrados</span></label><div class="selector-list" id="gallery-client-picker"><div class="row-meta">Loading registered clients...</div></div><p class="row-meta" style="margin-top:6px"><span data-en="">Select one or several clients. No typing usernames.</span><span data-es="">Selecciona uno o varios clientes. No escribas nombres manualmente.</span></p></div><div class="field"><label>Gallery title ES</label><input id="gallery-title-es" placeholder="Alavés vs Rayo Vallecano"/></div><div class="field"><label>Gallery title EN</label><input id="gallery-title-en" placeholder="Alavés vs Rayo Vallecano"/></div><div class="field"><label>Event date</label><input id="gallery-event-date" type="date"/></div><div class="field"><label>Location</label><input id="gallery-location" placeholder="Mendizorrotza, Vitoria-Gasteiz"/></div><div class="field"><label>Status</label><select id="gallery-status"><option value="created">Created / Creada</option><option value="in_progress">In progress / En proceso</option><option value="ready">Ready / Lista</option></select></div><div class="field full"><label>Gallery note ES</label><textarea id="gallery-note-es"></textarea></div><div class="field full"><label>Gallery note EN</label><textarea id="gallery-note-en"></textarea></div></div><br/><div class="grid two"><div class="crop-editor"><div class="mini-label">Cover image preview</div><div class="crop-frame cover-shape"><div class="crop-preview" id="gallery-cover-preview" style="--crop-img:url('img/work_L.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input data-crop="x" id="gallery-cover-x" max="100" min="0" type="range" value="50"/></label><label>Y<input data-crop="y" id="gallery-cover-y" max="100" min="0" type="range" value="50"/></label></div><br/><div class="field"><label><span data-en="">Choose gallery cover</span><span data-es="">Elegir portada de galería</span></label><input accept="image/*" data-preview="gallery-cover-preview" id="gallery-cover-file" type="file"/></div><p class="row-meta" id="gallery-cover-file-status">No gallery cover selected yet.</p></div><div class="upload-box"><strong><span data-en="">Gallery photos come next</span><span data-es="">Las fotos de la galería vienen después</span></strong><span data-en="">This step stores the cover image. Bulk photo upload will be connected after covers work perfectly.</span><span data-es="">Este paso guarda la portada. La subida masiva de fotos se conectará cuando las portadas funcionen perfecto.</span></div></div><div class="divider-line"></div><div class="status-switch"><button class="status-option active" id="gallery-save-draft" type="button"><span data-en="">Save as draft</span><span data-es="">Guardar como borrador</span></button><button class="status-option" id="gallery-publish" type="button"><span data-en="">Create and publish</span><span data-es="">Crear y publicar</span></button></div><br/><button class="btn primary" id="create-gallery-submit"><span data-en="">Create gallery</span><span data-es="">Crear galería</span></button><p class="row-meta" id="gallery-create-status" style="margin-top:12px"></p></div></div>
 
-      <section id="clients" class="section">
-        <div class="hero" style="--hero-img:url('img/work_F.JPG')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Clients</span><span data-es>Clientes</span></div><h1><span data-en>Client <em>management</em></span><span data-es>Gestión de <em>clientes</em></span></h1><p><span data-en>Only two workflows: view existing clients or create a complete client experience from scratch.</span><span data-es>Solo dos flujos: ver clientes existentes o crear una experiencia completa desde cero.</span></p></div></div></div>
-        <div class="tabs"><button class="tab active" data-tab="clients-list"><span data-en>Client list</span><span data-es>Lista de clientes</span></button><button class="tab" data-tab="clients-create"><span data-en>Create client</span><span data-es>Crear cliente</span></button></div>
-        <div id="clients-list" class="subsection active">
-          <p id="clients-sync-status" class="row-meta" style="margin:0 0 12px 0">Loading Supabase clients...</p>
-          <div class="list" id="clients-list-render">
-            <div class="list-row"><img class="avatar" src="img/IMG_IBAI.jpg" alt=""><div><div class="row-title">Antonio Blanco</div><div class="row-meta">Player · Deportivo Alavés · 3 galleries · antonio@example.com</div></div><div class="row-actions"><button class="btn" data-open="edit-client"><span data-en>Edit client</span><span data-es>Editar cliente</span></button><button class="btn"><span data-en>Change password</span><span data-es>Cambiar contraseña</span></button><button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button></div></div>
-            <div class="list-row"><img class="avatar" src="img/work_P.jpg" alt=""><div><div class="row-title">Quality Sport Images</div><div class="row-meta">Agency · Editorial coverage · 12 galleries</div></div><div class="row-actions"><button class="btn" data-open="edit-client"><span data-en>Edit client</span><span data-es>Editar cliente</span></button><button class="btn"><span data-en>Change password</span><span data-es>Cambiar contraseña</span></button><button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button></div></div>
-          </div>
-          <div id="edit-client" class="card pad" style="display:none;margin-top:18px">
-            <div class="section-title" style="margin-top:0">
-              <div>
-                <h2><span data-en>Edit full client page</span><span data-es>Editar página completa del cliente</span></h2>
-                <p><span data-en>Everything visible in the client dashboard can be edited here: identity, password, texts, hero image, profile image and visual crop.</span><span data-es>Todo lo visible en el dashboard del cliente se edita aquí: identidad, contraseña, textos, hero, foto de perfil y recorte visual.</span></p>
-              </div>
-            </div>
-            <input type="hidden" id="edit-client-id">
-            <input type="hidden" id="edit-client-current-profile-url">
-            <input type="hidden" id="edit-client-current-hero-url">
-            <div class="editor-grid">
-              <div class="form-grid">
-                <div class="field"><label>Client name</label><input id="edit-client-name" placeholder="Antonio Blanco"></div>
-                <div class="field"><label>Type</label><select id="edit-client-type"><option value="player">Player</option><option value="club">Club</option><option value="agency">Agency</option><option value="personal">Personal</option></select></div>
-                <div class="field"><label>Club / League / Country</label><input id="edit-client-context" placeholder="Deportivo Alavés · LaLiga · Spain"></div>
-                <div class="field"><label>Username</label><input id="edit-client-username" placeholder="antonio-blanco"></div>
-                <div class="field"><label>New password</label><input id="edit-client-password" type="password" placeholder="Leave empty to keep current password"></div>
-                <div class="field"><label>Preferred language</label><select id="edit-client-language"><option value="en">English</option><option value="es">Spanish</option></select></div>
-                <div class="field"><label>Visibility</label><select id="edit-client-publish-status"><option value="draft">Draft / Borrador</option><option value="published">Published / Publicado</option></select></div>
-                <div class="field full"><label>Welcome title EN</label><input id="edit-client-welcome-title-en" placeholder="Antonio, your private galleries are ready"></div>
-                <div class="field full"><label>Título bienvenida ES</label><input id="edit-client-welcome-title-es" placeholder="Antonio, tus galerías privadas están listas"></div>
-                <div class="field full"><label>Welcome message EN</label><textarea id="edit-client-welcome-message-en" placeholder="Personalised message for the client dashboard..."></textarea></div>
-                <div class="field full"><label>Mensaje bienvenida ES</label><textarea id="edit-client-welcome-message-es" placeholder="Mensaje personalizado para el dashboard del cliente..."></textarea></div>
-                <div class="field full"><label>License EN</label><textarea id="edit-client-license-en" placeholder="Licensed for client use. Third-party usage requires written permission."></textarea></div>
-                <div class="field full"><label>Licencia ES</label><textarea id="edit-client-license-es" placeholder="Licencia para uso del cliente. El uso por terceros requiere autorización escrita."></textarea></div>
-                <div class="field full"><label>Internal notes</label><textarea id="edit-client-internal-notes" placeholder="Private notes only visible to admin..."></textarea></div>
-              </div>
-              <div>
-                <div class="crop-editor">
-                  <div class="mini-label">Hero image visual crop</div>
-                  <div class="crop-frame hero-shape"><div id="edit-client-hero-preview" class="crop-preview" style="--crop-img:url('img/work_A.jpg')"></div><div class="crop-hint"></div></div>
-                  <div class="range-row"><label>X position<input id="edit-client-hero-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y position<input id="edit-client-hero-y" type="range" min="0" max="100" value="45" data-crop="y"></label></div>
-                  <br><div class="field"><label><span data-en>Change hero image</span><span data-es>Cambiar foto hero</span></label><input id="edit-client-hero-file" type="file" accept="image/*" data-preview="edit-client-hero-preview"></div><p class="row-meta" id="edit-client-hero-file-status">No new hero image selected.</p>
-                </div>
-                <br>
-                <div class="crop-editor">
-                  <div class="mini-label">Profile circle crop</div>
-                  <div class="crop-frame profile-shape"><div id="edit-client-profile-preview" class="crop-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
-                  <div class="range-row"><label>X<input id="edit-client-profile-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y<input id="edit-client-profile-y" type="range" min="0" max="100" value="45" data-crop="y"></label></div>
-                  <br><div class="field"><label><span data-en>Change profile image</span><span data-es>Cambiar foto de perfil</span></label><input id="edit-client-profile-file" type="file" accept="image/*" data-preview="edit-client-profile-preview"></div><p class="row-meta" id="edit-client-profile-file-status">No new profile image selected.</p>
-                </div>
-              </div>
-            </div>
-            <div class="divider-line"></div>
-            <div class="compact-panel"><h4><span data-en>Client publication checklist</span><span data-es>Checklist de publicación del cliente</span></h4><ul><li><span class="check-dot"></span><span data-en>Profile image selected</span><span data-es>Foto de perfil seleccionada</span></li><li><span class="check-dot"></span><span data-en>Hero crop checked</span><span data-es>Recorte del hero revisado</span></li><li><span class="check-dot warn"></span><span data-en>License text needs final review</span><span data-es>Licencia pendiente de revisión final</span></li></ul></div>
-            <div class="preview-actions"><button class="btn" id="preview-edit-client" type="button"><span data-en>Preview client page</span><span data-es>Previsualizar cliente</span></button><button class="btn"><span data-en>Duplicate client</span><span data-es>Duplicar cliente</span></button><button class="btn primary" id="save-edit-client" type="button"><span data-en>Save client</span><span data-es>Guardar cliente</span></button></div>
-            <p id="edit-client-status" class="row-meta" style="margin-top:12px"></p>
-          </div>
-        </div>
-        <div id="clients-create" class="subsection"><div class="card pad"><h2><span data-en>Create complete client</span><span data-es>Crear cliente completo</span></h2><p><span data-en>Fill identity, credentials, personalised dashboard images, texts and license before publishing the account.</span><span data-es>Rellena identidad, credenciales, imágenes del dashboard, textos y licencia antes de publicar la cuenta.</span></p><br><div class="form-grid"><div class="field"><label>Name</label><input id="client-name" placeholder="Antonio Blanco"></div><div class="field"><label>Client type</label><select id="client-type"><option value="player">Player</option><option value="club">Club</option><option value="agency">Agency</option><option value="personal">Personal</option></select></div><div class="field"><label>Player club / Club category / Agency type</label><input id="client-context" placeholder="Deportivo Alavés / Primera Federación / Editorial agency"></div><div class="field"><label>Username</label><input id="client-username" placeholder="antonio-blanco"></div><div class="field"><label>Password created by admin</label><input id="client-password" type="password" placeholder="Private-Password-2026"></div><div class="field"><label>Preferred language</label><select id="client-language"><option value="en">English</option><option value="es">Spanish</option></select></div><div class="field full"><label>Welcome title ES</label><input id="client-welcome-title-es" placeholder="Antonio, tus galerías privadas están listas"></div><div class="field full"><label>Welcome title EN</label><input id="client-welcome-title-en" placeholder="Antonio, your private galleries are ready"></div><div class="field full"><label>Mensaje bienvenida ES</label><textarea id="client-welcome-message-es" placeholder="Mensaje personalizado para el dashboard del cliente..."></textarea></div><div class="field full"><label>Welcome message EN</label><textarea id="client-welcome-message-en" placeholder="Personalised message for the client dashboard..."></textarea></div></div><br><div class="grid two"><div class="crop-editor"><div class="mini-label">Hero image preview</div><div class="crop-frame hero-shape"><div id="client-hero-preview" class="crop-preview" style="--crop-img:url('img/work_G.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input id="client-hero-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y<input id="client-hero-y" type="range" min="0" max="100" value="45" data-crop="y"></label></div><br><div class="field"><label><span data-en>Choose hero image</span><span data-es>Elegir foto hero</span></label><input id="client-hero-file" type="file" accept="image/*" data-preview="client-hero-preview"></div><p class="row-meta" id="client-hero-file-status">No hero image selected yet.</p></div><div class="crop-editor"><div class="mini-label">Profile circle preview</div><div class="crop-frame profile-shape"><div id="client-profile-preview" class="crop-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input id="client-profile-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y<input id="client-profile-y" type="range" min="0" max="100" value="45" data-crop="y"></label></div><br><div class="field"><label><span data-en>Choose profile image</span><span data-es>Elegir foto de perfil</span></label><input id="client-profile-file" type="file" accept="image/*" data-preview="client-profile-preview"></div><p class="row-meta" id="client-profile-file-status">No profile image selected yet.</p></div></div><div class="divider-line"></div><div class="status-switch"><button class="status-option active"><span data-en>Save as draft</span><span data-es>Guardar como borrador</span></button><button class="status-option"><span data-en>Create and publish</span><span data-es>Crear y publicar</span></button></div><br><div class="preview-actions"><button class="btn" id="preview-create-client" type="button"><span data-en>Preview client page</span><span data-es>Previsualizar cliente</span></button><button class="btn primary" id="create-client-submit" type="button"><span data-en>Create client</span><span data-es>Crear cliente</span></button></div><p id="client-create-status" class="row-meta" style="margin-top:12px"></p></div></div>
-      </section>
 
-      <section id="galleries" class="section">
-        <div class="hero" style="--hero-img:url('img/work_B.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Galleries</span><span data-es>Galerías</span></div><h1><span data-en>Gallery <em>control</em></span><span data-es>Control de <em>galerías</em></span></h1><p><span data-en>Create, assign, edit, upload and publish every private delivery.</span><span data-es>Crea, asigna, edita, sube y publica cada entrega privada.</span></p></div></div></div>
-        <div class="tabs"><button class="tab active" data-tab="gallery-list"><span data-en>Gallery list</span><span data-es>Lista de galerías</span></button><button class="tab" data-tab="gallery-create"><span data-en>Create gallery</span><span data-es>Crear galería</span></button></div>
-        <div id="gallery-list" class="subsection active">
-          <p id="galleries-sync-status" class="row-meta" style="margin:0 0 12px 0">Loading Supabase galleries...</p>
-          <div class="list" id="galleries-list-render">
-            <div class="list-row"><img class="thumb" src="img/work_A.jpg" alt=""><div><div class="row-title">Loading galleries...</div><div class="row-meta">Connecting to Supabase</div></div></div>
-          </div>
-          <div id="edit-gallery" class="card pad" style="display:none;margin-top:18px">
-            <h2><span data-en>Edit complete gallery</span><span data-es>Editar galería completa</span></h2>
-            <p><span data-en>Everything that appears in the client gallery can be edited here: clients, texts, cover, status, metadata and permissions.</span><span data-es>Aquí puedes editar todo lo que aparece en la galería del cliente: clientes, textos, portada, estado, metadatos y permisos.</span></p>
-            <input id="edit-gallery-id" type="hidden">
-            <input id="edit-gallery-current-cover-url" type="hidden">
-            <br>
-            <div class="editor-grid">
-              <div>
-                <div class="form-grid">
-                  <div class="field"><label><span data-en>Title ES</span><span data-es>Título ES</span></label><input id="edit-gallery-title-es"></div>
-                  <div class="field"><label><span data-en>Title EN</span><span data-es>Título EN</span></label><input id="edit-gallery-title-en"></div>
-                  <div class="field"><label><span data-en>Date</span><span data-es>Fecha</span></label><input id="edit-gallery-date" type="date"></div>
-                  <div class="field"><label><span data-en>Location</span><span data-es>Lugar</span></label><input id="edit-gallery-location"></div>
-                  <div class="field"><label><span data-en>Status</span><span data-es>Estado</span></label><select id="edit-gallery-status"><option value="created">Created / Creada</option><option value="in_progress">In progress / En proceso</option><option value="ready">Ready / Lista</option><option value="archived">Archived / Archivada</option></select></div>
-                  <div class="field"><label><span data-en>Visibility</span><span data-es>Visibilidad</span></label><select id="edit-gallery-publish-status"><option value="draft">Draft / Borrador</option><option value="published">Published / Publicada</option></select></div>
-                  <div class="field full"><label><span data-en>Assigned clients</span><span data-es>Clientes asignados</span></label><div id="edit-gallery-client-picker" class="selector-list"><div class="row-meta">Loading registered clients...</div></div></div>
-                  <div class="field full"><label><span data-en>Gallery note ES</span><span data-es>Nota de galería ES</span></label><textarea id="edit-gallery-note-es"></textarea></div>
-                  <div class="field full"><label><span data-en>Gallery note EN</span><span data-es>Nota de galería EN</span></label><textarea id="edit-gallery-note-en"></textarea></div>
-                  <div class="field full"><label><span data-en>Internal gallery notes</span><span data-es>Notas internas de galería</span></label><textarea id="edit-gallery-internal-notes"></textarea></div>
-                </div>
-              </div>
-              <div>
-                <div class="crop-editor">
-                  <div class="mini-label"><span data-en>Cover image manual crop</span><span data-es>Recorte manual de portada</span></div>
-                  <div class="crop-frame cover-shape"><div id="edit-gallery-cover-preview" class="crop-preview" style="--crop-img:url('img/work_A.jpg')"></div><div class="crop-hint"></div></div>
-                  <div class="range-row"><label>X<input id="edit-gallery-cover-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y<input id="edit-gallery-cover-y" type="range" min="0" max="100" value="50" data-crop="y"></label></div>
-                  <br>
-                  <div class="field"><label><span data-en>Replace cover image</span><span data-es>Reemplazar portada</span></label><input id="edit-gallery-cover-file" type="file" accept="image/*" data-preview="edit-gallery-cover-preview"></div>
-                  <p id="edit-gallery-cover-file-status" class="row-meta">Current cover loaded. Choose a new image only if you want to replace it.</p>
-                </div>
-              </div>
-            </div>
-            <div class="divider-line"></div>
-            <div class="grid two">
-              <div class="compact-panel"><h4><span data-en>Gallery publication checklist</span><span data-es>Checklist de publicación de galería</span></h4><ul><li><span class="check-dot"></span><span data-en>Clients assigned</span><span data-es>Clientes asignados</span></li><li><span class="check-dot"></span><span data-en>Cover image selected</span><span data-es>Portada seleccionada</span></li><li><span class="check-dot warn"></span><span data-en>Photos uploaded</span><span data-es>Fotos subidas</span></li></ul></div>
-              <div class="compact-panel"><h4><span data-en>Photo order</span><span data-es>Orden de fotos</span></h4><p class="row-meta"><span data-en>The uploaded photos will appear below after saving. Ordering is stored in Supabase.</span><span data-es>Las fotos subidas aparecerán abajo después de guardar. El orden se guarda en Supabase.</span></p><div id="edit-gallery-photo-order" class="gallery-order"></div></div>
-            </div>
-            <div class="preview-actions"><button class="btn" id="preview-edit-gallery"><span data-en>Preview gallery</span><span data-es>Previsualizar galería</span></button><button class="btn"><span data-en>Duplicate gallery</span><span data-es>Duplicar galería</span></button><button class="btn primary" id="save-edit-gallery"><span data-en>Save gallery</span><span data-es>Guardar galería</span></button></div>
-            <p id="edit-gallery-status-msg" class="row-meta" style="margin-top:12px"></p>
-          </div>
-          <div id="upload-gallery" class="card pad" style="display:none;margin-top:18px">
-            <h2><span data-en>Upload gallery photos</span><span data-es>Subir fotos de galería</span></h2>
-            <p class="row-meta"><span data-en>Select a gallery, choose several JPG/PNG/WebP files and upload them to Supabase Storage. The photos will be linked to the selected gallery automatically.</span><span data-es>Selecciona una galería, elige varios JPG/PNG/WebP y súbelos a Supabase Storage. Las fotos se vincularán automáticamente a la galería elegida.</span></p>
-            <br>
-            <div class="form-grid">
-              <div class="field full"><label><span data-en>Gallery</span><span data-es>Galería</span></label><select id="upload-gallery-id"><option value="">Select a gallery / Selecciona una galería</option></select></div>
-              <div class="field full"><label><span data-en>Photo files</span><span data-es>Archivos de foto</span></label><input id="gallery-photo-files" type="file" accept="image/*" multiple></div>
-              <div class="field"><label><span data-en>Default location</span><span data-es>Lugar por defecto</span></label><input id="upload-photo-location" placeholder="Mendizorrotza, Vitoria-Gasteiz"></div>
-              <div class="field"><label><span data-en>Default date</span><span data-es>Fecha por defecto</span></label><input id="upload-photo-date" type="date"></div>
-            </div>
-            <br>
-            <div class="grid three">
-              <div class="upload-box"><strong>Original</strong><span data-en>The uploaded file is saved as original for now.</span><span data-es>El archivo subido se guarda como original por ahora.</span></div>
-              <div class="upload-box"><strong>Large · future</strong><span data-en>Automatic 3000px versions will be generated later.</span><span data-es>Las versiones 3000px automáticas se generarán más adelante.</span></div>
-              <div class="upload-box"><strong>Preview · future</strong><span data-en>Automatic preview versions will be generated later.</span><span data-es>Las versiones preview automáticas se generarán más adelante.</span></div>
-            </div>
-            <br>
-            <button class="btn primary" id="upload-gallery-photos-submit"><span data-en>Upload photos</span><span data-es>Subir fotos</span></button>
-            <p id="upload-gallery-status" class="row-meta" style="margin-top:12px"></p>
-            <div id="upload-gallery-preview" class="gallery-order" style="margin-top:16px"></div>
-          </div>
-        </div></div>
-        <div id="gallery-create" class="subsection"><div class="card pad"><h2><span data-en>Create full gallery</span><span data-es>Crear galería completa</span></h2><p><span data-en>First assign one or several clients, then create the gallery with all visual and functional options.</span><span data-es>Primero asigna uno o varios clientes, después crea la galería con todas las opciones visuales y funcionales.</span></p><br><div class="form-grid"><div class="field full"><label><span data-en>Assign registered clients</span><span data-es>Asignar clientes registrados</span></label><div id="gallery-client-picker" class="selector-list"><div class="row-meta">Loading registered clients...</div></div><p class="row-meta" style="margin-top:6px"><span data-en>Select one or several clients. No typing usernames.</span><span data-es>Selecciona uno o varios clientes. No escribas nombres manualmente.</span></p></div><div class="field"><label>Gallery title ES</label><input id="gallery-title-es" placeholder="Alavés vs Rayo Vallecano"></div><div class="field"><label>Gallery title EN</label><input id="gallery-title-en" placeholder="Alavés vs Rayo Vallecano"></div><div class="field"><label>Event date</label><input id="gallery-event-date" type="date"></div><div class="field"><label>Location</label><input id="gallery-location" placeholder="Mendizorrotza, Vitoria-Gasteiz"></div><div class="field"><label>Status</label><select id="gallery-status"><option value="created">Created / Creada</option><option value="in_progress">In progress / En proceso</option><option value="ready">Ready / Lista</option></select></div><div class="field full"><label>Gallery note ES</label><textarea id="gallery-note-es"></textarea></div><div class="field full"><label>Gallery note EN</label><textarea id="gallery-note-en"></textarea></div></div><br><div class="grid two"><div class="crop-editor"><div class="mini-label">Cover image preview</div><div class="crop-frame cover-shape"><div id="gallery-cover-preview" class="crop-preview" style="--crop-img:url('img/work_L.jpg')"></div><div class="crop-hint"></div></div><div class="range-row"><label>X<input id="gallery-cover-x" type="range" min="0" max="100" value="50" data-crop="x"></label><label>Y<input id="gallery-cover-y" type="range" min="0" max="100" value="50" data-crop="y"></label></div><br><div class="field"><label><span data-en>Choose gallery cover</span><span data-es>Elegir portada de galería</span></label><input id="gallery-cover-file" type="file" accept="image/*" data-preview="gallery-cover-preview"></div><p class="row-meta" id="gallery-cover-file-status">No gallery cover selected yet.</p></div><div class="upload-box"><strong><span data-en>Gallery photos come next</span><span data-es>Las fotos de la galería vienen después</span></strong><span data-en>This step stores the cover image. Bulk photo upload will be connected after covers work perfectly.</span><span data-es>Este paso guarda la portada. La subida masiva de fotos se conectará cuando las portadas funcionen perfecto.</span></div></div><div class="divider-line"></div><div class="status-switch"><button class="status-option active" type="button" id="gallery-save-draft"><span data-en>Save as draft</span><span data-es>Guardar como borrador</span></button><button class="status-option" type="button" id="gallery-publish"><span data-en>Create and publish</span><span data-es>Crear y publicar</span></button></div><br><button class="btn primary" id="create-gallery-submit"><span data-en>Create gallery</span><span data-es>Crear galería</span></button><p id="gallery-create-status" class="row-meta" style="margin-top:12px"></p></div></div>
-      </section>
-
-      <div class="main admin-main-secondary">
-      <section id="calendar" class="section"><div class="hero" style="--hero-img:url('img/work_H.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Calendar</span><span data-es>Calendario</span></div><h1><span data-en>Upcoming <em>coverage</em></span><span data-es>Próximas <em>coberturas</em></span></h1><p><span data-en>Plan future events, assign coverage and track their status.</span><span data-es>Planifica eventos futuros, asigna coberturas y controla su estado.</span></p></div><button class="btn primary"><span data-en>Add event</span><span data-es>Añadir evento</span></button></div></div><div class="calendar-wrap"><div class="card pad"><div class="calendar-head"><h2><span data-en>June 2026</span><span data-es>Junio 2026</span></h2><div class="row-actions"><button class="btn"><span data-en>Previous</span><span data-es>Anterior</span></button><button class="btn"><span data-en>Next</span><span data-es>Siguiente</span></button></div></div><div class="calendar-grid"><div class="day-name"><span data-en>Mon</span><span data-es>Lun</span></div><div class="day-name"><span data-en>Tue</span><span data-es>Mar</span></div><div class="day-name"><span data-en>Wed</span><span data-es>Mié</span></div><div class="day-name"><span data-en>Thu</span><span data-es>Jue</span></div><div class="day-name"><span data-en>Fri</span><span data-es>Vie</span></div><div class="day-name"><span data-en>Sat</span><span data-es>Sáb</span></div><div class="day-name"><span data-en>Sun</span><span data-es>Dom</span></div>
-        <div class="day past"><span class="day-num">1</span></div><div class="day past"><span class="day-num">2</span></div><div class="day past"><span class="day-num">3</span></div><div class="day past"><span class="day-num">4</span></div><div class="day past"><span class="day-num">5</span></div><div class="day past"><span class="day-num">6</span></div><div class="day today"><span class="day-num">7</span><div class="event-chip yellow"><span data-en>Confirmed · San Mamés</span><span data-es>Confirmado · San Mamés</span></div></div><div class="day"><span class="day-num">8</span></div><div class="day"><span class="day-num">9</span></div><div class="day"><span class="day-num">10</span></div><div class="day"><span class="day-num">11</span></div><div class="day"><span class="day-num">12</span></div><div class="day"><span class="day-num">13</span><div class="event-chip green"><span data-en>Finished · Agency</span><span data-es>Finalizado · Agencia</span></div></div><div class="day"><span class="day-num">14</span></div><div class="day"><span class="day-num">15</span></div><div class="day"><span class="day-num">16</span></div><div class="day"><span class="day-num">17</span></div><div class="day"><span class="day-num">18</span></div><div class="day"><span class="day-num">19</span></div><div class="day"><span class="day-num">20</span></div><div class="day"><span class="day-num">21</span><div class="event-chip red"><span data-en>Pending · TBC</span><span data-es>Pendiente · Por confirmar</span></div></div></div></div><div class="card pad"><h2><span data-en>Event details</span><span data-es>Detalles del evento</span></h2><div class="form-grid" style="grid-template-columns:1fr"><div class="field"><label><span data-en>Event title</span><span data-es>Título del evento</span></label><input value="Athletic Club vs Real Sociedad"></div><div class="field"><label><span data-en>Photographer</span><span data-es>Fotógrafo</span></label><select><option>Ibai Tudanca</option><option>External photographer</option></select></div><div class="field"><label><span data-en>Status</span><span data-es>Estado</span></label><select><option>Pending / Pendiente</option><option selected>Confirmed / Confirmado</option><option>In coverage / En cobertura</option><option>Finished / Finalizado</option><option>Cancelled / Cancelado</option></select></div><div class="field"><label><span data-en>Notes</span><span data-es>Notas</span></label><textarea>Arrive 90 minutes before kick-off. Ethernet position requested.</textarea></div></div></div></div></section>
-
-      <section id="requests" class="section"><div class="hero" style="--hero-img:url('img/work_D.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Retouch requests</span><span data-es>Solicitudes de retoque</span></div><h1><span data-en>Client <em>requests</em></span><span data-es>Retoques de <em>clientes</em></span></h1><p><span data-en>Review requested edits and replace final images from here.</span><span data-es>Revisa retoques solicitados y reemplaza imágenes finales desde aquí.</span></p></div></div></div><div class="list"><div class="list-row"><img class="thumb" src="img/work_A.jpg"><div><div class="row-title">IMG_240526_014 · Antonio Blanco</div><div class="row-meta">Alavés vs Rayo · <span data-en>Crop for Instagram vertical</span><span data-es>Recorte vertical para Instagram</span></div></div><div class="row-actions"><button class="btn"><span data-en>Replace image</span><span data-es>Reemplazar imagen</span></button><button class="btn primary"><span data-en>Complete</span><span data-es>Completar</span></button></div></div></div></section>
-
-      <section id="downloads" class="section"><div class="hero" style="--hero-img:url('img/work_M.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Downloads</span><span data-es>Descargas</span></div><h1><span data-en>Delivery <em>activity</em></span><span data-es>Actividad de <em>entregas</em></span></h1><p><span data-en>Track who downloads, what they download and which size they choose.</span><span data-es>Controla quién descarga, qué descarga y qué tamaño elige.</span></p></div></div></div><div class="list"><div class="list-row"><img class="avatar" src="img/IMG_IBAI.jpg"><div><div class="row-title">Antonio Blanco · 24 photos</div><div class="row-meta">Alavés vs Rayo · Selected photos · 3000×2000 · Today 13:42</div></div><div class="pill"><span data-en>Selected</span><span data-es>Seleccionadas</span></div></div><div class="list-row"><img class="avatar" src="img/work_P.jpg"><div><div class="row-title">Quality Sport Images · 148 photos</div><div class="row-meta">Full gallery · 6000×4000 · Yesterday 21:06</div></div><div class="pill"><span data-en>Full gallery</span><span data-es>Galería completa</span></div></div></div></section>
-
-      
-      <section id="admins" class="section">
-        <div class="hero" style="--hero-img:url('img/work_N.JPG')">
-          <div class="hero-inner">
-            <div>
-              <div class="eyebrow"><span data-en>Administrators</span><span data-es>Administradores</span></div>
-              <h1><span data-en>Admin <em>access</em></span><span data-es>Acceso de <em>administradores</em></span></h1>
-              <p><span data-en>Create, edit and manage the people allowed to enter the private administration panel.</span><span data-es>Crea, edita y gestiona las personas que pueden entrar al panel privado de administración.</span></p>
-            </div>
-          </div>
-        </div>
-        <div class="tabs">
-          <button class="tab active" data-tab="admins-list"><span data-en>Admin list</span><span data-es>Lista de administradores</span></button>
-          <button class="tab" data-tab="admin-create"><span data-en>Create admin</span><span data-es>Crear administrador</span></button>
-        </div>
-        <div id="admins-list" class="subsection active">
-          <p id="admins-sync-status" class="row-meta" style="margin:10px 0 14px"></p>
-          <div id="admins-list-render" class="list"></div>
-          <div id="edit-admin" class="card pad admin-edit-panel" style="display:none">
-            <div class="section-title" style="margin-top:0">
-              <div>
-                <h2><span data-en>Edit administrator</span><span data-es>Editar administrador</span></h2>
-                <p><span data-en>Change username, name, role, password and profile image. The profile image appears in the admin panel welcome area.</span><span data-es>Cambia usuario, nombre, rol, contraseña y foto de perfil. La foto aparece en la bienvenida del panel admin.</span></p>
-              </div>
-            </div>
-            <input type="hidden" id="edit-admin-id">
-            <input type="hidden" id="edit-admin-current-profile-url">
-            <div class="admin-section-grid">
-              <div class="form-grid">
-                <div class="field"><label><span data-en>Admin name</span><span data-es>Nombre administrador</span></label><input id="edit-admin-name" placeholder="Ibai Tudanca"></div>
-                <div class="field"><label><span data-en>Username</span><span data-es>Usuario</span></label><input id="edit-admin-username" placeholder="ibai-admin"></div>
-                <div class="field"><label><span data-en>New password</span><span data-es>Nueva contraseña</span></label><input id="edit-admin-password" type="password" placeholder="Leave empty to keep current password"></div>
-                <div class="field"><label><span data-en>Role</span><span data-es>Rol</span></label><select id="edit-admin-role"><option value="owner">Owner / Propietario</option><option value="editor">Editor / Editor</option></select></div>
-                <div class="field"><label><span data-en>Status</span><span data-es>Estado</span></label><select id="edit-admin-active"><option value="true">Active / Activo</option><option value="false">Inactive / Inactivo</option></select></div>
-              </div>
-              <div class="crop-editor">
-                <div class="mini-label"><span data-en>Admin profile image</span><span data-es>Foto de perfil admin</span></div>
-                <div class="crop-frame profile-shape"><div id="edit-admin-profile-preview" class="crop-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
-                <br>
-                <div class="field"><label><span data-en>Choose profile image</span><span data-es>Elegir foto de perfil</span></label><input id="edit-admin-profile-file" type="file" accept="image/*" data-preview="edit-admin-profile-preview"></div>
-                <p class="row-meta" id="edit-admin-profile-file-status">No new image selected.</p>
-              </div>
-            </div>
-            <div class="divider-line"></div>
-            <button class="btn primary" id="save-edit-admin" type="button"><span data-en>Save administrator</span><span data-es>Guardar administrador</span></button>
-            <p id="edit-admin-status" class="row-meta" style="margin-top:12px"></p>
-          </div>
-        </div>
-        <div id="admin-create" class="subsection">
-          <div class="card pad">
-            <div class="admin-lock-note"><span data-en>Only create administrator accounts for people you fully trust. Administrators can manage clients, galleries and private delivery information.</span><span data-es>Crea cuentas de administrador solo para personas de total confianza. Los administradores pueden gestionar clientes, galerías e información privada de entregas.</span></div>
-            <div class="admin-section-grid">
-              <div class="form-grid">
-                <div class="field"><label><span data-en>Admin name</span><span data-es>Nombre administrador</span></label><input id="admin-name" placeholder="Ibai Tudanca"></div>
-                <div class="field"><label><span data-en>Username</span><span data-es>Usuario</span></label><input id="admin-username" placeholder="ibai-admin"></div>
-                <div class="field"><label><span data-en>Password created by you</span><span data-es>Contraseña creada por ti</span></label><input id="admin-password" type="password" placeholder="••••••••"></div>
-                <div class="field"><label><span data-en>Role</span><span data-es>Rol</span></label><select id="admin-role"><option value="owner">Owner / Propietario</option><option value="editor">Editor / Editor</option></select></div>
-              </div>
-              <div class="crop-editor">
-                <div class="mini-label"><span data-en>Admin profile image</span><span data-es>Foto de perfil admin</span></div>
-                <div class="crop-frame profile-shape"><div id="admin-profile-preview" class="crop-preview" style="--crop-img:url('img/IMG_IBAI.jpg')"></div><div class="crop-hint"></div></div>
-                <br>
-                <div class="field"><label><span data-en>Choose profile image</span><span data-es>Elegir foto de perfil</span></label><input id="admin-profile-file" type="file" accept="image/*" data-preview="admin-profile-preview"></div>
-                <p class="row-meta" id="admin-profile-file-status">No image selected yet.</p>
-              </div>
-            </div>
-            <br>
-            <button class="btn primary" id="create-admin-submit"><span data-en>Create administrator</span><span data-es>Crear administrador</span></button>
-            <p id="admin-create-status" class="row-meta" style="margin-top:12px"></p>
-          </div>
-        </div>
-      </section>
-<section id="settings" class="section"><div class="hero" style="--hero-img:url('img/work_Q.jpg')"><div class="hero-inner"><div><div class="eyebrow"><span data-en>Settings</span><span data-es>Ajustes</span></div><h1><span data-en>System <em>defaults</em></span><span data-es>Ajustes <em>base</em></span></h1><p><span data-en>Default texts, license templates, sizes and contact details.</span><span data-es>Textos por defecto, licencias, tamaños y datos de contacto.</span></p></div></div></div><div class="card pad"><div class="form-grid"><div class="field"><label>Default sizes</label><input value="6000x4000, 3000x2000, 1600x1067"></div><div class="field"><label>Contact email</label><input value="ibaituda1999@gmail.com"></div><div class="field full"><label>Default license EN</label><textarea>Images are licensed only to the assigned client account. Third-party commercial use requires written permission.</textarea></div><div class="field full"><label>Licencia por defecto ES</label><textarea>Las imágenes están licenciadas únicamente para la cuenta de cliente asignada. El uso comercial por terceros requiere autorización escrita.</textarea></div></div><br><button class="btn primary"><span data-en>Save settings</span><span data-es>Guardar ajustes</span></button></div></section>
-    </div>
-  </div>
+</div>
 </main>
 <script>
   const body=document.body;
@@ -311,10 +299,8 @@
   const search=document.getElementById('global-search');
   if(search){search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();document.querySelectorAll('.list-row,.photo-card,.card').forEach(el=>{const hit=q && el.innerText.toLowerCase().includes(q);el.classList.toggle('search-hit',!!hit);});});}
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/admin-supabase.js"></script>
-
 </body>
 </html>
