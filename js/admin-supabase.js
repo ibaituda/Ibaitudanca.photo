@@ -140,7 +140,7 @@
             <div class="row-meta">${type} · ${context} · ${client.username || ""} · ${status}</div>
           </div>
           <div class="row-actions">
-            <button class="btn" data-open="edit-client"><span data-en>Edit client</span><span data-es>Editar cliente</span></button>
+            <button class="btn" data-edit-client="${client.id}"><span data-en>Edit client</span><span data-es>Editar cliente</span></button>
             <button class="btn"><span data-en>Change password</span><span data-es>Cambiar contraseña</span></button>
             <button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button>
           </div>
@@ -148,11 +148,157 @@
       `;
     }).join("");
 
-    list.querySelectorAll("[data-open]").forEach((btn) => {
-      btn.addEventListener("click", () => openPanel(btn.dataset.open));
+    list.querySelectorAll("[data-edit-client]").forEach((btn) => {
+      btn.addEventListener("click", () => populateEditClient(btn.dataset.editClient));
     });
   }
 
+
+  function setValue(selector, value) {
+    const el = $(selector);
+    if (el) el.value = value ?? "";
+  }
+
+  function setPreviewImage(selector, url) {
+    const el = $(selector);
+    if (el && url) el.style.setProperty("--crop-img", `url('${url}')`);
+  }
+
+  function setCrop(selectorX, selectorY, x, y) {
+    setValue(selectorX, x ?? 50);
+    setValue(selectorY, y ?? 50);
+    const xEl = $(selectorX);
+    if (xEl) xEl.dispatchEvent(new Event("input", { bubbles: true }));
+    const yEl = $(selectorY);
+    if (yEl) yEl.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function clientContext(client) {
+    if (!client) return "";
+    if (client.client_type === "player") return client.club || "";
+    if (client.client_type === "club") return client.league || client.country || "";
+    if (client.client_type === "agency") return client.agency_type || "";
+    if (client.client_type === "personal") return client.personal_relation || "";
+    return client.club || client.league || client.agency_type || client.personal_relation || "";
+  }
+
+  function populateEditClient(clientId) {
+    const client = (window.IBAI_CLIENTS_CACHE || []).find((item) => item.id === clientId);
+    if (!client) {
+      setText("#edit-client-status", "Client data not found. Reload the page and try again.");
+      return;
+    }
+
+    openPanel("edit-client");
+    setValue("#edit-client-id", client.id);
+    setValue("#edit-client-current-profile-url", client.profile_image_url || "");
+    setValue("#edit-client-current-hero-url", client.hero_image_url || "");
+    setValue("#edit-client-name", client.name || "");
+    setValue("#edit-client-type", client.client_type || "player");
+    setValue("#edit-client-context", clientContext(client));
+    setValue("#edit-client-username", client.username || "");
+    setValue("#edit-client-password", "");
+    setValue("#edit-client-language", client.language_preference || "es");
+    setValue("#edit-client-publish-status", client.publish_status || "draft");
+    setValue("#edit-client-welcome-title-en", client.welcome_title_en || "");
+    setValue("#edit-client-welcome-title-es", client.welcome_title_es || "");
+    setValue("#edit-client-welcome-message-en", client.welcome_message_en || "");
+    setValue("#edit-client-welcome-message-es", client.welcome_message_es || "");
+    setValue("#edit-client-license-en", client.license_en || "");
+    setValue("#edit-client-license-es", client.license_es || "");
+    setValue("#edit-client-internal-notes", client.internal_notes || "");
+    setValue("#edit-client-profile-file", "");
+    setValue("#edit-client-hero-file", "");
+    setText("#edit-client-profile-file-status", client.profile_image_url ? "Current profile image loaded. Choose a new image only if you want to replace it." : "No profile image saved yet.");
+    setText("#edit-client-hero-file-status", client.hero_image_url ? "Current hero image loaded. Choose a new image only if you want to replace it." : "No hero image saved yet.");
+    setPreviewImage("#edit-client-profile-preview", client.profile_image_url || "img/IMG_IBAI.jpg");
+    setPreviewImage("#edit-client-hero-preview", client.hero_image_url || "img/work_A.jpg");
+    setCrop("#edit-client-hero-x", "#edit-client-hero-y", client.hero_position_x ?? 50, client.hero_position_y ?? 50);
+    setCrop("#edit-client-profile-x", "#edit-client-profile-y", 50, 45);
+    setText("#edit-client-status", `Editing ${client.name || client.username}.`);
+  }
+
+  function previewClientPage(username) {
+    const user = username || $("#edit-client-username")?.value.trim() || $("#client-username")?.value.trim() || slugify($("#client-name")?.value.trim());
+    const url = user ? `client-dashboard.html?client=${encodeURIComponent(user)}` : "client-dashboard.html";
+    window.open(url, "_blank");
+  }
+
+  async function saveEditClient() {
+    const supabase = getSupabaseClient("#edit-client-status");
+    if (!supabase) return;
+
+    const id = $("#edit-client-id")?.value;
+    if (!id) {
+      setText("#edit-client-status", "Choose a client from the list first.");
+      return;
+    }
+
+    const name = $("#edit-client-name")?.value.trim();
+    const type = $("#edit-client-type")?.value || "player";
+    const username = $("#edit-client-username")?.value.trim();
+    const context = $("#edit-client-context")?.value.trim();
+    const password = $("#edit-client-password")?.value;
+
+    if (!name || !username) {
+      setText("#edit-client-status", "Client name and username are required.");
+      return;
+    }
+
+    let profileImageUrl = $("#edit-client-current-profile-url")?.value || null;
+    let heroImageUrl = $("#edit-client-current-hero-url")?.value || null;
+
+    try {
+      const newProfile = await uploadImage(supabase, $("#edit-client-profile-file")?.files?.[0], `clients/${username}/profile`, "#edit-client-profile-file-status");
+      const newHero = await uploadImage(supabase, $("#edit-client-hero-file")?.files?.[0], `clients/${username}/hero`, "#edit-client-hero-file-status");
+      if (newProfile) profileImageUrl = newProfile;
+      if (newHero) heroImageUrl = newHero;
+    } catch (uploadError) {
+      setText("#edit-client-status", "Image upload failed: " + uploadError.message);
+      return;
+    }
+
+    const payload = {
+      name,
+      username,
+      client_type: type,
+      language_preference: $("#edit-client-language")?.value || "es",
+      publish_status: $("#edit-client-publish-status")?.value || "draft",
+      profile_image_url: profileImageUrl,
+      hero_image_url: heroImageUrl,
+      hero_position_x: Number($("#edit-client-hero-x")?.value || 50),
+      hero_position_y: Number($("#edit-client-hero-y")?.value || 50),
+      welcome_title_en: $("#edit-client-welcome-title-en")?.value.trim() || null,
+      welcome_title_es: $("#edit-client-welcome-title-es")?.value.trim() || null,
+      welcome_message_en: $("#edit-client-welcome-message-en")?.value.trim() || null,
+      welcome_message_es: $("#edit-client-welcome-message-es")?.value.trim() || null,
+      license_en: $("#edit-client-license-en")?.value.trim() || null,
+      license_es: $("#edit-client-license-es")?.value.trim() || null,
+      internal_notes: $("#edit-client-internal-notes")?.value.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+
+    payload.club = null;
+    payload.league = null;
+    payload.agency_type = null;
+    payload.personal_relation = null;
+    if (type === "player") payload.club = context || null;
+    if (type === "club") payload.league = context || null;
+    if (type === "agency") payload.agency_type = context || null;
+    if (type === "personal") payload.personal_relation = context || null;
+    if (password) payload.password_hash = await sha256(password);
+
+    setText("#edit-client-status", "Saving client changes...");
+    const { error } = await supabase.from("clients").update(payload).eq("id", id);
+
+    if (error) {
+      setText("#edit-client-status", "Could not save client: " + error.message);
+      return;
+    }
+
+    setText("#edit-client-status", `Client updated: ${name}.`);
+    await loadClients();
+  }
 
   function renderGalleryClientPicker(clients) {
     const picker = $("#gallery-client-picker");
@@ -530,6 +676,15 @@
 
     const createClientBtn = $("#create-client-submit");
     if (createClientBtn) createClientBtn.addEventListener("click", createClient);
+
+    const saveEditClientBtn = $("#save-edit-client");
+    if (saveEditClientBtn) saveEditClientBtn.addEventListener("click", saveEditClient);
+
+    const previewCreateClientBtn = $("#preview-create-client");
+    if (previewCreateClientBtn) previewCreateClientBtn.addEventListener("click", () => previewClientPage());
+
+    const previewEditClientBtn = $("#preview-edit-client");
+    if (previewEditClientBtn) previewEditClientBtn.addEventListener("click", () => previewClientPage());
 
     const createGalleryBtn = $("#create-gallery-submit");
     if (createGalleryBtn) createGalleryBtn.addEventListener("click", createGallery);
