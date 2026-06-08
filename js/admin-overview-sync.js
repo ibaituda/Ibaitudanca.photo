@@ -79,9 +79,16 @@
     const openRequests=requestRows.filter(r=>!['done','completed'].includes(r.status)).length;
     setText('#overview-clients-count', activeClients); setText('#overview-galleries-count', activeGalleries); setText('#overview-uploads-count', pendingUploads); setText('#overview-retouch-count', openRequests);
   }
+  let __checklistRunId=0;
   async function updateChecklist(){
     const box=$('#overview-checklist-content'); if(!box) return;
-    box.innerHTML='<div class="row-meta">Cargando checklist real...</div>';
+    const runId=++__checklistRunId;
+    // Nunca mostramos contenido demo. Tampoco limpiamos el contenido real en cada refresco,
+    // para evitar el parpadeo: vacío/cargando -> real -> vacío/cargando -> real.
+    if(!box.dataset.loaded && !box.dataset.loading){
+      box.dataset.loading='1';
+      box.innerHTML='<div class="row-meta">Cargando checklist real...</div>';
+    }
     const [galleries,links,photos,requests,tasks,events]=await Promise.all([
       selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,personal_note_es,created_at,updated_at',{order:'updated_at',ascending:false,limit:80}),
       selectSafe('gallery_clients','id,gallery_id,client_id'),
@@ -90,6 +97,7 @@
       selectSafe('app_tasks','id,title,status,due_date,created_at',{order:'created_at',ascending:false,limit:50}),
       selectSafe('calendar_events','id,title,event_date,status,location',{gte:[['event_date',new Date().toISOString().slice(0,10)]],order:'event_date',ascending:true,limit:30})
     ]);
+    if(runId!==__checklistRunId) return;
     const linked=new Set((links.data||[]).map(x=>x.gallery_id).filter(Boolean));
     const photoRows=photos.data||[];
     const photoCount={}; const visibleCount={};
@@ -110,6 +118,8 @@
     (requests.data||[]).filter(r=>!['done','completed'].includes(r.status)).slice(0,3).forEach(r=>items.push({severity:'yellow',title:'Retoque pendiente',place:'Retoques',detail:r.message?`Solicitud: ${r.message}`:'Solicitud de retoque sin completar.',target:'requests'}));
     (tasks.data||[]).filter(t=>['pending','in_progress'].includes(t.status)).slice(0,3).forEach(t=>items.push({severity:t.status==='pending'?'red':'yellow',title:`Tarea · ${t.title||'Sin título'}`,place:'Tareas',detail:t.due_date?`Fecha límite: ${t.due_date}`:(t.status==='pending'?'Pendiente de empezar.':'En progreso.'),target:'tasks'}));
     (events.data||[]).filter(e=>['pending','confirmed','covering'].includes(e.status)).slice(0,2).forEach(e=>items.push({severity:e.status==='pending'?'red':'yellow',title:`Calendario · ${e.title||'Evento'}`,place:'Calendario',detail:`${e.event_date||'Sin fecha'}${e.location?' · '+e.location:''} · ${statusLabel(e.status)}`,target:'calendar'}));
+    box.dataset.loading='0';
+    box.dataset.loaded='1';
     if(!items.length){ box.innerHTML='<div class="overview-mini-row"><span class="check-dot"></span><div><strong>Todo al día</strong><span>No hay pendientes automáticos en galerías, tareas, retoques o calendario.</span></div></div>'; return; }
     box.innerHTML=items.slice(0,8).map(item=>`<div class="overview-mini-row checklist-source-row" data-section-link="${esc(item.target)}"><span class="check-dot ${item.severity==='red'?'red-dot':'warn'}"></span><div><strong>${esc(item.title)}</strong><span><b>${esc(item.place)}</b> · ${esc(item.detail)}</span></div></div>`).join('');
   }
@@ -167,8 +177,8 @@
   function init(){
     injectStyles(); bindOverviewLinks(); replaceTopPanels();
     // Run several delayed passes because older scripts can overwrite the overview after DOMContentLoaded.
-    refresh(); setTimeout(refresh,250); setTimeout(refresh,900); setTimeout(refresh,1800);
-    if(!window.IBAI_OVERVIEW_INTERVAL) window.IBAI_OVERVIEW_INTERVAL=setInterval(refresh,30000);
+    refresh(); setTimeout(refresh,1200);
+    if(!window.IBAI_OVERVIEW_INTERVAL) window.IBAI_OVERVIEW_INTERVAL=setInterval(refresh,60000);
     window.IBAI_REFRESH_OVERVIEW=refresh;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
