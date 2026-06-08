@@ -1,6 +1,7 @@
 (function(){
   const qs=new URLSearchParams(location.search);
   const clientParam=qs.get('client');
+  const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -8,6 +9,8 @@
     if(!window.supabase||!window.IBAI_SUPABASE_URL||!window.IBAI_SUPABASE_ANON_KEY){return null;}
     return window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);
   }
+  function getClientSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+  function clearClientSession(){localStorage.removeItem(SESSION_KEY);}
   function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v||'');}
   function statusInfo(status){
     if(status==='ready') return {cls:'ready',en:'Ready',es:'Lista',copyEn:'All files available',copyEs:'Todos los archivos disponibles',button:false};
@@ -23,13 +26,17 @@
     return count||0;
   }
   async function load(){
-    if(!clientParam) return;
     const sb=getClient(); if(!sb) return;
+    const session=getClientSession();
+    const effectiveClient=clientParam || session?.id;
+    if(!effectiveClient){ window.location.href='clientes.html'; return; }
+    if(!clientParam && !session?.id){ window.location.href='clientes.html'; return; }
     const q=sb.from('clients').select('*').limit(1);
-    if(isUuid(clientParam)) q.eq('id',clientParam); else q.eq('username',clientParam);
+    if(isUuid(effectiveClient)) q.eq('id',effectiveClient); else q.eq('username',effectiveClient);
     const {data, error}=await q.maybeSingle();
     if(error||!data){console.warn('Client dashboard load error',error);return;}
     const client=data;
+    if(!clientParam && session?.id && session.id!==client.id){ window.location.href='clientes.html'; return; }
     const lang=localStorage.getItem('ibaiLanguage')||client.language_preference||'es';
     document.documentElement.lang=lang;
     const name=client.name||client.username;
@@ -87,5 +94,13 @@
       return `<article class="gallery-card"><div class="gallery-image"><img src="${esc(cover)}" alt="${esc(title)} cover" style="object-position:${g.cover_position_x||50}% ${g.cover_position_y||50}%"><div class="gallery-status"><span class="status-pill"><i class="status-dot ${st.cls}"></i>${lang==='es'?st.es:st.en}</span></div></div><div class="gallery-content"><h3>${esc(title)}</h3><div class="status-copy">${lang==='es'?st.copyEs:st.copyEn}</div><p>${esc(note)}</p><div class="meta"><div><span>${lang==='es'?'Fotos':'Photos'}</span><strong>${count}</strong></div><div><span>${lang==='es'?'Fecha':'Date'}</span><strong>${dateLabel(g.event_date)}</strong></div><div><span>${lang==='es'?'Caducidad':'Expiry'}</span><strong>${lang==='es'?'Sin caducidad':'No expiry'}</strong></div></div><div class="quality-row"><span class="quality">Original</span><span class="quality">Large</span><span class="quality">Preview</span></div><div class="card-actions"><a class="btn btn-primary${disabled}" href="${st.button?'#':`gallery-view.html?gallery=${encodeURIComponent(g.id)}`}">${st.button?(lang==='es'?'Próximamente':'Coming soon'):(lang==='es'?'Abrir':'Open')}</a><a class="btn btn-ghost" href="gallery-view.html?gallery=${encodeURIComponent(g.id)}">${lang==='es'?'Detalles':'Details'}</a></div></div></article>`;
     }).join('');
   }
-  document.addEventListener('DOMContentLoaded',load);
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('a,button').forEach(el=>{
+      const label=(el.textContent||'').trim().toLowerCase();
+      if(label==='log out'||label==='cerrar sesión'||label==='salir'){
+        el.addEventListener('click',(ev)=>{ev.preventDefault(); clearClientSession(); window.location.href='clientes.html';});
+      }
+    });
+    load();
+  });
 })();
