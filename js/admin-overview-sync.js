@@ -66,15 +66,15 @@
     const panels=$$('#overview .grid.three .compact-panel');
     if(panels[0]){
       panels[0].id='overview-publication-checklist';
-      panels[0].innerHTML='<h4><span data-es>Checklist real</span><span data-en>Real checklist</span></h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta">Cargando...</div></div>';
+      panels[0].innerHTML='<h4><span data-es>Checklist real</span><span data-en>Real checklist</span></h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta"><span data-es>Cargando datos reales...</span><span data-en>Loading real data...</span></div></div>';
     }
     if(panels[1]){
       panels[1].id='overview-tasks-panel';
-      panels[1].innerHTML='<h4><span data-es>Tareas pendientes</span><span data-en>Pending tasks</span></h4><div id="overview-tasks-content" class="overview-mini-list"><div class="row-meta">Cargando...</div></div><button class="btn" data-section-link="tasks" style="margin-top:10px"><span data-es>Abrir tareas</span><span data-en>Open tasks</span></button>';
+      panels[1].innerHTML='<h4><span data-es>Tareas pendientes</span><span data-en>Pending tasks</span></h4><div id="overview-tasks-content" class="overview-mini-list"><div class="row-meta"><span data-es>Cargando datos reales...</span><span data-en>Loading real data...</span></div></div><button class="btn" data-section-link="tasks" style="margin-top:10px"><span data-es>Abrir tareas</span><span data-en>Open tasks</span></button>';
     }
     if(panels[2]){
       panels[2].id='overview-activity-panel';
-      panels[2].innerHTML='<h4><span data-es>Actividad útil</span><span data-en>Useful activity</span></h4><div id="overview-activity-content" class="overview-mini-list"><div class="row-meta">Cargando...</div></div>';
+      panels[2].innerHTML='<h4><span data-es>Actividad útil</span><span data-en>Useful activity</span></h4><div id="overview-activity-content" class="overview-mini-list"><div class="row-meta"><span data-es>Cargando datos reales...</span><span data-en>Loading real data...</span></div></div>';
     }
   }
   async function updateChecklist(){
@@ -187,6 +187,14 @@
     replaceTopPanels();
     await Promise.allSettled([updateStats(),updateChecklist(),updateTasks(),updateActivity(),updateLatestCards()]);
   }
-  function init(){ injectStyles(); bindOverviewLinks(); setTimeout(refresh,800); setInterval(refresh,30000); window.IBAI_REFRESH_OVERVIEW=refresh; }
+  function init(){
+    injectStyles();
+    bindOverviewLinks();
+    // Replace any static placeholders immediately, before Supabase data arrives.
+    replaceTopPanels();
+    refresh();
+    setInterval(refresh,30000);
+    window.IBAI_REFRESH_OVERVIEW=refresh;
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
