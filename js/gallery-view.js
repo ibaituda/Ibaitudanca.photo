@@ -149,7 +149,46 @@
     $('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current); reviewed.add(current); await persistToggle('selections',current,selected); openLightbox(current); applyFilter();});
     $('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));
     $('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected)); $('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs)); $('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));
-    $('#requestEdit')?.addEventListener('click',()=>alert(lang==='es'?'Solicitud de retoque preparada. En el siguiente paso la guardaremos en el admin panel.':'Edit request prepared. In the next step it will be saved in the admin panel.'));
+    
+    const requestBtn = $('#requestEdit');
+    if (requestBtn) {
+      const cleanBtn = requestBtn.cloneNode(true);
+      requestBtn.parentNode.replaceChild(cleanBtn, requestBtn);
+      cleanBtn.addEventListener('click', async () => {
+        const sb = getClient();
+        const photo = realPhotos[current];
+        if (!sb || !photo?.db_id || !galleryId) {
+          alert(lang === 'es' ? 'No se ha podido preparar la solicitud de retoque.' : 'Could not prepare the edit request.');
+          return;
+        }
+        if (!activeClient?.id) {
+          alert(lang === 'es' ? 'Inicia sesión como cliente para solicitar retoques.' : 'Log in as a client to request edits.');
+          return;
+        }
+        const defaultMessage = lang === 'es' ? 'Indica aquí qué retoque necesitas para esta foto.' : 'Write here the edit you need for this photo.';
+        const message = window.prompt(lang === 'es' ? 'Solicitud de retoque' : 'Edit request', defaultMessage);
+        if (message === null) return;
+        const cleanMessage = (message || '').trim() || (lang === 'es' ? 'Solicitud de retoque sin mensaje adicional.' : 'Edit request without additional message.');
+        cleanBtn.disabled = true;
+        cleanBtn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
+        const { error } = await sb.from('retouch_requests').insert({
+          client_id: activeClient.id,
+          gallery_id: galleryId,
+          photo_id: photo.db_id,
+          message: cleanMessage,
+          status: 'new'
+        });
+        cleanBtn.disabled = false;
+        cleanBtn.textContent = lang === 'es' ? 'Solicitar retoque' : 'Request edit';
+        if (error) {
+          console.warn('retouch request error', error);
+          alert((lang === 'es' ? 'No se pudo enviar la solicitud: ' : 'Could not send request: ') + error.message);
+          return;
+        }
+        alert(lang === 'es' ? 'Solicitud de retoque enviada al panel de administración.' : 'Edit request sent to the admin panel.');
+      });
+    }
+
     document.addEventListener('keydown',e=>{if(!$('#lightbox')?.classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')openLightbox((current-1+realPhotos.length)%realPhotos.length);if(e.key==='ArrowRight')openLightbox((current+1)%realPhotos.length);if(e.key.toLowerCase()==='f'){$('#lightFav')?.click();}if(e.key.toLowerCase()==='s'){$('#lightSel')?.click();}});
     load();
   });
