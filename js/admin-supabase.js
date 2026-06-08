@@ -44,6 +44,56 @@
     return window.supabase.createClient(url, key);
   }
 
+  const STORAGE_BUCKET = "portfolio-images";
+
+  function fileExtension(file) {
+    const name = file?.name || "image.jpg";
+    const ext = name.split(".").pop()?.toLowerCase() || "jpg";
+    return ext.replace(/[^a-z0-9]/g, "") || "jpg";
+  }
+
+  async function uploadImage(supabase, file, folder, statusSelector) {
+    if (!file) return null;
+    const safeFolder = slugify(folder || "uploads") || "uploads";
+    const ext = fileExtension(file);
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+    const path = `${safeFolder}/${filename}`;
+
+    setText(statusSelector, `Uploading ${file.name}...`);
+
+    const { error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(path, file, { cacheControl: "3600", upsert: true });
+
+    if (error) throw error;
+
+    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    setText(statusSelector, `Uploaded: ${file.name}`);
+    return data.publicUrl;
+  }
+
+  function setupImagePreviewInputs() {
+    document.querySelectorAll('input[type="file"][data-preview]').forEach((input) => {
+      input.addEventListener("change", () => {
+        const file = input.files?.[0];
+        const preview = document.getElementById(input.dataset.preview);
+        const status = document.getElementById(`${input.id}-status`);
+        if (!file) {
+          if (status) status.textContent = "No image selected yet.";
+          return;
+        }
+        if (!file.type.startsWith("image/")) {
+          if (status) status.textContent = "Please select an image file.";
+          input.value = "";
+          return;
+        }
+        const objectUrl = URL.createObjectURL(file);
+        if (preview) preview.style.setProperty("--crop-img", `url('${objectUrl}')`);
+        if (status) status.textContent = `Selected: ${file.name}`;
+      });
+    });
+  }
+
   function openPanel(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -170,12 +220,27 @@
     const username = usernameInput || slugify(name);
     const password_hash = await sha256(password);
 
+    let profileImageUrl = null;
+    let heroImageUrl = null;
+
+    try {
+      profileImageUrl = await uploadImage(supabase, $("#client-profile-file")?.files?.[0], `clients/${username}/profile`, "#client-profile-file-status");
+      heroImageUrl = await uploadImage(supabase, $("#client-hero-file")?.files?.[0], `clients/${username}/hero`, "#client-hero-file-status");
+    } catch (uploadError) {
+      setText("#client-create-status", "Image upload failed: " + uploadError.message);
+      return;
+    }
+
     const payload = {
       username,
       password_hash,
       name,
       client_type: type,
       language_preference: language,
+      profile_image_url: profileImageUrl,
+      hero_image_url: heroImageUrl,
+      hero_position_x: Number($("#client-hero-x")?.value || 50),
+      hero_position_y: Number($("#client-hero-y")?.value || 50),
       welcome_title_es: $("#client-welcome-title-es")?.value.trim() || null,
       welcome_title_en: $("#client-welcome-title-en")?.value.trim() || null,
       welcome_message_es: $("#client-welcome-message-es")?.value.trim() || null,
@@ -199,10 +264,12 @@
     }
 
     setText("#client-create-status", `Client created: ${name} (${username})`);
-    ["#client-name", "#client-context", "#client-username", "#client-password", "#client-welcome-title-es", "#client-welcome-title-en", "#client-welcome-message-es", "#client-welcome-message-en"].forEach((selector) => {
+    ["#client-name", "#client-context", "#client-username", "#client-password", "#client-welcome-title-es", "#client-welcome-title-en", "#client-welcome-message-es", "#client-welcome-message-en", "#client-profile-file", "#client-hero-file"].forEach((selector) => {
       const el = $(selector);
       if (el) el.value = "";
     });
+    setText("#client-profile-file-status", "No profile image selected yet.");
+    setText("#client-hero-file-status", "No hero image selected yet.");
 
     await loadClients();
   }
@@ -315,13 +382,21 @@
     const publishButton = $("#gallery-publish");
     const publishStatus = publishButton?.classList.contains("active") ? "published" : "draft";
 
+    let coverImageUrl = null;
+    try {
+      coverImageUrl = await uploadImage(supabase, $("#gallery-cover-file")?.files?.[0], `galleries/${slugify(titleEs || titleEn)}/cover`, "#gallery-cover-file-status");
+    } catch (uploadError) {
+      setText("#gallery-create-status", "Cover upload failed: " + uploadError.message);
+      return;
+    }
+
     const payload = {
       title_es: titleEs || titleEn,
       title_en: titleEn || titleEs,
       event_date: $("#gallery-event-date")?.value || null,
       location,
       city,
-      cover_image_url: "img/work_A.jpg",
+      cover_image_url: coverImageUrl || "img/work_A.jpg",
       cover_position_x: Number($("#gallery-cover-x")?.value || 50),
       cover_position_y: Number($("#gallery-cover-y")?.value || 50),
       status: $("#gallery-status")?.value || "created",
@@ -356,10 +431,11 @@
     }
 
     setText("#gallery-create-status", `Gallery created and assigned to ${clients.length} client(s).`);
-    ["#gallery-title-es", "#gallery-title-en", "#gallery-event-date", "#gallery-location", "#gallery-note-es", "#gallery-note-en"].forEach((selector) => {
+    ["#gallery-title-es", "#gallery-title-en", "#gallery-event-date", "#gallery-location", "#gallery-note-es", "#gallery-note-en", "#gallery-cover-file"].forEach((selector) => {
       const el = $(selector);
       if (el) el.value = "";
     });
+    setText("#gallery-cover-file-status", "No gallery cover selected yet.");
     document.querySelectorAll('input[name="gallery-client"]:checked').forEach((input) => { input.checked = false; });
 
     await loadGalleries();
@@ -460,6 +536,8 @@
 
     const createAdminBtn = $("#create-admin-submit");
     if (createAdminBtn) createAdminBtn.addEventListener("click", createAdmin);
+
+    setupImagePreviewInputs();
 
     loadClients();
     loadGalleries();
