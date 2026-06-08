@@ -46,9 +46,9 @@
     const panels=findOverviewPanels();
     if(panels[0] && panels[0].id!=='overview-publication-checklist'){
       panels[0].id='overview-publication-checklist';
-      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta">Cargando checklist real...</div></div>';
+      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list" data-real-loaded="false"></div>';
     }else if(panels[0] && !$('#overview-checklist-content', panels[0])){
-      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta">Cargando checklist real...</div></div>';
+      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list" data-real-loaded="false"></div>';
     }
     if(panels[1] && panels[1].id!=='overview-tasks-panel'){
       panels[1].id='overview-tasks-panel';
@@ -87,7 +87,8 @@
     // para evitar el parpadeo: vacío/cargando -> real -> vacío/cargando -> real.
     if(!box.dataset.loaded && !box.dataset.loading){
       box.dataset.loading='1';
-      box.innerHTML='<div class="row-meta">Cargando checklist real...</div>';
+      box.setAttribute('data-real-loaded','false');
+      box.innerHTML='';
     }
     const [galleries,links,photos,requests,tasks,events]=await Promise.all([
       selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,personal_note_es,created_at,updated_at',{order:'updated_at',ascending:false,limit:80}),
@@ -120,6 +121,7 @@
     (events.data||[]).filter(e=>['pending','confirmed','covering'].includes(e.status)).slice(0,2).forEach(e=>items.push({severity:e.status==='pending'?'red':'yellow',title:`Calendario · ${e.title||'Evento'}`,place:'Calendario',detail:`${e.event_date||'Sin fecha'}${e.location?' · '+e.location:''} · ${statusLabel(e.status)}`,target:'calendar'}));
     box.dataset.loading='0';
     box.dataset.loaded='1';
+    box.setAttribute('data-real-loaded','true');
     if(!items.length){ box.innerHTML='<div class="overview-mini-row"><span class="check-dot"></span><div><strong>Todo al día</strong><span>No hay pendientes automáticos en galerías, tareas, retoques o calendario.</span></div></div>'; return; }
     box.innerHTML=items.slice(0,8).map(item=>`<div class="overview-mini-row checklist-source-row" data-section-link="${esc(item.target)}"><span class="check-dot ${item.severity==='red'?'red-dot':'warn'}"></span><div><strong>${esc(item.title)}</strong><span><b>${esc(item.place)}</b> · ${esc(item.detail)}</span></div></div>`).join('');
   }
@@ -162,20 +164,32 @@
       setTimeout(()=>{ if(section==='tasks') $('#task-title')?.focus(); if(section==='galleries') document.querySelector('.tab[data-tab="galleries-list"]')?.click(); },150);
     },true);
   }
+  function protectChecklistFromDemoFlash(){
+    const box=$('#overview-checklist-content');
+    if(!box || window.__ibaiChecklistObserver) return;
+    box.setAttribute('data-real-loaded','false');
+    box.innerHTML='';
+    window.__ibaiChecklistObserver=new MutationObserver(()=>{
+      if(box.getAttribute('data-real-loaded')!=='true' && box.dataset.loading!=='1'){
+        box.innerHTML='';
+      }
+    });
+    window.__ibaiChecklistObserver.observe(box,{childList:true,subtree:true});
+  }
   function injectStyles(){
     if($('#overview-sync-styles')) return;
     const st=document.createElement('style'); st.id='overview-sync-styles';
     st.textContent=`
-      .overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px;cursor:pointer}.overview-mini-row strong{display:block;font-size:12px;font-weight:500;color:var(--text)}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.overview-mini-row b{color:var(--soft);font-weight:500}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red,.check-dot.red-dot{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}.check-dot.red-dot{box-shadow:0 0 0 4px rgba(255,92,92,.10)}
+      #overview-checklist-content:not([data-real-loaded="true"]){visibility:hidden;min-height:120px}.overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px;cursor:pointer}.overview-mini-row strong{display:block;font-size:12px;font-weight:500;color:var(--text)}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.overview-mini-row b{color:var(--soft);font-weight:500}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red,.check-dot.red-dot{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}.check-dot.red-dot{box-shadow:0 0 0 4px rgba(255,92,92,.10)}
     `;
     document.head.appendChild(st);
   }
   async function refresh(){
-    replaceTopPanels();
+    replaceTopPanels(); protectChecklistFromDemoFlash();
     await Promise.allSettled([updateStats(),updateChecklist(),updateTasks(),updateActivity()]);
   }
   function init(){
-    injectStyles(); bindOverviewLinks(); replaceTopPanels();
+    injectStyles(); bindOverviewLinks(); replaceTopPanels(); protectChecklistFromDemoFlash();
     // Run several delayed passes because older scripts can overwrite the overview after DOMContentLoaded.
     refresh(); setTimeout(refresh,1200);
     if(!window.IBAI_OVERVIEW_INTERVAL) window.IBAI_OVERVIEW_INTERVAL=setInterval(refresh,60000);
