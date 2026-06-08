@@ -66,7 +66,7 @@
     const panels=$$('#overview .grid.three .compact-panel');
     if(panels[0]){
       panels[0].id='overview-publication-checklist';
-      panels[0].innerHTML='<h4><span data-es>Checklist real</span><span data-en>Real checklist</span></h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta"><span data-es>Cargando datos reales...</span><span data-en>Loading real data...</span></div></div>';
+      panels[0].innerHTML='<h4><span data-es>Pendientes automáticos</span><span data-en>Automatic pending items</span></h4><div id="overview-checklist-content" class="overview-mini-list"><div class="row-meta"><span data-es>Cargando comprobaciones reales...</span><span data-en>Loading real checks...</span></div></div>';
     }
     if(panels[1]){
       panels[1].id='overview-tasks-panel';
@@ -78,23 +78,82 @@
     }
   }
   async function updateChecklist(){
-    const [galleries,links,photos]=await Promise.all([
-      selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,created_at',{order:'updated_at',ascending:false,limit:50}),
+    const [galleries,links,photos,requests,tasks,events]=await Promise.all([
+      selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,created_at,updated_at',{order:'updated_at',ascending:false,limit:80}),
       selectSafe('gallery_clients','id,gallery_id,client_id'),
-      selectSafe('photos','id,gallery_id')
+      selectSafe('photos','id,gallery_id,hidden'),
+      selectSafe('retouch_requests','id,gallery_id,status,message,created_at',{order:'created_at',ascending:false,limit:50}),
+      selectSafe('app_tasks','id,title,status,due_date,created_at',{order:'created_at',ascending:false,limit:50}),
+      selectSafe('calendar_events','id,title,event_date,status,location',{gte:[['event_date',new Date().toISOString().slice(0,10)]],order:'event_date',ascending:true,limit:30})
     ]);
-    const linked=new Set((links.data||[]).map(x=>x.gallery_id));
-    const withPhotos=new Set((photos.data||[]).map(x=>x.gallery_id));
-    const pending=(galleries.data||[]).filter(g=>g.publish_status!=='published').slice(0,6);
     const box=$('#overview-checklist-content'); if(!box) return;
-    if(!pending.length){ box.innerHTML='<div class="row-meta"><span data-es>No hay galerías pendientes de publicar.</span><span data-en>No galleries pending publication.</span></div>'; return; }
-    box.innerHTML=pending.map(g=>{
+
+    const linked=new Set((links.data||[]).map(x=>x.gallery_id).filter(Boolean));
+    const photoRows=photos.data||[];
+    const photoCountByGallery=photoRows.reduce((acc,p)=>{ if(p.gallery_id) acc[p.gallery_id]=(acc[p.gallery_id]||0)+1; return acc; },{});
+    const visibleCountByGallery=photoRows.reduce((acc,p)=>{ if(p.gallery_id && p.hidden!==true) acc[p.gallery_id]=(acc[p.gallery_id]||0)+1; return acc; },{});
+    const items=[];
+
+    (galleries.data||[]).forEach(g=>{
       const missing=[];
-      if(!linked.has(g.id)) missing.push('cliente');
+      if(!linked.has(g.id)) missing.push('cliente asignado');
       if(!g.cover_image_url) missing.push('portada');
-      if(!withPhotos.has(g.id)) missing.push('fotos');
-      const ok=!missing.length;
-      return `<div class="overview-mini-row"><span class="check-dot ${ok?'':'warn'}"></span><div><strong>${esc(g.title_es||g.title_en||'Galería')}</strong><span>${ok?'Lista para publicar':'Falta: '+missing.join(', ')}</span></div></div>`;
+      if(!photoCountByGallery[g.id]) missing.push('fotos subidas');
+      if(photoCountByGallery[g.id] && !visibleCountByGallery[g.id]) missing.push('fotos visibles');
+      if(g.publish_status!=='published') missing.push('publicación');
+      if(missing.length){
+        const title=g.title_es||g.title_en||'Galería sin título';
+        const severity=(!linked.has(g.id) || !photoCountByGallery[g.id]) ? 'red' : 'yellow';
+        items.push({
+          severity,
+          title:`Galería · ${title}`,
+          place:'Galerías > Editar galería',
+          detail:`Falta: ${missing.join(', ')}`,
+          target:'galleries'
+        });
+      }
+    });
+
+    (requests.data||[]).filter(r=>!['done','completed'].includes(r.status)).slice(0,3).forEach(r=>{
+      items.push({
+        severity:'yellow',
+        title:'Retoque pendiente',
+        place:'Retoques',
+        detail:r.message ? `Solicitud: ${r.message}` : 'Hay una solicitud de retoque sin completar.',
+        target:'requests'
+      });
+    });
+
+    (tasks.data||[]).filter(t=>['pending','in_progress'].includes(t.status)).slice(0,3).forEach(t=>{
+      items.push({
+        severity:t.status==='pending'?'red':'yellow',
+        title:`Tarea · ${t.title||'Sin título'}`,
+        place:'Tareas',
+        detail:t.due_date ? `Fecha límite: ${t.due_date}` : (t.status==='pending'?'Pendiente de empezar.':'En progreso.'),
+        target:'tasks'
+      });
+    });
+
+    const upcoming=(events.data||[]).filter(e=>['pending','confirmed','covering'].includes(e.status)).slice(0,2);
+    upcoming.forEach(e=>{
+      items.push({
+        severity:e.status==='pending'?'red':'yellow',
+        title:`Calendario · ${e.title||'Evento'}`,
+        place:'Calendario',
+        detail:`${e.event_date||'Sin fecha'}${e.location?' · '+e.location:''} · ${e.status||'pending'}`,
+        target:'calendar'
+      });
+    });
+
+    if(!items.length){
+      box.innerHTML='<div class="overview-mini-row"><span class="check-dot"></span><div><strong>Todo al día</strong><span>No hay pendientes automáticos en galerías, tareas, retoques o calendario.</span></div></div>';
+      return;
+    }
+
+    box.innerHTML=items.slice(0,8).map(item=>{
+      const cls=item.severity==='red'?'danger':(item.severity==='yellow'?'warn':'');
+      const dot=item.severity==='red'?'red-dot':(item.severity==='yellow'?'warn':'');
+      return `<div class="overview-mini-row checklist-source-row" data-section-link="${esc(item.target||'overview')}"><span class="check-dot ${dot}"></span><div><strong>${esc(item.title)}</strong><span><b>${esc(item.place)}</b> · ${esc(item.detail)}</span></div></div>`;
     }).join('');
   }
   async function updateTasks(){
@@ -179,7 +238,7 @@
     if($('#overview-sync-styles')) return;
     const st=document.createElement('style'); st.id='overview-sync-styles';
     st.textContent=`
-      .overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px}.overview-mini-row strong{display:block;font-size:12px;font-weight:500}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}
+      .overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px}.overview-mini-row strong{display:block;font-size:12px;font-weight:500}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}.check-dot.red-dot{background:var(--red)}.checklist-source-row{cursor:pointer}.checklist-source-row:hover{background:rgba(255,255,255,.055)}.overview-mini-row b{font-weight:500;color:var(--soft)}
     `;
     document.head.appendChild(st);
   }
