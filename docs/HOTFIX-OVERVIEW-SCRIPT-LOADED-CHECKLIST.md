@@ -1,0 +1,1 @@
+Incluye admin-overview-sync.js en admin-panel.html y lo ejecuta al final para que el checklist muestre origen real y el panel de tareas mantenga el diseño anterior. No requiere SQL.
