@@ -300,8 +300,8 @@
     await loadClients();
   }
 
-  function renderGalleryClientPicker(clients) {
-    const picker = $("#gallery-client-picker");
+  function renderGalleryClientPicker(clients, targetSelector = "#gallery-client-picker", inputName = "gallery-client", selectedIds = []) {
+    const picker = $(targetSelector);
     if (!picker) return;
 
     if (!clients || !clients.length) {
@@ -312,9 +312,10 @@
     picker.innerHTML = clients.map((client) => {
       const type = client.client_type || "client";
       const context = client.club || client.league || client.country || client.agency_type || client.personal_relation || client.username || "Private client";
+      const checked = selectedIds.includes(client.id) ? "checked" : "";
       return `
         <label class="selector-card">
-          <input type="checkbox" name="gallery-client" value="${client.id}" data-client-name="${client.name || client.username}">
+          <input type="checkbox" name="${inputName}" value="${client.id}" data-client-name="${client.name || client.username}" ${checked}>
           <div>
             <strong>${client.name || client.username}</strong>
             <span>${type} · ${context}</span>
@@ -453,17 +454,23 @@
             <div class="row-meta">${galleryStatusMarkup(gallery.status)} · ${assigned} · ${date} · ${place}</div>
           </div>
           <div class="row-actions">
-            <button class="btn" data-open="edit-gallery"><span data-en>Edit gallery</span><span data-es>Editar galería</span></button>
-            <button class="btn" data-open="upload-gallery"><span data-en>Upload photos</span><span data-es>Subir fotos</span></button>
-            <button class="btn"><span data-en>Preview</span><span data-es>Previsualizar</span></button>
+            <button class="btn" data-edit-gallery="${gallery.id}"><span data-en>Edit gallery</span><span data-es>Editar galería</span></button>
+            <button class="btn" data-upload-gallery="${gallery.id}"><span data-en>Upload photos</span><span data-es>Subir fotos</span></button>
+            <button class="btn" data-preview-gallery="${gallery.id}"><span data-en>Preview</span><span data-es>Previsualizar</span></button>
             <button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button>
           </div>
         </div>
       `;
     }).join("");
 
-    list.querySelectorAll("[data-open]").forEach((btn) => {
-      btn.addEventListener("click", () => openPanel(btn.dataset.open));
+    list.querySelectorAll("[data-edit-gallery]").forEach((btn) => {
+      btn.addEventListener("click", () => populateEditGallery(btn.dataset.editGallery));
+    });
+    list.querySelectorAll("[data-upload-gallery]").forEach((btn) => {
+      btn.addEventListener("click", () => openUploadGallery(btn.dataset.uploadGallery));
+    });
+    list.querySelectorAll("[data-preview-gallery]").forEach((btn) => {
+      btn.addEventListener("click", () => previewGallery(btn.dataset.previewGallery));
     });
   }
 
@@ -484,8 +491,228 @@
     }
 
     setText("#galleries-sync-status", `${data.length} gallery/galleries loaded from Supabase.`);
+    window.IBAI_GALLERIES_CACHE = data || [];
     renderGalleries(data || []);
+    renderUploadGalleryOptions(data || []);
     return data || [];
+  }
+
+
+  function renderUploadGalleryOptions(galleries) {
+    const select = $("#upload-gallery-id");
+    if (!select) return;
+    const current = select.value;
+    select.innerHTML = `<option value="">Select a gallery / Selecciona una galería</option>` + (galleries || []).map((gallery) => {
+      const title = gallery.title_es || gallery.title_en || "Untitled gallery";
+      return `<option value="${gallery.id}">${title}</option>`;
+    }).join("");
+    if (current) select.value = current;
+  }
+
+  function galleryAssignedClientIds(gallery) {
+    return (gallery?.gallery_clients || []).map((row) => row.client_id || row.clients?.id).filter(Boolean);
+  }
+
+  async function loadGalleryPhotos(galleryId, targetSelector = "#edit-gallery-photo-order") {
+    const supabase = getSupabaseClient("#edit-gallery-status-msg");
+    if (!supabase || !galleryId) return [];
+    const { data, error } = await supabase
+      .from("photos")
+      .select("id, filename, original_url, large_url, preview_url, orientation, sort_order")
+      .eq("gallery_id", galleryId)
+      .order("sort_order", { ascending: true });
+    const target = $(targetSelector);
+    if (error) {
+      if (target) target.innerHTML = `<p class="row-meta">Could not load photos: ${error.message}</p>`;
+      return [];
+    }
+    if (target) {
+      if (!data || !data.length) {
+        target.innerHTML = `<p class="row-meta">No photos uploaded yet.</p>`;
+      } else {
+        target.innerHTML = data.map((photo, index) => `
+          <div class="order-photo" title="${photo.filename}">
+            <img src="${photo.preview_url || photo.large_url || photo.original_url}" alt="">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+          </div>
+        `).join("");
+      }
+    }
+    return data || [];
+  }
+
+  function populateEditGallery(galleryId) {
+    const gallery = (window.IBAI_GALLERIES_CACHE || []).find((item) => item.id === galleryId);
+    if (!gallery) {
+      setText("#edit-gallery-status-msg", "Gallery data not found. Reload and try again.");
+      return;
+    }
+    openPanel("edit-gallery");
+    setValue("#edit-gallery-id", gallery.id);
+    setValue("#edit-gallery-current-cover-url", gallery.cover_image_url || "");
+    setValue("#edit-gallery-title-es", gallery.title_es || "");
+    setValue("#edit-gallery-title-en", gallery.title_en || "");
+    setValue("#edit-gallery-date", gallery.event_date || "");
+    setValue("#edit-gallery-location", gallery.location || "");
+    setValue("#edit-gallery-status", gallery.status || "created");
+    setValue("#edit-gallery-publish-status", gallery.publish_status || "draft");
+    setValue("#edit-gallery-note-es", gallery.personal_note_es || "");
+    setValue("#edit-gallery-note-en", gallery.personal_note_en || "");
+    setValue("#edit-gallery-internal-notes", gallery.internal_notes || "");
+    setValue("#edit-gallery-cover-file", "");
+    setPreviewImage("#edit-gallery-cover-preview", gallery.cover_image_url || "img/work_A.jpg");
+    setCrop("#edit-gallery-cover-x", "#edit-gallery-cover-y", gallery.cover_position_x ?? 50, gallery.cover_position_y ?? 50);
+    setText("#edit-gallery-cover-file-status", gallery.cover_image_url ? "Current cover image loaded. Choose a new image only if you want to replace it." : "No cover image saved yet.");
+    renderGalleryClientPicker(window.IBAI_CLIENTS_CACHE || [], "#edit-gallery-client-picker", "edit-gallery-client", galleryAssignedClientIds(gallery));
+    setText("#edit-gallery-status-msg", `Editing ${gallery.title_es || gallery.title_en || "gallery"}.`);
+    loadGalleryPhotos(gallery.id);
+  }
+
+  async function saveEditGallery() {
+    const supabase = getSupabaseClient("#edit-gallery-status-msg");
+    if (!supabase) return;
+    const id = $("#edit-gallery-id")?.value;
+    if (!id) {
+      setText("#edit-gallery-status-msg", "Choose a gallery from the list first.");
+      return;
+    }
+    const titleEs = $("#edit-gallery-title-es")?.value.trim();
+    const titleEn = $("#edit-gallery-title-en")?.value.trim();
+    if (!titleEs && !titleEn) {
+      setText("#edit-gallery-status-msg", "Add a gallery title first.");
+      return;
+    }
+    const selectedClientIds = Array.from(document.querySelectorAll('input[name="edit-gallery-client"]:checked')).map((input) => input.value);
+    if (!selectedClientIds.length) {
+      setText("#edit-gallery-status-msg", "Assign at least one client.");
+      return;
+    }
+    let coverImageUrl = $("#edit-gallery-current-cover-url")?.value || null;
+    try {
+      const newCover = await uploadImage(supabase, $("#edit-gallery-cover-file")?.files?.[0], `galleries/${slugify(titleEs || titleEn)}/cover`, "#edit-gallery-cover-file-status");
+      if (newCover) coverImageUrl = newCover;
+    } catch (uploadError) {
+      setText("#edit-gallery-status-msg", "Cover upload failed: " + uploadError.message);
+      return;
+    }
+    const location = $("#edit-gallery-location")?.value.trim() || null;
+    const payload = {
+      title_es: titleEs || titleEn,
+      title_en: titleEn || titleEs,
+      event_date: $("#edit-gallery-date")?.value || null,
+      location,
+      cover_image_url: coverImageUrl || "img/work_A.jpg",
+      cover_position_x: Number($("#edit-gallery-cover-x")?.value || 50),
+      cover_position_y: Number($("#edit-gallery-cover-y")?.value || 50),
+      status: $("#edit-gallery-status")?.value || "created",
+      publish_status: $("#edit-gallery-publish-status")?.value || "draft",
+      personal_note_es: $("#edit-gallery-note-es")?.value.trim() || null,
+      personal_note_en: $("#edit-gallery-note-en")?.value.trim() || null,
+      internal_notes: $("#edit-gallery-internal-notes")?.value.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+    setText("#edit-gallery-status-msg", "Saving gallery changes...");
+    const { error } = await supabase.from("galleries").update(payload).eq("id", id);
+    if (error) {
+      setText("#edit-gallery-status-msg", "Could not save gallery: " + error.message);
+      return;
+    }
+    await supabase.from("gallery_clients").delete().eq("gallery_id", id);
+    const links = selectedClientIds.map((clientId) => ({ gallery_id: id, client_id: clientId }));
+    const { error: linkError } = await supabase.from("gallery_clients").insert(links);
+    if (linkError) {
+      setText("#edit-gallery-status-msg", "Gallery saved, but client assignment failed: " + linkError.message);
+      await loadGalleries();
+      return;
+    }
+    setText("#edit-gallery-status-msg", "Gallery saved correctly.");
+    await loadGalleries();
+  }
+
+  function openUploadGallery(galleryId) {
+    openPanel("upload-gallery");
+    const select = $("#upload-gallery-id");
+    if (select && galleryId) select.value = galleryId;
+    const gallery = (window.IBAI_GALLERIES_CACHE || []).find((item) => item.id === galleryId);
+    if (gallery) {
+      setValue("#upload-photo-location", gallery.location || "");
+      setValue("#upload-photo-date", gallery.event_date || "");
+    }
+    setText("#upload-gallery-status", gallery ? `Ready to upload photos to ${gallery.title_es || gallery.title_en}.` : "Choose a gallery and select files.");
+  }
+
+  function detectImageOrientation(file) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const orientation = img.naturalHeight > img.naturalWidth ? "vertical" : "horizontal";
+        URL.revokeObjectURL(url);
+        resolve(orientation);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve("horizontal");
+      };
+      img.src = url;
+    });
+  }
+
+  async function uploadGalleryPhotos() {
+    const supabase = getSupabaseClient("#upload-gallery-status");
+    if (!supabase) return;
+    const galleryId = $("#upload-gallery-id")?.value;
+    const files = Array.from($("#gallery-photo-files")?.files || []);
+    if (!galleryId) {
+      setText("#upload-gallery-status", "Choose a gallery first.");
+      return;
+    }
+    if (!files.length) {
+      setText("#upload-gallery-status", "Select one or more image files first.");
+      return;
+    }
+    const gallery = (window.IBAI_GALLERIES_CACHE || []).find((item) => item.id === galleryId);
+    const gallerySlug = slugify(gallery?.title_es || gallery?.title_en || galleryId);
+    const location = $("#upload-photo-location")?.value.trim() || gallery?.location || null;
+    const eventDate = $("#upload-photo-date")?.value || gallery?.event_date || null;
+    const preview = $("#upload-gallery-preview");
+    if (preview) preview.innerHTML = "";
+    setText("#upload-gallery-status", `Uploading 0/${files.length} photos...`);
+    let uploaded = 0;
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+      const orientation = await detectImageOrientation(file);
+      const publicUrl = await uploadImage(supabase, file, `galleries/${gallerySlug}/photos/original`, "#upload-gallery-status");
+      const { error } = await supabase.from("photos").insert({
+        gallery_id: galleryId,
+        filename: file.name,
+        original_url: publicUrl,
+        large_url: publicUrl,
+        preview_url: publicUrl,
+        orientation,
+        sort_order: Date.now() + uploaded,
+        event_date: eventDate,
+        location
+      });
+      if (error) {
+        setText("#upload-gallery-status", "Photo uploaded, but database insert failed: " + error.message);
+        return;
+      }
+      uploaded += 1;
+      if (preview) {
+        preview.insertAdjacentHTML("beforeend", `<div class="order-photo"><img src="${publicUrl}" alt=""><span>${String(uploaded).padStart(2, "0")}</span></div>`);
+      }
+      setText("#upload-gallery-status", `Uploading ${uploaded}/${files.length} photos...`);
+    }
+    setText("#upload-gallery-status", `${uploaded} photo(s) uploaded and linked to the gallery.`);
+    const galleryStatus = uploaded > 0 ? "in_progress" : "created";
+    await supabase.from("galleries").update({ status: galleryStatus, updated_at: new Date().toISOString() }).eq("id", galleryId).neq("status", "ready");
+    await loadGalleries();
+  }
+
+  function previewGallery(galleryId) {
+    const url = galleryId ? `gallery-view.html?gallery=${encodeURIComponent(galleryId)}` : "gallery-view.html";
+    window.open(url, "_blank");
   }
 
   async function createGallery() {
@@ -688,6 +915,15 @@
 
     const createGalleryBtn = $("#create-gallery-submit");
     if (createGalleryBtn) createGalleryBtn.addEventListener("click", createGallery);
+
+    const saveEditGalleryBtn = $("#save-edit-gallery");
+    if (saveEditGalleryBtn) saveEditGalleryBtn.addEventListener("click", saveEditGallery);
+
+    const previewEditGalleryBtn = $("#preview-edit-gallery");
+    if (previewEditGalleryBtn) previewEditGalleryBtn.addEventListener("click", () => previewGallery($("#edit-gallery-id")?.value));
+
+    const uploadGalleryPhotosBtn = $("#upload-gallery-photos-submit");
+    if (uploadGalleryPhotosBtn) uploadGalleryPhotosBtn.addEventListener("click", uploadGalleryPhotos);
 
     const createAdminBtn = $("#create-admin-submit");
     if (createAdminBtn) createAdminBtn.addEventListener("click", createAdmin);
