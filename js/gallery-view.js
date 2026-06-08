@@ -13,6 +13,27 @@
   function dateLabel(date){if(!date)return ''; try{return new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date;}}
   function photoSrc(p){return p.preview_url||p.large_url||p.original_url||'';}
   function downloadSrc(p){const size=$('#globalSize')?.value||document.querySelector('.download-option.active')?.dataset.size||'original'; return size==='preview'?(p.preview_url||p.large_url||p.original_url):size==='large'?(p.large_url||p.original_url||p.preview_url):(p.original_url||p.large_url||p.preview_url);}
+
+  function currentSizeLabel(){
+    const size=$('#globalSize')?.value||document.querySelector('.download-option.active')?.dataset.size||'original';
+    if(size==='preview') return '1600x1067';
+    if(size==='large') return '3000x2000';
+    return '6000x4000';
+  }
+
+  async function logDownload(downloadType, photoId=null, photosCount=1){
+    const sb=getClient();
+    if(!sb || !activeClient?.id || !activeGallery?.id) return;
+    const {error}=await sb.from('download_logs').insert({
+      client_id: activeClient.id,
+      gallery_id: activeGallery.id,
+      photo_id: photoId,
+      download_type: downloadType,
+      size_label: currentSizeLabel(),
+      photos_count: photosCount
+    });
+    if(error) console.warn('download log error', error);
+  }
   function photoDbId(index){return realPhotos[index]?.db_id;}
 
   async function loadSavedState(sb){
@@ -135,20 +156,20 @@
     $('#lightbox').classList.add('open'); $('#lightbox').setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; updateCounts(); applyFilter();
   }
   function closeLightbox(){ $('#lightbox').classList.remove('open'); $('#lightbox').setAttribute('aria-hidden','true'); document.body.style.overflow='';}
-  function downloadPhoto(i){const p=realPhotos[i]; if(!p)return; const a=document.createElement('a'); a.href=downloadSrc(p); a.download=p.file||'photo.jpg'; document.body.appendChild(a); a.click(); a.remove(); reviewed.add(i); updateCounts();}
-  function downloadSet(set){Array.from(set).forEach((i)=>downloadPhoto(i));}
+  async function downloadPhoto(i,type='single'){const p=realPhotos[i]; if(!p)return; const a=document.createElement('a'); a.href=downloadSrc(p); a.download=p.file||'photo.jpg'; document.body.appendChild(a); a.click(); a.remove(); reviewed.add(i); updateCounts(); await logDownload(type,p.db_id,1);}
+  async function downloadSet(set,type='selected'){const items=Array.from(set); for(const i of items){const p=realPhotos[i]; if(!p) continue; const a=document.createElement('a'); a.href=downloadSrc(p); a.download=p.file||'photo.jpg'; document.body.appendChild(a); a.click(); a.remove(); reviewed.add(i);} updateCounts(); await logDownload(type,null,items.length);}
 
   document.addEventListener('DOMContentLoaded',()=>{
     if(!galleryId) return;
     document.addEventListener('click',async(e)=>{
-      const card=e.target.closest('.photo-card'); if(card&&card.dataset.index){const i=+card.dataset.index; if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('favourites',i,favs); return;} if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('selections',i,selected); return;} if(e.target.closest('.dl')){downloadPhoto(i);return;} openLightbox(i);}
+      const card=e.target.closest('.photo-card'); if(card&&card.dataset.index){const i=+card.dataset.index; if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('favourites',i,favs); return;} if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('selections',i,selected); return;} if(e.target.closest('.dl')){downloadPhoto(i,'individual');return;} openLightbox(i);}
       if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active')); e.target.closest('.filter').classList.add('is-active'); applyFilter();}
     },true);
     $('#closeLight')?.addEventListener('click',closeLight); $('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length)); $('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));
     $('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current); reviewed.add(current); await persistToggle('favourites',current,favs); openLightbox(current); applyFilter();});
     $('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current); reviewed.add(current); await persistToggle('selections',current,selected); openLightbox(current); applyFilter();});
-    $('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));
-    $('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected)); $('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs)); $('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));
+    $('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current,'individual'));
+    $('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected,'selected')); $('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs,'favourites')); $('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected,'selected'));
     
     const requestBtn = $('#requestEdit');
     if (requestBtn) {
