@@ -63,7 +63,7 @@
 
       const { data, error } = await supabase
         .from("admin_users")
-        .select("id, username, name, role, active")
+        .select("id, username, name, role, active, profile_image_url")
         .eq("username", username)
         .eq("password_hash", password_hash)
         .eq("active", true)
@@ -84,6 +84,7 @@
         username: data.username,
         name: data.name,
         role: data.role,
+        profile_image_url: data.profile_image_url,
         loggedAt: new Date().toISOString()
       }));
 

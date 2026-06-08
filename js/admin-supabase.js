@@ -826,32 +826,52 @@
       location.href = "admin-login.html";
       return null;
     }
-    if (session) setText("#admin-session-status", `Admin: ${session.name || session.username}`);
+    if (session) {
+      setText("#admin-session-status", `Admin: ${session.name || session.username}`);
+      updateAdminHero(session);
+    }
     return session;
+  }
+
+
+  function updateAdminHero(session) {
+    if (!session) return;
+    const nameEl = $("#admin-hero-name");
+    const avatarEl = $("#admin-hero-avatar");
+    if (nameEl) nameEl.textContent = session.name || session.username || "Admin";
+    if (avatarEl && session.profile_image_url) avatarEl.src = session.profile_image_url;
   }
 
   function renderAdmins(admins) {
     const list = $("#admins-list-render");
     if (!list) return;
 
+    window.IBAI_ADMINS_CACHE = admins || [];
+
     if (!admins || !admins.length) {
       list.innerHTML = `<div class="list-row"><div><div class="row-title">No administrators yet</div><div class="row-meta">Create the first administrator from the Create admin tab.</div></div></div>`;
       return;
     }
 
-    list.innerHTML = admins.map((admin) => `
-      <div class="list-row" data-admin-id="${admin.id}">
-        <img class="avatar" src="img/IMG_IBAI.jpg" alt="">
-        <div>
-          <div class="row-title">${admin.name || admin.username}</div>
-          <div class="row-meta">${admin.username} · ${admin.role || "editor"} · ${admin.active ? "active" : "inactive"}</div>
+    list.innerHTML = admins.map((admin) => {
+      const img = admin.profile_image_url || "img/IMG_IBAI.jpg";
+      return `
+        <div class="list-row" data-admin-id="${admin.id}">
+          <img class="avatar" src="${img}" alt="">
+          <div>
+            <div class="row-title">${admin.name || admin.username}</div>
+            <div class="row-meta">${admin.username} · ${admin.role || "editor"} · ${admin.active ? "active" : "inactive"}</div>
+          </div>
+          <div class="row-actions admin-card-actions">
+            <button class="btn" data-edit-admin="${admin.id}"><span data-en>Edit admin</span><span data-es>Editar admin</span></button>
+          </div>
         </div>
-        <div class="row-actions">
-          <button class="btn"><span data-en>Change password</span><span data-es>Cambiar contraseña</span></button>
-          <button class="btn"><span data-en>Deactivate</span><span data-es>Desactivar</span></button>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
+
+    list.querySelectorAll("[data-edit-admin]").forEach((btn) => {
+      btn.addEventListener("click", () => populateEditAdmin(btn.dataset.editAdmin));
+    });
   }
 
   async function loadAdmins() {
@@ -860,7 +880,7 @@
     setText("#admins-sync-status", "Loading administrators from Supabase...");
     const { data, error } = await supabase
       .from("admin_users")
-      .select("id, username, name, role, active, created_at")
+      .select("id, username, name, role, active, profile_image_url, created_at")
       .order("created_at", { ascending: false });
     if (error) {
       setText("#admins-sync-status", "Could not load administrators: " + error.message);
@@ -868,7 +888,36 @@
     }
     setText("#admins-sync-status", `${data.length} administrator(s) loaded from Supabase.`);
     renderAdmins(data || []);
+
+    const session = currentAdminSession();
+    if (session?.id) {
+      const fresh = (data || []).find((admin) => admin.id === session.id);
+      if (fresh) {
+        localStorage.setItem("ibaiAdminSession", JSON.stringify({ ...session, ...fresh }));
+        updateAdminHero(fresh);
+      }
+    }
     return data || [];
+  }
+
+  function populateEditAdmin(adminId) {
+    const admin = (window.IBAI_ADMINS_CACHE || []).find((item) => item.id === adminId);
+    if (!admin) {
+      setText("#edit-admin-status", "Administrator data not found. Reload the page and try again.");
+      return;
+    }
+    openPanel("edit-admin");
+    setValue("#edit-admin-id", admin.id);
+    setValue("#edit-admin-current-profile-url", admin.profile_image_url || "");
+    setValue("#edit-admin-name", admin.name || "");
+    setValue("#edit-admin-username", admin.username || "");
+    setValue("#edit-admin-password", "");
+    setValue("#edit-admin-role", admin.role || "editor");
+    setValue("#edit-admin-active", admin.active ? "true" : "false");
+    setPreviewImage("#edit-admin-profile-preview", admin.profile_image_url || "img/IMG_IBAI.jpg");
+    setValue("#edit-admin-profile-file", "");
+    setText("#edit-admin-profile-file-status", admin.profile_image_url ? "Current admin profile image loaded. Choose a new image only if you want to replace it." : "No profile image saved yet.");
+    setText("#edit-admin-status", `Editing ${admin.name || admin.username}.`);
   }
 
   async function createAdmin() {
@@ -882,18 +931,74 @@
       setText("#admin-create-status", "Add admin name, username and password first.");
       return;
     }
+
+    let profileImageUrl = null;
+    try {
+      profileImageUrl = await uploadImage(supabase, $("#admin-profile-file")?.files?.[0], `admins/${username}/profile`, "#admin-profile-file-status");
+    } catch (uploadError) {
+      setText("#admin-create-status", "Admin profile image upload failed: " + uploadError.message);
+      return;
+    }
+
     const password_hash = await sha256(password);
     setText("#admin-create-status", "Creating administrator in Supabase...");
-    const { error } = await supabase.from("admin_users").insert({ username, password_hash, name, role, active: true });
+    const { error } = await supabase.from("admin_users").insert({ username, password_hash, name, role, active: true, profile_image_url: profileImageUrl });
     if (error) {
       setText("#admin-create-status", "Could not create administrator: " + error.message);
       return;
     }
     setText("#admin-create-status", `Administrator created: ${name} (${username})`);
-    ["#admin-name", "#admin-username", "#admin-password"].forEach((selector) => { const el = $(selector); if (el) el.value = ""; });
+    ["#admin-name", "#admin-username", "#admin-password", "#admin-profile-file"].forEach((selector) => { const el = $(selector); if (el) el.value = ""; });
+    setText("#admin-profile-file-status", "No image selected yet.");
+    setPreviewImage("#admin-profile-preview", "img/IMG_IBAI.jpg");
     await loadAdmins();
   }
 
+  async function saveEditAdmin() {
+    const supabase = getSupabaseClient("#edit-admin-status");
+    if (!supabase) return;
+
+    const id = $("#edit-admin-id")?.value;
+    const name = $("#edit-admin-name")?.value.trim();
+    const username = slugify($("#edit-admin-username")?.value.trim());
+    const password = $("#edit-admin-password")?.value;
+    const role = $("#edit-admin-role")?.value || "editor";
+    const active = $("#edit-admin-active")?.value === "true";
+
+    if (!id || !name || !username) {
+      setText("#edit-admin-status", "Choose an administrator and add name and username.");
+      return;
+    }
+
+    let profileImageUrl = $("#edit-admin-current-profile-url")?.value || null;
+    try {
+      const newProfile = await uploadImage(supabase, $("#edit-admin-profile-file")?.files?.[0], `admins/${username}/profile`, "#edit-admin-profile-file-status");
+      if (newProfile) profileImageUrl = newProfile;
+    } catch (uploadError) {
+      setText("#edit-admin-status", "Admin profile image upload failed: " + uploadError.message);
+      return;
+    }
+
+    const payload = { name, username, role, active, profile_image_url: profileImageUrl, updated_at: new Date().toISOString() };
+    if (password) payload.password_hash = await sha256(password);
+
+    setText("#edit-admin-status", "Saving administrator changes...");
+    const { error } = await supabase.from("admin_users").update(payload).eq("id", id);
+    if (error) {
+      setText("#edit-admin-status", "Could not update administrator: " + error.message);
+      return;
+    }
+
+    const session = currentAdminSession();
+    if (session?.id === id) {
+      const updatedSession = { ...session, ...payload, id };
+      localStorage.setItem("ibaiAdminSession", JSON.stringify(updatedSession));
+      updateAdminHero(updatedSession);
+    }
+
+    setText("#edit-admin-status", "Administrator updated successfully.");
+    await loadAdmins();
+  }
   document.addEventListener("DOMContentLoaded", () => {
     const session = requireAdminSession();
     if (!session && location.pathname.endsWith("admin-panel.html")) return;
@@ -927,6 +1032,9 @@
 
     const createAdminBtn = $("#create-admin-submit");
     if (createAdminBtn) createAdminBtn.addEventListener("click", createAdmin);
+
+    const saveEditAdminBtn = $("#save-edit-admin");
+    if (saveEditAdminBtn) saveEditAdminBtn.addEventListener("click", saveEditAdmin);
 
     setupImagePreviewInputs();
 
