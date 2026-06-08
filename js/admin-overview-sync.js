@@ -1,68 +1,50 @@
 (function(){
   'use strict';
   const $=(s,r=document)=>r.querySelector(s);
-  const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=(v)=>String(v ?? '').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
-  const imgFallback='img/IMG_IBAI.jpg';
-  function supa(){
+
+  function client(){
     try{
       if(!window.supabase || !window.IBAI_SUPABASE_URL || !window.IBAI_SUPABASE_ANON_KEY) return null;
-      if(!window.IBAI_OVERVIEW_CLIENT) window.IBAI_OVERVIEW_CLIENT=window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);
+      if(!window.IBAI_OVERVIEW_CLIENT){
+        window.IBAI_OVERVIEW_CLIENT=window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);
+      }
       return window.IBAI_OVERVIEW_CLIENT;
-    }catch(e){ console.warn('[overview-sync] supabase init failed',e); return null; }
+    }catch(e){ console.warn('[overview] client init failed', e); return null; }
   }
-  function setText(id,value){ const el=$(id); if(el) el.textContent = value; }
+
+  function setText(selector,value){ const el=$(selector); if(el) el.textContent=value; }
   function fmtDate(value){
     if(!value) return '—';
-    try{ return new Date(value).toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return String(value); }
+    try{ return new Date(value).toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+    catch(e){ return String(value); }
   }
   function statusLabel(status){
-    const map={ready:'Lista',in_progress:'En proceso',created:'Creada',published:'Publicado',draft:'Borrador',pending:'Pendiente',done:'Finalizado',completed:'Finalizado',confirmed:'Confirmado',cancelled:'Cancelado'};
-    return map[status]||status||'—';
-  }
-  function statusPill(status){
-    const color = ['ready','published','done','completed'].includes(status) ? 'green' : (['created','pending','cancelled'].includes(status) ? 'red' : 'yellow');
-    return `<span class="pill"><span class="dot ${color}"></span>${esc(statusLabel(status))}</span>`;
+    const map={ready:'Lista',in_progress:'En proceso',created:'Creada',published:'Publicado',draft:'Borrador',pending:'Pendiente',done:'Finalizado',completed:'Finalizado',confirmed:'Confirmado',covering:'En cobertura',cancelled:'Cancelado'};
+    return map[status] || status || '—';
   }
   async function selectSafe(table,query='*',opts={}){
-    const sb=supa(); if(!sb) return {data:[],error:new Error('Supabase no configurado')};
+    const sb=client();
+    if(!sb) return {data:[],error:new Error('Supabase no configurado')};
     try{
-      let q=sb.from(table).select(query, opts.count?{count:'exact',head:!!opts.head}:undefined);
+      let q=sb.from(table).select(query);
+      if(opts.eq) opts.eq.forEach(([k,v])=>{ q=q.eq(k,v); });
+      if(opts.gte) opts.gte.forEach(([k,v])=>{ q=q.gte(k,v); });
       if(opts.order) q=q.order(opts.order,{ascending:!!opts.ascending});
       if(opts.limit) q=q.limit(opts.limit);
-      if(opts.eq) opts.eq.forEach(([k,v])=>{q=q.eq(k,v);});
-      if(opts.gte) opts.gte.forEach(([k,v])=>{q=q.gte(k,v);});
       return await q;
-    }catch(e){ console.warn('[overview-sync] select failed',table,e); return {data:[],error:e}; }
+    }catch(e){ console.warn('[overview] select failed', table, e); return {data:[],error:e}; }
   }
-  function findOverviewPanels(){
-    // We target only the first row of 3 compact panels in Resumen, not client/gallery subsections.
-    const overview=$('#overview') || $('.section.active');
-    let panels=[];
-    if(overview){ panels=$$('.grid.three .compact-panel', overview).slice(0,3); }
-    return panels;
+
+  function injectStyles(){
+    if($('#overview-rebuild-styles')) return;
+    const st=document.createElement('style'); st.id='overview-rebuild-styles';
+    st.textContent=`
+      .overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px;cursor:pointer}.overview-mini-row strong{display:block;font-size:12px;font-weight:500;color:var(--text)}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.overview-mini-row b{color:var(--soft);font-weight:500}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red,.check-dot.red-dot{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}.check-dot.red-dot{box-shadow:0 0 0 4px rgba(255,92,92,.10)}
+    `;
+    document.head.appendChild(st);
   }
-  function replaceTopPanels(){
-    const panels=findOverviewPanels();
-    if(panels[0] && panels[0].id!=='overview-publication-checklist'){
-      panels[0].id='overview-publication-checklist';
-      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list" data-real-loaded="false"></div>';
-    }else if(panels[0] && !$('#overview-checklist-content', panels[0])){
-      panels[0].innerHTML='<h4>Checklist de publicación</h4><div id="overview-checklist-content" class="overview-mini-list" data-real-loaded="false"></div>';
-    }
-    if(panels[1] && panels[1].id!=='overview-tasks-panel'){
-      panels[1].id='overview-tasks-panel';
-      panels[1].innerHTML='<h4>Tareas pendientes</h4><div id="overview-tasks-content" class="overview-mini-list"><div class="row-meta">Cargando tareas reales...</div></div><button class="btn" data-section-link="tasks" style="margin-top:10px">Abrir tareas</button>';
-    }else if(panels[1] && !$('#overview-tasks-content', panels[1])){
-      panels[1].innerHTML='<h4>Tareas pendientes</h4><div id="overview-tasks-content" class="overview-mini-list"><div class="row-meta">Cargando tareas reales...</div></div><button class="btn" data-section-link="tasks" style="margin-top:10px">Abrir tareas</button>';
-    }
-    if(panels[2] && panels[2].id!=='overview-activity-panel'){
-      panels[2].id='overview-activity-panel';
-      panels[2].innerHTML='<h4>Actividad útil</h4><div id="overview-activity-content" class="overview-mini-list"><div class="row-meta">Cargando actividad real...</div></div>';
-    }else if(panels[2] && !$('#overview-activity-content', panels[2])){
-      panels[2].innerHTML='<h4>Actividad útil</h4><div id="overview-activity-content" class="overview-mini-list"><div class="row-meta">Cargando actividad real...</div></div>';
-    }
-  }
+
   async function updateStats(){
     setText('#overview-clients-count','…'); setText('#overview-galleries-count','…'); setText('#overview-uploads-count','…'); setText('#overview-retouch-count','…');
     const [clients,galleries,requests,photos]=await Promise.all([
@@ -77,32 +59,24 @@
     const galleriesWithPhotos=new Set(photoRows.map(p=>p.gallery_id).filter(Boolean));
     const pendingUploads=galleryRows.filter(g=>g.status==='created'||g.status==='in_progress'||!galleriesWithPhotos.has(g.id)).length;
     const openRequests=requestRows.filter(r=>!['done','completed'].includes(r.status)).length;
-    setText('#overview-clients-count', activeClients); setText('#overview-galleries-count', activeGalleries); setText('#overview-uploads-count', pendingUploads); setText('#overview-retouch-count', openRequests);
+    setText('#overview-clients-count',activeClients); setText('#overview-galleries-count',activeGalleries); setText('#overview-uploads-count',pendingUploads); setText('#overview-retouch-count',openRequests);
   }
-  let __checklistRunId=0;
+
   async function updateChecklist(){
-    const box=$('#overview-checklist-content'); if(!box) return;
-    const runId=++__checklistRunId;
-    // Nunca mostramos contenido demo. Tampoco limpiamos el contenido real en cada refresco,
-    // para evitar el parpadeo: vacío/cargando -> real -> vacío/cargando -> real.
-    if(!box.dataset.loaded && !box.dataset.loading){
-      box.dataset.loading='1';
-      box.setAttribute('data-real-loaded','false');
-      box.innerHTML='';
-    }
+    const box=$('#overview-checklist-real-content'); if(!box) return;
+    box.innerHTML='<div class="row-meta">Cargando checklist real...</div>';
+    const today=new Date().toISOString().slice(0,10);
     const [galleries,links,photos,requests,tasks,events]=await Promise.all([
-      selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,personal_note_es,created_at,updated_at',{order:'updated_at',ascending:false,limit:80}),
+      selectSafe('galleries','id,title_es,title_en,cover_image_url,status,publish_status,personal_note_es,created_at,updated_at',{order:'updated_at',ascending:false,limit:100}),
       selectSafe('gallery_clients','id,gallery_id,client_id'),
       selectSafe('photos','id,gallery_id,hidden'),
       selectSafe('retouch_requests','id,gallery_id,status,message,created_at',{order:'created_at',ascending:false,limit:50}),
       selectSafe('app_tasks','id,title,status,due_date,created_at',{order:'created_at',ascending:false,limit:50}),
-      selectSafe('calendar_events','id,title,event_date,status,location',{gte:[['event_date',new Date().toISOString().slice(0,10)]],order:'event_date',ascending:true,limit:30})
+      selectSafe('calendar_events','id,title,event_date,status,location',{gte:[['event_date',today]],order:'event_date',ascending:true,limit:30})
     ]);
-    if(runId!==__checklistRunId) return;
     const linked=new Set((links.data||[]).map(x=>x.gallery_id).filter(Boolean));
-    const photoRows=photos.data||[];
     const photoCount={}; const visibleCount={};
-    photoRows.forEach(p=>{ if(!p.gallery_id) return; photoCount[p.gallery_id]=(photoCount[p.gallery_id]||0)+1; if(p.hidden!==true) visibleCount[p.gallery_id]=(visibleCount[p.gallery_id]||0)+1; });
+    (photos.data||[]).forEach(p=>{ if(!p.gallery_id) return; photoCount[p.gallery_id]=(photoCount[p.gallery_id]||0)+1; if(p.hidden!==true) visibleCount[p.gallery_id]=(visibleCount[p.gallery_id]||0)+1; });
     const items=[];
     (galleries.data||[]).forEach(g=>{
       const missing=[];
@@ -113,18 +87,16 @@
       if(!g.personal_note_es) missing.push('nota personalizada');
       if(g.publish_status!=='published') missing.push('publicación');
       if(missing.length){
-        items.push({severity:(!linked.has(g.id)||!photoCount[g.id])?'red':'yellow', title:`Galería · ${g.title_es||g.title_en||'Sin título'}`, place:'Galerías > Editar galería', detail:`Falta: ${missing.join(', ')}`, target:'galleries'});
+        items.push({severity:(!linked.has(g.id)||!photoCount[g.id])?'red':'yellow',title:`Galería · ${g.title_es||g.title_en||'Sin título'}`,place:'Galerías > Editar galería',detail:`Falta: ${missing.join(', ')}`,target:'galleries'});
       }
     });
     (requests.data||[]).filter(r=>!['done','completed'].includes(r.status)).slice(0,3).forEach(r=>items.push({severity:'yellow',title:'Retoque pendiente',place:'Retoques',detail:r.message?`Solicitud: ${r.message}`:'Solicitud de retoque sin completar.',target:'requests'}));
     (tasks.data||[]).filter(t=>['pending','in_progress'].includes(t.status)).slice(0,3).forEach(t=>items.push({severity:t.status==='pending'?'red':'yellow',title:`Tarea · ${t.title||'Sin título'}`,place:'Tareas',detail:t.due_date?`Fecha límite: ${t.due_date}`:(t.status==='pending'?'Pendiente de empezar.':'En progreso.'),target:'tasks'}));
     (events.data||[]).filter(e=>['pending','confirmed','covering'].includes(e.status)).slice(0,2).forEach(e=>items.push({severity:e.status==='pending'?'red':'yellow',title:`Calendario · ${e.title||'Evento'}`,place:'Calendario',detail:`${e.event_date||'Sin fecha'}${e.location?' · '+e.location:''} · ${statusLabel(e.status)}`,target:'calendar'}));
-    box.dataset.loading='0';
-    box.dataset.loaded='1';
-    box.setAttribute('data-real-loaded','true');
     if(!items.length){ box.innerHTML='<div class="overview-mini-row"><span class="check-dot"></span><div><strong>Todo al día</strong><span>No hay pendientes automáticos en galerías, tareas, retoques o calendario.</span></div></div>'; return; }
     box.innerHTML=items.slice(0,8).map(item=>`<div class="overview-mini-row checklist-source-row" data-section-link="${esc(item.target)}"><span class="check-dot ${item.severity==='red'?'red-dot':'warn'}"></span><div><strong>${esc(item.title)}</strong><span><b>${esc(item.place)}</b> · ${esc(item.detail)}</span></div></div>`).join('');
   }
+
   async function updateTasks(){
     const box=$('#overview-tasks-content'); if(!box) return;
     const res=await selectSafe('app_tasks','id,title,status,due_date,created_at',{order:'created_at',ascending:false,limit:100});
@@ -132,10 +104,11 @@
     const rows=res.data||[];
     const pending=rows.filter(t=>t.status==='pending'), progress=rows.filter(t=>t.status==='in_progress'), done=rows.filter(t=>t.status==='done'||t.status==='completed');
     const visible=[...pending,...progress].slice(0,4);
-    const counters=`<div class="task-summary"><span><i class="dot red"></i>${pending.length}</span><span><i class="dot yellow"></i>${progress.length}</span><span><i class="dot green"></i>${done.length}</span></div>`;
+    const counters=`<div class="task-summary"><span><i class="red"></i>${pending.length}</span><span><i class="yellow"></i>${progress.length}</span><span><i class="green"></i>${done.length}</span></div>`;
     if(!rows.length){ box.innerHTML=counters+'<div class="row-meta">No hay tareas creadas.</div>'; return; }
     box.innerHTML=counters+(visible.length?visible.map(t=>`<div class="overview-mini-row"><span class="task-dot ${esc(t.status)}"></span><div><strong>${esc(t.title)}</strong><span>${t.due_date?esc(t.due_date):'Sin fecha límite'}</span></div></div>`).join(''):'<div class="row-meta">No hay tareas pendientes.</div>');
   }
+
   async function updateActivity(){
     const box=$('#overview-activity-content'); if(!box) return;
     const chunks=[];
@@ -155,6 +128,7 @@
     const items=chunks.slice(0,4);
     box.innerHTML=items.length?items.map(x=>`<div class="overview-mini-row"><span class="side-dot"></span><div><strong>${esc(x.title)}</strong><span>${esc(x.meta)} · ${fmtDate(x.t)}</span></div></div>`).join(''):'<div class="row-meta">Aún no hay actividad real.</div>';
   }
+
   function bindOverviewLinks(){
     if(window.__ibaiOverviewLinksBound) return; window.__ibaiOverviewLinksBound=true;
     document.addEventListener('click',(e)=>{
@@ -164,34 +138,12 @@
       setTimeout(()=>{ if(section==='tasks') $('#task-title')?.focus(); if(section==='galleries') document.querySelector('.tab[data-tab="galleries-list"]')?.click(); },150);
     },true);
   }
-  function protectChecklistFromDemoFlash(){
-    const box=$('#overview-checklist-content');
-    if(!box || window.__ibaiChecklistObserver) return;
-    box.setAttribute('data-real-loaded','false');
-    box.innerHTML='';
-    window.__ibaiChecklistObserver=new MutationObserver(()=>{
-      if(box.getAttribute('data-real-loaded')!=='true' && box.dataset.loading!=='1'){
-        box.innerHTML='';
-      }
-    });
-    window.__ibaiChecklistObserver.observe(box,{childList:true,subtree:true});
-  }
-  function injectStyles(){
-    if($('#overview-sync-styles')) return;
-    const st=document.createElement('style'); st.id='overview-sync-styles';
-    st.textContent=`
-      #overview-checklist-content:not([data-real-loaded="true"]){visibility:hidden;min-height:120px}.overview-mini-list{display:grid;gap:9px}.overview-mini-row{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);background:rgba(255,255,255,.025);padding:9px;cursor:pointer}.overview-mini-row strong{display:block;font-size:12px;font-weight:500;color:var(--text)}.overview-mini-row span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}.overview-mini-row b{color:var(--soft);font-weight:500}.task-summary{display:flex;gap:8px;margin:0 0 10px 0}.task-summary span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:6px 8px;font-size:11px;color:var(--soft)}.task-summary i{width:8px;height:8px;border-radius:50%;display:inline-block}.task-summary .red,.check-dot.red-dot{background:var(--red)}.task-summary .yellow{background:var(--yellow)}.task-summary .green{background:var(--green)}.check-dot.red-dot{box-shadow:0 0 0 4px rgba(255,92,92,.10)}
-    `;
-    document.head.appendChild(st);
-  }
+
   async function refresh(){
-    replaceTopPanels(); protectChecklistFromDemoFlash();
     await Promise.allSettled([updateStats(),updateChecklist(),updateTasks(),updateActivity()]);
   }
   function init(){
-    injectStyles(); bindOverviewLinks(); replaceTopPanels(); protectChecklistFromDemoFlash();
-    // Run several delayed passes because older scripts can overwrite the overview after DOMContentLoaded.
-    refresh(); setTimeout(refresh,1200);
+    injectStyles(); bindOverviewLinks(); refresh();
     if(!window.IBAI_OVERVIEW_INTERVAL) window.IBAI_OVERVIEW_INTERVAL=setInterval(refresh,60000);
     window.IBAI_REFRESH_OVERVIEW=refresh;
   }
