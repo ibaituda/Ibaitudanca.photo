@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ibai Tudanca | Football &amp; Sports Photographer</title>
+<meta content="Professional football and sports photographer based in Bilbao, Spain. Available for clubs, athletes, agencies and media worldwide." name="description"/>
+<meta content="Ibai Tudanca" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<meta content="football photographer, sports photographer, sports photographer Spain, football photographer Spain, sports photographer Bilbao, football photographer Bilbao, LaLiga photographer, editorial sports photography, Ibai Tudanca" name="keywords"/>
+<link href="https://ibaitudanca.photo/" rel="canonical"/>
+<meta content="#080808" name="theme-color"/>
+<!-- Open Graph / Social Preview -->
+<meta content="website" property="og:type"/>
+<meta content="Ibai Tudanca Photography" property="og:site_name"/>
+<meta content="Football &amp; Sports Photographer | Ibai Tudanca" property="og:title"/>
+<meta content="Professional football and sports photographer based in Bilbao, Spain. Available for clubs, athletes, agencies, media outlets and international sporting events." property="og:description"/>
+<meta content="https://ibaitudanca.photo/" property="og:url"/>
+<meta content="https://ibaitudanca.photo/img/hero.jpg" property="og:image"/>
+<meta content="Ibai Tudanca football and sports photography portfolio" property="og:image:alt"/>
+<meta content="en_GB" property="og:locale"/>
+<!-- Twitter / X Preview -->
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Football &amp; Sports Photographer | Ibai Tudanca" name="twitter:title"/>
+<meta content="Professional football and sports photographer based in Bilbao, Spain. Available for clubs, athletes, agencies, media outlets and international sporting events." name="twitter:description"/>
+<meta content="https://ibaitudanca.photo/img/hero.jpg" name="twitter:image"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #080808;
+      color: #f5f5f5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 28px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.4s ease, padding 0.4s ease;
+    }
+    .nav.solid {
+      background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(16px);
+      padding: 18px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    /* Estado estático: letras negras sobre foto */
+    .nav-logo {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: #000;
+      transition: color 0.3s;
+    }
+    .nav-right { display: flex; align-items: center; gap: 36px; }
+    .nav-link {
+      font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+      font-weight: 500;
+      color: rgba(0,0,0,0.75);
+      transition: color 0.3s;
+    }
+    .nav-link:hover { color: #000; }
+    .nav-cta {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      border: 1.5px solid rgba(0,0,0,0.6);
+      padding: 9px 22px; border-radius: 2px;
+      color: #000;
+      transition: all 0.3s;
+    }
+    .nav-cta:hover { border-color: #000; background: #000; color: #fff; }
+
+    /* Estado scrolled: letras blancas sobre fondo negro */
+    .nav.solid .nav-logo { color: #fff; }
+    .nav.solid .nav-link { color: rgba(255,255,255,0.55); }
+    .nav.solid .nav-link:hover { color: #fff; }
+    .nav.solid .nav-cta {
+      border-color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.8);
+    }
+    .nav.solid .nav-cta:hover { border-color: #fff; color: #fff; background: transparent; }
+    .nav.solid .nav-menu-btn span { background: #fff; }
+
+    .nav-menu-btn {
+      display: none; background: none; border: none; color: #000;
+      flex-direction: column; gap: 5px; padding: 4px;
+      transition: color 0.3s;
+    }
+    .nav-menu-btn span { display: block; width: 22px; height: 1.5px; background: #000; transition: background 0.3s; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 92vh;
+      min-height: 600px;
+      overflow: hidden;
+    }
+    .hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+      transition: transform 8s ease;
+      background: #111;
+    }
+    .hero:hover .hero-img { transform: scale(1.03); }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.05) 40%,
+        rgba(0,0,0,0.6) 75%,
+        rgba(8,8,8,1) 100%
+      );
+    }
+    .hero-content {
+      position: absolute;
+      bottom: 52px; left: 40px; right: 40px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .hero-identity { }
+    .hero-name {
+      font-size: clamp(42px, 7vw, 88px);
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .hero-name em {
+      font-style: normal;
+      font-weight: 600;
+    }
+    .hero-credentials {
+      display: flex; align-items: center; gap: 0;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    .hero-credentials span { padding: 0 12px; }
+    .hero-credentials span:first-child { padding-left: 0; }
+    .hero-credentials .dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      padding: 0; flex-shrink: 0;
+    }
+    .hero-credentials-clean {
+      flex-wrap: wrap;
+      max-width: 760px;
+    }
+
+    .hero-scroll-cta {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .hero-scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    }
+
+    /* ── PORTFOLIO SECTION ── */
+    .portfolio {
+      padding: 56px 0 0;
+    }
+    .portfolio-header {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px 34px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .portfolio-intro {
+      max-width: 760px;
+    }
+    .portfolio-kicker {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .portfolio-kicker::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: rgba(255,255,255,0.58);
+    }
+    .portfolio-title {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300; letter-spacing: -0.02em; line-height: 1.15;
+      color: #fff; margin-bottom: 28px;
+    }
+    .portfolio-title strong { font-weight: 600; }
+    .filters {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      margin-top: 28px;
+    }
+    .filter-btn {
+      background: transparent; border: none;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      padding: 6px 14px; border-radius: 1px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { color: rgba(255,255,255,0.7); }
+    .filter-btn.active { color: #fff; background: rgba(255,255,255,0.08); }
+
+    /* ── GALLERY ── */
+    .gallery-grid {
+      columns: 3;
+      column-gap: 6px;
+      padding: 6px;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 6px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: block;
+      background: #111;
+    }
+    /* Patrón controlado: todas las columnas tienen la misma anchura.
+       4x3 = 3 de ancho x 4 de alto. 3x2 = 3 de ancho x 2 de alto. */
+    .gallery-item-inner {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .gallery-item img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .gallery-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 40px 16px 16px;
+      background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .gallery-item:hover .gallery-caption { opacity: 1; }
+    .gallery-caption-text {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      color: rgba(255,255,255,0.82);
+    }
+    .gallery-caption-name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .gallery-caption-team {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.68);
+    }
+
+    /* Placeholder mientras carga */
+    .gallery-placeholder {
+      width: 100%; background: #111;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── ABOUT ── */
+    .about {
+      padding: 96px 40px 82px;
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 80px; align-items: center;
+    }
+    .about > * { min-width: 0; }
+    .about-photo {
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      position: relative;
+      border-radius: 2px;
+      background: #111;
+    }
+    .about-photo img {
+      width: 100%; height: 100%; object-fit: cover;
+      object-position: center center;
+    }
+    .about-photo-placeholder {
+      width: 100%; height: 100%; background: #111;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #333; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .about-photo-mobile { display: none; }
+    .about-text {
+      min-width: 0;
+      width: 100%;
+      overflow: hidden;
+      padding-inline: clamp(0px, 1vw, 16px);
+    }
+    .about-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .about-label::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: rgba(255,255,255,0.58);
+    }
+    .about-h2 {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300; letter-spacing: -0.02em; line-height: 1.15;
+      color: #fff; margin-bottom: 28px;
+    }
+    .about-h2 strong { font-weight: 600; }
+    .about-body {
+      font-size: 15px; line-height: 1.85;
+      color: rgba(255,255,255,0.48);
+      margin-bottom: 24px;
+      max-width: 680px;
+      text-align: justify;
+      text-align-last: left;
+      hyphens: auto;
+    }
+    .about-body + .about-body { margin-top: -10px; }
+    .about-tags {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px;
+    }
+    .about-tag {
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 7px 14px; color: rgba(255,255,255,0.4);
+    }
+
+    .about-credentials {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin-top: -28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .about-credentials .cred-block { margin-top: 0; }
+    .published-proof {
+      grid-column: 1 / -1;
+      margin-top: 28px;
+      text-align: center;
+    }
+    .proof-subtitle {
+      max-width: 620px;
+      margin: 0 auto 18px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.42);
+    }
+    .proof-carousel {
+      position: relative;
+      overflow: hidden;
+      min-height: 560px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
+    }
+    .proof-stage {
+      position: relative;
+      width: min(100%, 980px);
+      height: 530px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .proof-slide {
+      position: absolute;
+      width: min(315px, 64vw);
+      aspect-ratio: 9 / 16;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+      opacity: 0;
+      transform: translateX(0) scale(0.78);
+      filter: blur(6px) brightness(0.55);
+      transition: transform 0.45s ease, opacity 0.45s ease, filter 0.45s ease;
+      pointer-events: none;
+    }
+    .proof-slide.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: none;
+      z-index: 3;
+      pointer-events: auto;
+    }
+    .proof-slide.prev {
+      opacity: 0.42;
+      transform: translateX(-78%) scale(0.82);
+      z-index: 2;
+    }
+    .proof-slide.next {
+      opacity: 0.42;
+      transform: translateX(78%) scale(0.82);
+      z-index: 2;
+    }
+    .proof-slide img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .proof-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 28px;
+      color: rgba(255,255,255,0.32);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+      text-transform: uppercase;
+    }
+    .proof-nav {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 5;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.45);
+      color: rgba(255,255,255,0.78);
+      font-size: 24px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .proof-nav:hover { border-color: rgba(255,255,255,0.42); background: rgba(0,0,0,0.7); color: #fff; }
+    .proof-prev { left: 22px; }
+    .proof-next { right: 22px; }
+    .proof-dots {
+      position: absolute;
+      bottom: 18px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 8px;
+      z-index: 6;
+    }
+    .proof-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      border: 0;
+      background: rgba(255,255,255,0.22);
+      padding: 0;
+    }
+    .proof-dot.active { background: rgba(255,255,255,0.75); }
+
+    /* ── CREDENTIAL BLOCKS ── */
+    .cred-block { margin-top: 28px; min-width: 0; }
+    .cred-block-label {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.68); margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      font-weight: 500;
+    }
+    .logo-marquee {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(90deg, rgba(255,255,255,0.035), rgba(255,255,255,0.018));
+      border: 1px solid rgba(255,255,255,0.075);
+      border-radius: 10px;
+      padding: 22px 0;
+      mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+    }
+    .logo-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: marqueeLogos 34s linear infinite;
+      will-change: transform;
+    }
+    .logo-set {
+      display: flex;
+      align-items: center;
+      gap: 46px;
+      padding-right: 46px;
+      flex: 0 0 auto;
+      min-width: max-content;
+    }
+
+    .cred-logo-item {
+      flex: 0 0 150px;
+      width: 150px;
+      height: 90px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: zoom-in;
+      opacity: 0.88;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .cred-logo-item.club {
+      flex-basis: 125px;
+      width: 125px;
+      height: 96px;
+    }
+    .cred-logo-item:hover { opacity: 1; transform: scale(1.06); }
+    .cred-logo-item img {
+      height: 72px; width: auto; max-width: 150px;
+      object-fit: contain; display: block;
+      filter: none;
+    }
+    .cred-logo-item.club img { height: 82px; max-width: 125px; }
+    .logo-track.reverse {
+      animation-name: marqueeLogosReverse;
+    }
+    @keyframes marqueeLogos {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @keyframes marqueeLogosReverse {
+      from { transform: translateX(-50%); }
+      to { transform: translateX(0); }
+    }
+
+    @media (max-width: 600px) {
+      .logo-track { animation-duration: 25s; }
+      .logo-set { gap: 32px; padding-right: 32px; }
+      .cred-logo-item { flex-basis: 118px; width: 118px; height: 68px; }
+      .cred-logo-item.club { flex-basis: 100px; width: 100px; height: 78px; }
+      .cred-logo-item img { height: 54px; max-width: 118px; }
+      .cred-logo-item.club img { height: 64px; max-width: 100px; }
+    }
+
+    /* Agencias y medios: sobre fondo oscuro directo */
+    .cred-logos-dark {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .cred-logos-dark.published-list {
+      flex-wrap: nowrap;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .cred-logos-dark.published-list .cred-text-item {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .cred-logos-dark.published-list .cred-text-item span {
+      font-size: clamp(8px, 0.82vw, 10px);
+      letter-spacing: 0.02em;
+      white-space: normal;
+    }
+    .credentials-cta {
+      grid-column: 1 / -1;
+      text-align: center;
+      margin-top: -4px;
+    }
+    .cred-text-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 8px 14px;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    .cred-text-item:hover { background: rgba(255,255,255,0.08); }
+    .cred-text-item span {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+    }
+
+    .about-cta {
+      display: inline-block; margin-top: 18px;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 4px;
+      transition: border-color 0.2s;
+    }
+    .about-cta:hover { border-color: #fff; }
+
+
+
+    /* ── SERVICES ── */
+    .services {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 88px 40px 82px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .services-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .services-label::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: rgba(255,255,255,0.58);
+    }
+    .services-header {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 70px;
+      align-items: end;
+      margin-bottom: 44px;
+    }
+    .services-title {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300; letter-spacing: -0.02em; line-height: 1.15;
+      color: #fff;
+    }
+    .services-title strong { font-weight: 600; }
+    .services-intro {
+      font-size: 15px;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.48);
+      max-width: 620px;
+      text-align: justify;
+      text-align-last: left;
+      hyphens: auto;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    .service-card {
+      min-height: 430px;
+      position: relative;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: flex-end;
+      isolation: isolate;
+    }
+    .service-card img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.58;
+      transform: scale(1.01);
+      transition: transform 0.65s ease, opacity 0.35s ease;
+      z-index: -2;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.58) 45%, rgba(0,0,0,0.14) 100%);
+      z-index: -1;
+    }
+    .service-card:hover img {
+      transform: scale(1.06);
+      opacity: 0.72;
+    }
+    .service-content {
+      padding: 22px;
+    }
+    .service-num {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 14px;
+    }
+    .service-content h3 {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.18;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .service-content p {
+      font-size: 12px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.58);
+    }
+    .services-availability {
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .services-availability span {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.48);
+    }
+    .services-availability strong {
+      color: #fff;
+      font-weight: 500;
+    }
+    .services-cta {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.35);
+      padding-bottom: 4px;
+      transition: border-color 0.2s;
+    }
+    .services-cta:hover { border-color: #fff; }
+
+    @media (max-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .service-card { min-height: 360px; }
+    }
+    @media (max-width: 768px) {
+      .services { padding: 68px 20px 62px; }
+      .services-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 36px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .service-card { min-height: 330px; }
+    }
+
+    /* ── CONTACT ── */
+    .contact {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 84px 40px 78px;
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+    }
+    .contact-left { }
+    .contact-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .contact-label::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: rgba(255,255,255,0.58);
+    }
+    .contact-h2 {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300; letter-spacing: -0.02em; line-height: 1.15;
+      color: #fff; margin-bottom: 20px;
+    }
+    .contact-sub {
+      font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.38);
+      margin-bottom: 40px;
+    }
+    .contact-items { display: flex; flex-direction: column; gap: 20px; }
+    .contact-item { display: flex; flex-direction: column; gap: 3px; }
+    .contact-item-label {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+    .contact-item-val {
+      font-size: 14px; color: rgba(255,255,255,0.65);
+      transition: color 0.2s;
+    }
+    .contact-item-val:hover { color: #fff; }
+    .contact-right { }
+    .contact-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-field {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .form-label {
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+    }
+    .form-input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff; padding: 13px 16px;
+      font-family: inherit; font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+      border-radius: 0;
+      width: 100%;
+    }
+    .form-input:focus { border-color: rgba(255,255,255,0.3); }
+    .form-input::placeholder { color: rgba(255,255,255,0.18); }
+    textarea.form-input { resize: none; min-height: 110px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .btn-submit {
+      background: #fff; color: #080808;
+      border: none; padding: 15px 32px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.2s;
+      align-self: flex-start; margin-top: 4px;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+    .form-success {
+      display: none; text-align: center; padding: 40px 0;
+    }
+    .form-success p { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 58px 40px 38px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1fr auto;
+      gap: 42px;
+      align-items: start;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 360px;
+    }
+    .footer-logo {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #fff;
+      font-weight: 600;
+    }
+    .footer-role {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.54);
+    }
+    .footer-desc {
+      font-size: 13px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.42);
+      margin-top: 4px;
+    }
+    .footer-location {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.36);
+      margin-top: 4px;
+    }
+    .footer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .footer-heading {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.32);
+      margin-bottom: 4px;
+    }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links a,
+    .footer-contact a,
+    .footer-top {
+      width: fit-content;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.52);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .footer-links a:hover,
+    .footer-contact a:hover,
+    .footer-top:hover {
+      color: #fff;
+    }
+    .footer-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-top {
+      justify-self: end;
+      border-bottom: 1px solid rgba(255,255,255,0.24);
+      padding-bottom: 4px;
+    }
+    .footer-bottom {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-copy,
+    .footer-credit {
+      font-size: 10px;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 900px) {
+      .footer {
+        grid-template-columns: 1fr 1fr;
+        gap: 34px;
+      }
+      .footer-top {
+        justify-self: start;
+      }
+    }
+    @media (max-width: 600px) {
+      .footer {
+        grid-template-columns: 1fr;
+        padding: 46px 20px 30px;
+      }
+      .footer-bottom {
+        flex-direction: column;
+      }
+    }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.97);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .lightbox.active { opacity: 1; pointer-events: all; }
+    .lightbox-img {
+      max-width: 92vw; max-height: 92vh;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: fixed; top: 24px; right: 28px;
+      background: none; border: none; color: rgba(255,255,255,0.5);
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: color 0.2s;
+    }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: rgba(255,255,255,0.35);
+      font-size: 28px; cursor: pointer;
+      transition: color 0.2s; padding: 20px;
+    }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 12px; }
+    .lightbox-next { right: 12px; }
+    .lightbox-info {
+      position: fixed; bottom: 28px; left: 0; right: 0;
+      text-align: center;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── TOAST ── */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);
+      padding: 12px 18px; font-size: 12px; color: rgba(255,255,255,0.7);
+      min-width: 220px; animation: toastIn 0.25s ease;
+    }
+    @keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .gallery-grid { columns: 2; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 20px 20px; }
+      .nav.solid { padding: 14px 20px; }
+      .nav-right .nav-link { display: none; }
+      .nav-menu-btn { display: flex; }
+      .hero-content { bottom: 36px; left: 20px; right: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+      .hero-scroll-cta { display: none; }
+      .gallery-grid { columns: 2; }
+      .portfolio { padding-top: 44px; }
+      .portfolio-header { padding: 0 20px 26px; }
+      .about { grid-template-columns: 1fr; gap: 34px; padding: 68px 20px 62px; }
+      .about-credentials { grid-template-columns: 1fr; margin-top: 0; }
+      .proof-carousel { min-height: 470px; }
+      .proof-stage { height: 440px; }
+      .proof-slide { width: min(255px, 68vw); }
+      .proof-slide.prev { transform: translateX(-58%) scale(0.78); }
+      .proof-slide.next { transform: translateX(58%) scale(0.78); }
+      .about-photo { aspect-ratio: 3 / 4; max-height: 520px; width: min(100%, 390px); margin: 0 auto; }
+      .contact { grid-template-columns: 1fr; gap: 42px; padding: 68px 20px 62px; }
+      .footer { padding: 28px 20px; }
+    }
+    @media (max-width: 480px) {
+      .gallery-grid { columns: 1; }
+      .form-row { grid-template-columns: 1fr; }
+      .cred-logos-dark.published-list {
+        flex-wrap: wrap;
+      }
+      .cred-logos-dark.published-list .cred-text-item {
+        flex: 1 1 calc(50% - 8px);
+      }
+    }
+
+
+    /* ── V23 RESPONSIVE ORIENTATION POLISH ── */
+    @media (orientation: landscape) and (max-width: 1100px) {
+      /* Horizontal devices keep the desktop feeling */
+      .gallery-grid { columns: 3 !important; padding: 6px; }
+      .services-grid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 8px; }
+      .service-card { min-height: 300px; }
+      .service-content { padding: 16px; }
+      .service-content h3 { font-size: 14px; line-height: 1.15; }
+      .service-content p { font-size: 10.5px; line-height: 1.55; }
+      .services { padding: 64px 32px 58px; }
+      .services-header { grid-template-columns: 1fr 1.1fr; gap: 40px; margin-bottom: 36px; }
+      .about { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 44px; padding: 64px 32px 58px; }
+      .about-photo { max-height: 430px; width: 100%; margin: 0; }
+      .contact { grid-template-columns: 1fr 1fr; gap: 44px; padding: 64px 32px 58px; }
+      .proof-carousel { min-height: 430px; }
+      .proof-stage { height: 400px; }
+      .proof-slide { width: min(245px, 40vw); }
+      .nav-right.mobile-open { display: flex !important; }
+    }
+
+    @media (orientation: portrait) and (max-width: 900px) {
+      /* Premium vertical version */
+      .nav { padding: 20px; }
+      .nav.solid { padding: 14px 20px; }
+      .nav-menu-btn { display: flex; z-index: 120; }
+      .nav-right { display: none; }
+      .nav-right.mobile-open {
+        display: flex !important;
+        position: fixed;
+        inset: 0;
+        z-index: 110;
+        background: rgba(8,8,8,0.98);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+      }
+      .nav-right.mobile-open .nav-link,
+      .nav-right.mobile-open .nav-cta {
+        display: block !important;
+        color: #fff;
+        border-color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.18em;
+      }
+      .nav-right.mobile-open .nav-cta { padding: 11px 24px; }
+
+      .hero { height: 88vh; min-height: 560px; }
+      .hero-img { object-position: center center; }
+      .hero-content { bottom: 34px; left: 20px; right: 20px; }
+      .hero-name { font-size: clamp(44px, 14vw, 72px); }
+      .hero-credentials { font-size: 9px; line-height: 1.8; }
+
+      .portfolio { padding-top: 42px; }
+      .portfolio-header { padding: 0 20px 24px; }
+      .gallery-grid { columns: 3 !important; column-gap: 4px; padding: 4px; }
+      .gallery-item { margin-bottom: 4px; }
+      .gallery-caption { padding: 26px 8px 8px; }
+      .gallery-caption-name { font-size: 9px; letter-spacing: 0.06em; }
+      .gallery-caption-team { font-size: 7px; letter-spacing: 0.11em; }
+
+      .about { grid-template-columns: 1fr; gap: 34px; padding: 62px 20px 56px; }
+      .about > .about-photo:not(.about-photo-mobile) { display: none; }
+      .about-photo-mobile { display: block; max-height: 500px; width: min(100%, 380px); margin: 26px auto 28px; }
+      .about-body { text-align: left; hyphens: none; }
+      .about-credentials { grid-template-columns: 1fr; margin-top: 0; gap: 20px; }
+
+      .logo-marquee { padding: 18px 0; }
+      .cred-logo-item img { height: 54px; max-width: 118px; }
+      .cred-logo-item.club img { height: 62px; max-width: 100px; }
+
+      .proof-carousel { min-height: 410px; border-radius: 12px; }
+      .proof-stage { height: 380px; }
+      .proof-slide { width: min(220px, 66vw); border-radius: 14px; }
+      .proof-slide.prev { transform: translateX(-50%) scale(0.76); }
+      .proof-slide.next { transform: translateX(50%) scale(0.76); }
+      .proof-prev { left: 12px; }
+      .proof-next { right: 12px; }
+
+      .services { padding: 62px 20px 56px; }
+      .services-header { grid-template-columns: 1fr; gap: 22px; margin-bottom: 32px; }
+      .services-intro { text-align: left; hyphens: none; }
+      .services-grid { grid-template-columns: 1fr !important; gap: 12px; }
+      .service-card { min-height: unset; aspect-ratio: 16 / 9; }
+      .service-card::after { background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.52) 55%, rgba(0,0,0,0.12) 100%); }
+      .service-content { padding: 16px; }
+      .service-num { font-size: 8px; margin-bottom: 8px; }
+      .service-content h3 { font-size: 15px; margin-bottom: 7px; }
+      .service-content p { font-size: 10.5px; line-height: 1.48; max-width: 92%; }
+      .services-availability { align-items: flex-start; }
+
+      .contact { grid-template-columns: 1fr; gap: 38px; padding: 62px 20px 56px; }
+      .form-row { grid-template-columns: 1fr; }
+
+      .footer { grid-template-columns: 1fr; padding: 48px 20px 28px; gap: 34px; }
+      .footer-top { justify-self: start; }
+      .footer-bottom { grid-column: 1; flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+
+    @media (orientation: portrait) and (min-width: 700px) and (max-width: 1100px) {
+      /* Tablet portrait */
+      .gallery-grid { columns: 3 !important; max-width: 900px; }
+      .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+      .service-card { aspect-ratio: 4 / 5; }
+      .about { padding-left: 40px; padding-right: 40px; }
+      .services { padding-left: 40px; padding-right: 40px; }
+      .contact { padding-left: 40px; padding-right: 40px; }
+      .footer { padding-left: 40px; padding-right: 40px; }
+    }
+
+    @media (orientation: portrait) and (max-width: 380px) {
+      .gallery-caption-name { font-size: 10px; }
+      .gallery-caption-team { font-size: 7.5px; }
+      .service-content { padding: 18px; }
+      .service-content h3 { font-size: 17px; }
+      .service-content p { font-size: 11px; }
+    }
+
+  
+
+    /* ── V25 RESPONSIVE REFINEMENTS ── */
+    .about-credentials {
+      grid-column: 1 / -1;
+    }
+
+    @media (min-width: 769px) {
+      .about {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      }
+      .about-credentials {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .about-credentials .cred-block:first-child,
+      .about-credentials .cred-block:nth-child(2) {
+        grid-column: span 1;
+      }
+      .about-text > .cred-block {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+    }
+
+    @media (orientation: portrait) and (max-width: 768px) {
+      .about {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+      .about-text {
+        display: contents;
+      }
+      .about-label { order: 1; align-self: stretch; }
+      .about-h2 { order: 2; align-self: stretch; margin-bottom: 0; }
+      .about-photo {
+        order: 3;
+        width: min(78%, 310px);
+        max-height: 420px;
+        margin: 2px auto 12px;
+      }
+      .about-body {
+        order: 4;
+        max-width: 100%;
+        width: 100%;
+        text-align: justify;
+        text-align-last: left;
+        hyphens: auto;
+      }
+      .about-text > .cred-block:nth-of-type(1) { order: 7; width: 100%; }
+      .about-text > .cred-block:nth-of-type(2) { order: 8; width: 100%; }
+      .about-credentials { order: 9; width: 100%; }
+    }
+
+    @media (orientation: portrait) and (max-width: 768px) {
+      .services-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 4px;
+      }
+      .service-card {
+        min-height: 260px;
+        aspect-ratio: 3 / 5;
+      }
+      .service-card img {
+        opacity: 0.62;
+      }
+      .service-content {
+        padding: 9px 6px;
+      }
+      .service-num {
+        font-size: 7px;
+        letter-spacing: 0.12em;
+        margin-bottom: 6px;
+      }
+      .service-content h3 {
+        font-size: clamp(8px, 2.2vw, 11px);
+        line-height: 1.1;
+        margin-bottom: 6px;
+        letter-spacing: -0.01em;
+      }
+      .service-content p {
+        font-size: clamp(6.5px, 1.7vw, 8px);
+        line-height: 1.35;
+      }
+    }
+
+    @media (orientation: portrait) and (max-width: 430px) {
+      .services { padding-left: 10px; padding-right: 10px; }
+      .services-grid { gap: 3px; }
+      .service-card { min-height: 235px; }
+      .service-content { padding: 8px 5px; }
+      .service-content p { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+    }
+
+  
+
+    /* V25 final fixes */
+    .about-logo-strips {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 0;
+    }
+    .about-logo-strips .cred-block { width: 100%; }
+
+    @media (min-width: 769px) {
+      .about-logo-strips {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .about-logo-strips .logo-marquee {
+        width: 100%;
+      }
+    }
+
+    @media (orientation: portrait) and (max-width: 768px) {
+      .about-photo:not(.about-photo-mobile) { display: none; }
+      .about-photo-mobile { display: block; }
+      .about-text { display: block; }
+      .about-label, .about-h2, .about-body { width: 100%; }
+      .about-body { text-align: justify; text-align-last: left; hyphens: auto; }
+      .about-logo-strips { margin-top: 0; }
+    }
+
+    @media (orientation: landscape), (min-width: 769px) {
+      .about-photo-mobile { display: none; }
+    }
+
+  
+
+    /* ── V26 MOBILE REFINEMENTS ── */
+    @media (orientation: portrait) and (max-width: 768px) {
+      .about-h2 {
+        margin-bottom: 18px !important;
+      }
+      .about-photo,
+      .about-photo-mobile {
+        width: min(68%, 260px) !important;
+        max-height: 360px !important;
+        margin: 18px auto 24px !important;
+      }
+      .about-body {
+        text-align: justify !important;
+        text-align-last: left !important;
+        hyphens: auto !important;
+      }
+      .services-grid {
+        display: grid !important;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        gap: 3px !important;
+        width: 100%;
+      }
+      .service-card {
+        min-height: 238px !important;
+        aspect-ratio: 3 / 5 !important;
+      }
+      .service-card img {
+        opacity: 0.64;
+      }
+      .service-content {
+        padding: 8px 5px !important;
+      }
+      .service-num {
+        font-size: 7px !important;
+        letter-spacing: 0.12em !important;
+        margin-bottom: 6px !important;
+      }
+      .service-content h3 {
+        font-size: clamp(7.5px, 2.05vw, 10px) !important;
+        line-height: 1.08 !important;
+        margin-bottom: 6px !important;
+      }
+      .service-content p {
+        font-size: clamp(6px, 1.62vw, 7.8px) !important;
+        line-height: 1.32 !important;
+        max-width: 100% !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+
+    @media (orientation: portrait) and (max-width: 390px) {
+      .service-card { min-height: 224px !important; }
+      .service-content { padding: 7px 4px !important; }
+      .service-content p { -webkit-line-clamp: 5; }
+    }
+
+  
+    .language-switch {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 18px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(8,8,8,0.34);
+      backdrop-filter: blur(12px);
+    }
+    .lang-btn {
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,0.48);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 8px;
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .lang-btn.is-active {
+      background: #fff;
+      color: #080808;
+    }
+    .lang-btn:not(.is-active):hover { color: #fff; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Ibai Tudanca",
+  "url": "https://ibaitudanca.photo/",
+  "image": "https://ibaitudanca.photo/img/IMG_IBAI.jpg",
+  "jobTitle": "Football and Sports Photographer",
+  "description": "Professional football and sports photographer based in Bilbao, Spain, available for clubs, athletes, agencies, media outlets and international sporting events.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bilbao",
+    "addressRegion": "Basque Country",
+    "addressCountry": "Spain"
+  },
+  "sameAs": [
+    "https://instagram.com/ibaitudanca.photo"
+  ],
+  "knowsAbout": [
+    "Football photography",
+    "Sports photography",
+    "Editorial photography",
+    "LaLiga",
+    "UEFA Champions League",
+    "Copa del Rey",
+    "Eliteserien",
+    "FIBA Europe Cup"
+  ],
+  "makesOffer": [
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Match Coverage"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Editorial and Media Assignments"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Club Media Photography"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Athlete Personal Branding Photography"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Events and Special Projects Photography"
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+<a class="nav-logo" href="index.html">Ibai Tudanca</a>
+<div class="nav-right" id="nav-right">
+<a class="nav-link" href="#portfolio">Work</a>
+<a class="nav-link" href="#about">About me</a>
+<a class="nav-link" href="#services">Services</a>
+<a class="nav-link" href="#contact">Contact</a>
+<a class="nav-cta" href="clientes.html">Client access</a>
+<div aria-label="Language selector" class="language-switch"><button aria-pressed="true" class="lang-btn is-active" data-lang="en" type="button">EN</button><button aria-pressed="false" class="lang-btn" data-lang="es" type="button">ES</button></div></div>
+<button aria-label="Menu" class="nav-menu-btn" id="nav-menu-btn">
+<span></span><span></span><span></span>
+</button>
+</nav>
+<!-- HERO -->
+<section class="hero" id="hero">
+<img alt="Football and sports photography by Ibai Tudanca" class="hero-img" onerror="this.style.background='#111'; this.style.opacity='0'" src="img/hero.jpg"/>
+<div class="hero-overlay"></div>
+<div class="hero-content">
+<div class="hero-identity">
+<h1 class="hero-name">Ibai<br/><em>Tudanca</em></h1>
+<div class="hero-credentials hero-credentials-clean">
+<span>Football &amp; Sports Photographer</span>
+<span class="dot"></span>
+<span>Bilbao, Spain</span>
+<span class="dot"></span>
+<span>Available Worldwide</span>
+</div>
+</div>
+<div class="hero-scroll-cta">
+<span>Scroll</span>
+<div class="hero-scroll-line"></div>
+</div>
+</div>
+</section>
+<!-- PORTFOLIO -->
+<section class="portfolio" id="portfolio">
+<div class="portfolio-header">
+<div class="portfolio-intro">
+<span class="portfolio-kicker">Selected work</span>
+<h2 class="portfolio-title">My <strong>Photography</strong></h2>
+</div>
+<div class="filters" id="filters" style="display:none;">
+<button class="filter-btn active" data-filter="all">All</button>
+</div>
+</div>
+<div class="gallery-grid" id="gallery"></div>
+</section>
+<!-- ABOUT -->
+<section id="about">
+<div class="about">
+<div class="about-photo">
+<img alt="Ibai Tudanca, football and sports photographer based in Bilbao, Spain" onerror="this.parentNode.innerHTML='&lt;div class=\'about-photo-placeholder\'&gt;Photo coming soon&lt;/div&gt;'" src="img/IMG_IBAI.jpg"/>
+</div>
+<div class="about-text">
+<div class="about-label">About me</div>
+<h2 class="about-h2">Telling the story of football<br/><strong>through photography.</strong></h2>
+<div class="about-photo about-photo-mobile">
+<img alt="Ibai Tudanca, football and sports photographer based in Bilbao, Spain" onerror="this.parentNode.innerHTML='&lt;div class='about-photo-placeholder'&gt;Photo coming soon&lt;/div&gt;'" src="img/IMG_IBAI.jpg"/>
+</div>
+<p class="about-body">
+          I started photography in Norway, drawn first to landscapes, northern lights and the discipline of waiting for the right moment. That same instinct eventually brought me pitchside, where football quickly became the place where my way of seeing made the most sense.
+        </p>
+<p class="about-body">
+          Today I work as a sports photographer covering professional football and elite competitions, including LaLiga, UEFA Champions League, Copa del Rey and Eliteserien. My work is focused on clubs, players, agencies and editorial distribution, with images created for press, social media, communication departments and international platforms.
+        </p>
+<p class="about-body">
+          I look for photographs that feel direct, clean and useful: decisive actions, emotional reactions, portraits of competition and moments that explain the game without needing too many words. For me, the job is not only taking the picture, but delivering it quickly, consistently and with the standard required while the story is still alive.
+        </p>
+</div>
+<div class="about-credentials about-logo-strips">
+<!-- COMPETICIONES -->
+<div class="cred-block">
+<div class="cred-block-label">Competitions Covered</div>
+<div aria-label="Competitions covered" class="logo-marquee">
+<div class="logo-track">
+<div class="logo-set">
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+</div>
+<div aria-hidden="true" class="logo-set">
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga.png"/></div>
+<div class="cred-logo-item"><img alt="LaLiga Hypermotion" decoding="async" draggable="false" loading="eager" src="img/Logo LaLiga Hyper.png"/></div>
+<div class="cred-logo-item"><img alt="UEFA Champions League" decoding="async" draggable="false" loading="eager" src="img/Logo Champions League.png"/></div>
+<div class="cred-logo-item"><img alt="Copa del Rey" decoding="async" draggable="false" loading="eager" src="img/Logo CopadelRey.png"/></div>
+<div class="cred-logo-item"><img alt="Eliteserien" decoding="async" draggable="false" loading="eager" src="img/Logo Eliteserien.png"/></div>
+<div class="cred-logo-item"><img alt="FIBA Europe Cup" decoding="async" draggable="false" loading="eager" src="img/Logo FIBA Europe Cup.png"/></div>
+<div class="cred-logo-item"><img alt="AC Cup" decoding="async" draggable="false" loading="eager" src="img/Logo AC CUP.png"/></div>
+</div>
+</div>
+</div>
+</div>
+<!-- CLUBES -->
+<div class="cred-block">
+<div class="cred-block-label">Clubs I’ve Worked With</div>
+<div aria-label="Clubs collaborated with" class="logo-marquee">
+<div class="logo-track reverse">
+<div class="logo-set">
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+</div>
+<div aria-hidden="true" class="logo-set">
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+<div class="cred-logo-item club"><img alt="Real Betis" decoding="async" draggable="false" loading="eager" src="img/Escudo Betis.png"/></div>
+<div class="cred-logo-item club"><img alt="UD Las Palmas" decoding="async" draggable="false" loading="eager" src="img/Escudo UDLP.png"/></div>
+<div class="cred-logo-item club"><img alt="Cádiz CF" decoding="async" draggable="false" loading="eager" src="img/Escudo Cadiz.png"/></div>
+<div class="cred-logo-item club"><img alt="Viking FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Viking.png"/></div>
+<div class="cred-logo-item club"><img alt="Bryne FK" decoding="async" draggable="false" loading="eager" src="img/Escudo Bryne fk.png"/></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="about-credentials">
+<!-- AGENCIAS -->
+<div class="cred-block">
+<div class="cred-block-label">Agencies &amp; Distribution</div>
+<div class="cred-logos-dark">
+<div class="cred-text-item"><span>QualitySportImages</span></div>
+<div class="cred-text-item"><span>LOF</span></div>
+<div class="cred-text-item"><span>Getty Images</span></div>
+<div class="cred-text-item"><span>Imago</span></div>
+</div>
+</div>
+<!-- MEDIOS -->
+<div class="cred-block">
+<div class="cred-block-label">Published In</div>
+<div class="cred-logos-dark published-list">
+<div class="cred-text-item"><span>La Voz de Galicia</span></div>
+<div class="cred-text-item"><span>Diario de Cádiz</span></div>
+<div class="cred-text-item"><span>Diario Noticias</span></div>
+<div class="cred-text-item"><span>El Chiringuito</span></div>
+<div class="cred-text-item"><span>Estadio Deportivo</span></div>
+</div>
+</div>
+<!-- USED BY / SOCIAL PROOF -->
+<div class="published-proof">
+<div class="cred-block-label">Featured By</div>
+<p class="proof-subtitle">My work has been shared and published by professional clubs, players, agencies and media outlets.</p>
+<div aria-label="Featured published work screenshots" class="proof-carousel">
+<button aria-label="Previous screenshot" class="proof-nav proof-prev" type="button">‹</button>
+<div class="proof-stage" id="proof-stage">
+<div class="proof-slide active">
+<img alt="Featured published work screenshot 1" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_1.jpg&lt;/div&gt;'" src="img/Featured_1.jpg"/>
+</div>
+<div class="proof-slide next">
+<img alt="Featured published work screenshot 2" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_2.jpg&lt;/div&gt;'" src="img/Featured_2.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 3" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_3.jpg&lt;/div&gt;'" src="img/Featured_3.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 4" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_4.jpg&lt;/div&gt;'" src="img/Featured_4.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 5" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_5.jpg&lt;/div&gt;'" src="img/Featured_5.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 6" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_6.jpg&lt;/div&gt;'" src="img/Featured_6.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 7" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_7.jpg&lt;/div&gt;'" src="img/Featured_7.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 8" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_8.jpg&lt;/div&gt;'" src="img/Featured_8.jpg"/>
+</div>
+<div class="proof-slide">
+<img alt="Featured published work screenshot 9" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_9.jpg&lt;/div&gt;'" src="img/Featured_9.jpg"/>
+</div>
+<div class="proof-slide prev">
+<img alt="Featured published work screenshot 10" onerror="this.parentNode.innerHTML='&lt;div class='proof-placeholder'&gt;Add screenshot&lt;br&gt;img/Featured_10.jpg&lt;/div&gt;'" src="img/Featured_10.jpg"/>
+</div>
+</div>
+<button aria-label="Next screenshot" class="proof-nav proof-next" type="button">›</button>
+<div class="proof-dots" id="proof-dots"></div>
+</div>
+</div>
+<div class="credentials-cta credentials-cta-after-featured">
+<a class="about-cta" href="#contact">Get in touch →</a>
+</div>
+</div>
+</div>
+</section>
+<!-- SERVICES -->
+<section class="services" id="services">
+<div class="services-label">Services</div>
+<div class="services-header">
+<h2 class="services-title">Professional photography for<br/><strong>sporting stories.</strong></h2>
+<p class="services-intro">
+        Available for clubs, athletes, agencies, media outlets and sporting events. From live match coverage to editorial assignments and special projects, every commission is approached with a professional workflow, fast delivery and a clear visual narrative.
+      </p>
+</div>
+<div class="services-grid">
+<article class="service-card">
+<img alt="Match coverage photography" loading="lazy" src="img/work_L.jpg"/>
+<div class="service-content">
+<span class="service-num">01</span>
+<h3>Match Coverage</h3>
+<p>Professional coverage of football and sporting events, from domestic leagues to international competitions, focused on decisive moments, emotion and fast delivery.</p>
+</div>
+</article>
+<article class="service-card">
+<img alt="Editorial sports photography" loading="lazy" src="img/work_A.jpg"/>
+<div class="service-content">
+<span class="service-num">02</span>
+<h3>Editorial &amp; Media Assignments</h3>
+<p>Photography created for agencies, newspapers, digital publications and international distribution platforms under live editorial deadlines.</p>
+</div>
+</article>
+<article class="service-card">
+<img alt="Club media photography" loading="lazy" src="img/work_H.jpg"/>
+<div class="service-content">
+<span class="service-num">03</span>
+<h3>Clubs &amp; Organisations</h3>
+<p>Visual content for clubs, federations and sporting organisations, including matchdays, media activities, portraits and communication campaigns.</p>
+</div>
+</article>
+<article class="service-card">
+<img alt="Athlete personal branding photography" loading="lazy" src="img/work_P.jpg"/>
+<div class="service-content">
+<span class="service-num">04</span>
+<h3>Athletes &amp; Personal Branding</h3>
+<p>Photography tailored to professional athletes, helping build a strong visual identity through portraits, social media content and editorial storytelling.</p>
+</div>
+</article>
+<article class="service-card">
+<img alt="Sports events and special projects photography" loading="lazy" src="img/work_E.JPG"/>
+<div class="service-content">
+<span class="service-num">05</span>
+<h3>Events &amp; Special Projects</h3>
+<p>Coverage of tournaments, presentations, brand activations and special assignments with the same workflow used in elite sports environments.</p>
+</div>
+</article>
+</div>
+<div class="services-availability">
+<span><strong>Based in Bilbao, Spain</strong> · Available across Europe and internationally</span>
+<a class="services-cta" href="#contact">Get in touch →</a>
+</div>
+</section>
+<!-- CONTACT -->
+<div id="contact">
+<div class="contact">
+<div class="contact-left">
+<div class="contact-label">Contact</div>
+<h2 class="contact-h2">Let's work<br/>together.</h2>
+<p class="contact-sub">
+          Available for clubs, agencies and elite sports events
+          — in Spain and internationally. I respond within 24 hours.
+        </p>
+<div class="contact-items">
+<div class="contact-item">
+<span class="contact-item-label">Email</span>
+<a class="contact-item-val" href="mailto:ibaituda1999@gmail.com">ibaituda1999@gmail.com</a>
+</div>
+<div class="contact-item">
+<span class="contact-item-label">WhatsApp / Phone</span>
+<a class="contact-item-val" href="tel:+34688844038">+34 688 844 038</a>
+</div>
+<div class="contact-item">
+<span class="contact-item-label">Instagram</span>
+<a class="contact-item-val" href="https://instagram.com/ibaitudanca.photo" target="_blank">@ibaitudanca.photo</a>
+</div>
+<div class="contact-item">
+<span class="contact-item-label">Client portal</span>
+<a class="contact-item-val" href="clientes.html">Access private galleries →</a>
+</div>
+</div>
+</div>
+<div class="contact-right">
+<form class="contact-form" id="contact-form">
+<div class="form-row">
+<div class="form-field">
+<label class="form-label">Name</label>
+<input class="form-input" name="nombre" placeholder="Your name" required="" type="text"/>
+</div>
+<div class="form-field">
+<label class="form-label">Club / Agency</label>
+<input class="form-input" name="club" placeholder="Company / Club / Agency" type="text"/>
+</div>
+</div>
+<div class="form-field">
+<label class="form-label">Email</label>
+<input class="form-input" name="email" placeholder="email@club.com" required="" type="email"/>
+</div>
+<div class="form-field">
+<label class="form-label">Message</label>
+<textarea class="form-input" name="mensaje" placeholder="Tell me about the match, date, venue…" required=""></textarea>
+</div>
+<button class="btn-submit" id="btn-submit" type="submit">Send message</button>
+</form>
+<div class="form-success" id="form-success">
+<p style="font-size:28px; color:#fff;">✓</p>
+<p>Message sent. I'll reply within 24 hours.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER -->
+<footer class="footer">
+<div class="footer-brand">
+<span class="footer-logo">Ibai Tudanca</span>
+<span class="footer-role">Football &amp; Sports Photographer</span>
+<p class="footer-desc">Professional sports photography for clubs, athletes, agencies and media.</p>
+<span class="footer-location">Bilbao, Spain · Available Worldwide</span>
+</div>
+<div class="footer-column">
+<span class="footer-heading">Navigation</span>
+<div class="footer-links">
+<a href="#portfolio">Work</a>
+<a href="#services">Services</a>
+<a href="#about">About me</a>
+<a href="#contact">Contact</a>
+<a href="clientes.html">Client Access</a>
+</div>
+</div>
+<div class="footer-column">
+<span class="footer-heading">Contact</span>
+<div class="footer-contact">
+<a href="https://instagram.com/ibaitudanca.photo" rel="noopener" target="_blank">Instagram</a>
+<a href="mailto:ibaituda1999@gmail.com">Email</a>
+<a href="tel:+34688844038">WhatsApp</a>
+</div>
+</div>
+<a class="footer-top" href="#hero">↑ Back to Top</a>
+<div class="footer-bottom">
+<span class="footer-copy">© 2026 Ibai Tudanca. All rights reserved.</span>
+<span class="footer-credit">Sports photography · Editorial coverage · Client galleries</span>
+</div>
+</footer>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+<button class="lightbox-close" id="lb-close">Close ✕</button>
+<button class="lightbox-nav lightbox-prev" id="lb-prev">‹</button>
+<img alt="" class="lightbox-img" id="lb-img" src=""/>
+<button class="lightbox-nav lightbox-next" id="lb-next">›</button>
+<div class="lightbox-info" id="lb-info"></div>
+</div>
+<div class="toast-container" id="toasts"></div>
+<script>
+  // ── PHOTOS ──────────────────────────────────────────────
+  const PHOTOS = [
+    // Columna izquierda: 4x3, 3x2, 4x3, 3x2, 4x3, 3x2
+    { id:'A', src:'img/work_A.jpg', name:'Lamine Yamal', team:'FC Barcelona', title:'Lamine Yamal celebrates, FC Barcelona at San Mamés.', category:'all', ratio:'3/4' },
+    { id:'B', src:'img/work_B.jpg', name:'Abde Ezzalzouli', team:'Real Betis / Athletic Club', title:'Abde Ezzalzouli dribbles past Iñigo Ruiz de Galarreta, Real Betis and Athletic Club at San Mamés.', category:'all', ratio:'3/2' },
+    { id:'C', src:'img/work_C.jpg', name:'Sergi Cardona', team:'Villarreal CF', title:'Sergi Cardona celebrates after scoring, Villarreal CF at San Mamés.', category:'all', ratio:'3/4' },
+    { id:'D', src:'img/work_D.jpg', name:'Melwin Pantzar & Martin Krampelj', team:'Surne Bilbao Basket', title:'Melwin Pantzar and Martin Krampelj celebrate a crucial basket, Surne Bilbao Basket at Bilbao Arena.', category:'all', ratio:'3/2' },
+    { id:'E', src:'img/work_E.JPG', name:'Darrun Hilliard', team:'Surne Bilbao Basket', title:'Darrun Hilliard poses with the FIBA Europe Cup trophy, Surne Bilbao Basket at Bilbao Arena.', category:'all', ratio:'3/4' },
+    { id:'F', src:'img/work_F.JPG', name:'Aymeric Laporte', team:'Athletic Club', title:'Aymeric Laporte during a LaLiga match, Athletic Club at San Mamés.', category:'all', ratio:'3/2' },
+
+    // Columna central: 3x2, 4x3, 3x2, 4x3, 3x2, 4x3
+    { id:'G', src:'img/work_G.jpg', name:'Héctor Bellerín', team:'Real Betis', title:'Héctor Bellerín with the official LaLiga match ball, Real Betis at San Mamés.', category:'all', ratio:'3/2' },
+    { id:'H', src:'img/work_H.jpg', name:'Manuel Pellegrini', team:'Real Betis', title:'Manuel Pellegrini on the touchline, Real Betis at San Mamés.', category:'all', ratio:'3/4' },
+    { id:'I', src:'img/work_I.jpg', name:'Gorka Guruzeta', team:'Athletic Club', title:'Gorka Guruzeta celebrates after scoring, Athletic Club at San Mamés.', category:'all', ratio:'3/2' },
+    { id:'J', src:'img/work_J.jpg', name:'Antony', team:'Real Betis', title:'Antony in action, Real Betis at Reale Arena.', category:'all', ratio:'3/4' },
+    { id:'K', src:'img/work_K.jpg', name:'Claudio Giráldez', team:'RC Celta', title:'Claudio Giráldez is lifted by teammates after securing European qualification, RC Celta at San Mamés.', category:'all', ratio:'3/2' },
+    { id:'L', src:'img/work_L.jpg', name:'Antonio Blanco', team:'Deportivo Alavés', title:'Antonio Blanco celebrates after scoring, Deportivo Alavés at Mendizorroza.', category:'all', ratio:'3/4' },
+
+    // Columna derecha: 4x3, 3x2, 4x3, 3x2, 4x3, 3x2
+    { id:'M', src:'img/work_M.jpg', name:'Gorka Guruzeta', team:'Athletic Club', title:'Gorka Guruzeta celebrates after scoring in the UEFA Europa League, Athletic Club at San Mamés.', category:'all', ratio:'3/4' },
+    { id:'N', src:'img/work_N.JPG', name:'Sergio Cubero', team:'SD Eibar', title:'Sergio Cubero celebrates a defensive action, SD Eibar at Ipurua Stadium.', category:'all', ratio:'3/2' },
+    { id:'O', src:'img/work_O.jpg', name:'Nico Williams', team:'Athletic Club', title:'Nico Williams celebrates after scoring, Athletic Club at Mendizorroza.', category:'all', ratio:'3/4' },
+    { id:'P', src:'img/work_P.jpg', name:'Sander Svendsen', team:'Viking FK', title:'Sander Svendsen celebrates after scoring, Viking FK at Lyse Arena.', category:'all', ratio:'3/2' },
+    { id:'Q', src:'img/work_Q.jpg', name:'Héctor Bellerín', team:'Real Betis', title:'Héctor Bellerín controls the ball, Real Betis at Reale Arena.', category:'all', ratio:'3/4' },
+    { id:'R', src:'img/work_R.jpg', name:'Harald Frey', team:'Surne Bilbao Basket', title:'Harald Frey celebrates winning the FIBA Europe Cup, Surne Bilbao Basket at Bilbao Arena.', category:'all', ratio:'3/2' },
+  ];
+  // ── GALLERY ─────────────────────────────────────────────
+  let visible = [...PHOTOS];
+  let lbIndex = 0;
+
+  function buildItem(photo, index) {
+    const el = document.createElement('div');
+    el.className = 'gallery-item';
+    // Convertir ratio "3/4" → padding-top porcentaje para mantener proporción
+    const [w, h] = photo.ratio.split('/').map(Number);
+    const pct = (h / w * 100).toFixed(2);
+    el.innerHTML = `
+      <div class="gallery-item-inner" style="padding-top:${pct}%">
+        <img src="${photo.src}" alt="${photo.title}" loading="lazy"
+          onerror="this.style.background='#111'">
+      </div>
+      <div class="gallery-caption">
+        <div class="gallery-caption-text">
+          <span class="gallery-caption-name">${photo.name || photo.title}</span>
+          <span class="gallery-caption-team">${photo.team || ''}</span>
+        </div>
+      </div>`;
+    el.addEventListener('click', () => openLb(index));
+    return el;
+  }
+
+  function renderGallery(filter) {
+    visible = filter === 'all' ? PHOTOS : PHOTOS.filter(p => p.category === filter);
+    const grid = document.getElementById('gallery');
+    grid.innerHTML = '';
+    visible.forEach((p, i) => grid.appendChild(buildItem(p, i)));
+  }
+
+  const filtersEl = document.getElementById('filters');
+  if (filtersEl) {
+    filtersEl.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGallery(btn.dataset.filter);
+    });
+  }
+
+  renderGallery('all');
+
+
+  // ── PUBLISHED WORK CAROUSEL ─────────────────────────────
+  const proofSlides = [...document.querySelectorAll('.proof-slide')];
+  const proofDotsWrap = document.getElementById('proof-dots');
+  let proofIndex = 0;
+
+  if (proofSlides.length && proofDotsWrap) {
+    proofSlides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'proof-dot';
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Go to screenshot ${i + 1}`);
+      dot.addEventListener('click', () => setProofSlide(i));
+      proofDotsWrap.appendChild(dot);
+    });
+
+    function setProofSlide(index) {
+      proofIndex = (index + proofSlides.length) % proofSlides.length;
+      proofSlides.forEach((slide, i) => {
+        slide.classList.remove('active', 'prev', 'next');
+        if (i === proofIndex) slide.classList.add('active');
+        if (i === (proofIndex - 1 + proofSlides.length) % proofSlides.length) slide.classList.add('prev');
+        if (i === (proofIndex + 1) % proofSlides.length) slide.classList.add('next');
+      });
+      document.querySelectorAll('.proof-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === proofIndex);
+      });
+    }
+
+    document.querySelector('.proof-prev')?.addEventListener('click', () => setProofSlide(proofIndex - 1));
+    document.querySelector('.proof-next')?.addEventListener('click', () => setProofSlide(proofIndex + 1));
+    setProofSlide(0);
+  }
+
+  // ── NAV SCROLL ──────────────────────────────────────────
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('solid', window.scrollY > 60);
+  }, { passive: true });
+
+  // ── MOBILE MENU ─────────────────────────────────────────
+  const menuBtn = document.getElementById('nav-menu-btn');
+  const navRight = document.getElementById('nav-right');
+  menuBtn.addEventListener('click', () => {
+    navRight.classList.toggle('mobile-open');
+    document.body.style.overflow = navRight.classList.contains('mobile-open') ? 'hidden' : '';
+  });
+  navRight.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navRight.classList.remove('mobile-open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ── LIGHTBOX ────────────────────────────────────────────
+  const lb    = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbInf = document.getElementById('lb-info');
+  const lbPrevBtn = document.getElementById('lb-prev');
+  const lbNextBtn = document.getElementById('lb-next');
+  let logoLightbox = false;
+
+  function openLb(i) {
+    logoLightbox = false;
+    lbPrevBtn.style.display = '';
+    lbNextBtn.style.display = '';
+    lbIndex = i;
+    updateLb();
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function openLogoLightbox(src, label) {
+    logoLightbox = true;
+    lbImg.src = src;
+    lbInf.textContent = label || '';
+    lbPrevBtn.style.display = 'none';
+    lbNextBtn.style.display = 'none';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLb() {
+    lb.classList.remove('active');
+    document.body.style.overflow = '';
+    logoLightbox = false;
+    lbPrevBtn.style.display = '';
+    lbNextBtn.style.display = '';
+  }
+  function updateLb() {
+    const p = visible[lbIndex];
+    lbImg.src = p.src;
+    lbInf.textContent = `${p.title}  ·  ${lbIndex + 1} / ${visible.length}`;
+  }
+
+  document.querySelectorAll('.cred-logo-item img').forEach(img => {
+    img.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openLogoLightbox(img.getAttribute('src'), img.getAttribute('alt'));
+    });
+  });
+
+  document.getElementById('lb-close').addEventListener('click', closeLb);
+  lbPrevBtn.addEventListener('click', () => {
+    if (logoLightbox) return;
+    lbIndex = (lbIndex - 1 + visible.length) % visible.length; updateLb();
+  });
+  lbNextBtn.addEventListener('click', () => {
+    if (logoLightbox) return;
+    lbIndex = (lbIndex + 1) % visible.length; updateLb();
+  });
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLb();
+    if (logoLightbox) return;
+    if (e.key === 'ArrowLeft')  { lbIndex = (lbIndex - 1 + visible.length) % visible.length; updateLb(); }
+    if (e.key === 'ArrowRight') { lbIndex = (lbIndex + 1) % visible.length; updateLb(); }
+  });
+
+  // ── SMOOTH SCROLL ────────────────────────────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // ── CONTACT FORM ────────────────────────────────────────
+  document.getElementById('contact-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    await new Promise(r => setTimeout(r, 1000));
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  });
+  </script>
+
+<script>
+  window.IBAI_I18N = {
+    en: { title: "Ibai Tudanca | Football & Sports Photographer", description: "Professional football and sports photographer based in Bilbao, Spain. Available for clubs, athletes, agencies and media worldwide." },
+    es: { title: "Ibai Tudanca | Fotógrafo de fútbol y deporte", description: "Fotógrafo profesional de fútbol y deporte con base en Bilbao, España. Disponible para clubes, deportistas, agencias y medios a nivel internacional.", translations: {"Work": "Trabajo", "About me": "Sobre mí", "Services": "Servicios", "Contact": "Contacto", "Client access": "Acceso clientes", "Football & Sports Photographer": "Fotógrafo de fútbol y deporte", "Bilbao, Spain": "Bilbao, España", "Available Worldwide": "Disponible en todo el mundo", "Scroll": "Desliza", "Selected work": "Trabajo seleccionado", "My": "Mi", "Photography": "Fotografía", "All": "Todo", "Telling the story of football": "Contando la historia del fútbol", "through photography.": "a través de la fotografía.", "I started photography in Norway, drawn first to landscapes, northern lights and the discipline of waiting for the right moment. That same instinct eventually brought me pitchside, where football quickly became the place where my way of seeing made the most sense.": "Empecé en la fotografía en Noruega, atraído primero por los paisajes, las auroras boreales y la disciplina de esperar el momento adecuado. Ese mismo instinto terminó llevándome a pie de campo, donde el fútbol se convirtió rápidamente en el lugar donde mi forma de mirar tenía más sentido.", "Today I work as a sports photographer covering professional football and elite competitions, including LaLiga, UEFA Champions League, Copa del Rey and Eliteserien. My work is focused on clubs, players, agencies and editorial distribution, with images created for press, social media, communication departments and international platforms.": "Actualmente trabajo como fotógrafo deportivo cubriendo fútbol profesional y competiciones de élite, incluyendo LaLiga, UEFA Champions League, Copa del Rey y Eliteserien. Mi trabajo está orientado a clubes, jugadores, agencias y distribución editorial, con imágenes pensadas para prensa, redes sociales, departamentos de comunicación y plataformas internacionales.", "I look for photographs that feel direct, clean and useful: decisive actions, emotional reactions, portraits of competition and moments that explain the game without needing too many words. For me, the job is not only taking the picture, but delivering it quickly, consistently and with the standard required while the story is still alive.": "Busco fotografías directas, limpias y útiles: acciones decisivas, reacciones emocionales, retratos de competición y momentos que expliquen el partido sin necesitar demasiadas palabras. Para mí, el trabajo no es solo hacer la foto, sino entregarla rápido, de forma constante y con el estándar necesario mientras la historia sigue viva.", "Competitions Covered": "Competiciones cubiertas", "Clubs I’ve Worked With": "Clubes con los que he trabajado", "Agencies & Distribution": "Agencias y distribución", "Published In": "Publicado en", "Featured By": "Destacado por", "My work has been shared and published by professional clubs, players, agencies and media outlets.": "Mi trabajo ha sido compartido y publicado por clubes profesionales, jugadores, agencias y medios de comunicación.", "Get in touch →": "Contactar →", "Professional photography for": "Fotografía profesional para", "sporting stories.": "historias deportivas.", "Available for clubs, athletes, agencies, media outlets and sporting events. From live match coverage to editorial assignments and special projects, every commission is approached with a professional workflow, fast delivery and a clear visual narrative.": "Disponible para clubes, deportistas, agencias, medios y eventos deportivos. Desde coberturas en directo hasta encargos editoriales y proyectos especiales, cada trabajo se aborda con un flujo profesional, entrega rápida y una narrativa visual clara.", "Match Coverage": "Cobertura de partidos", "Professional coverage of football and sporting events, from domestic leagues to international competitions, focused on decisive moments, emotion and fast delivery.": "Cobertura profesional de fútbol y eventos deportivos, desde ligas nacionales hasta competiciones internacionales, centrada en momentos decisivos, emoción y entrega rápida.", "Editorial & Media Assignments": "Encargos editoriales y medios", "Photography created for agencies, newspapers, digital publications and international distribution platforms under live editorial deadlines.": "Fotografía creada para agencias, periódicos, publicaciones digitales y plataformas de distribución internacional bajo plazos editoriales en directo.", "Clubs & Organisations": "Clubes y organizaciones", "Visual content for clubs, federations and sporting organisations, including matchdays, media activities, portraits and communication campaigns.": "Contenido visual para clubes, federaciones y organizaciones deportivas, incluyendo días de partido, actividades de medios, retratos y campañas de comunicación.", "Athletes & Personal Branding": "Deportistas y marca personal", "Photography tailored to professional athletes, helping build a strong visual identity through portraits, social media content and editorial storytelling.": "Fotografía adaptada a deportistas profesionales para construir una identidad visual sólida mediante retratos, contenido para redes y narrativa editorial.", "Events & Special Projects": "Eventos y proyectos especiales", "Coverage of tournaments, presentations, brand activations and special assignments with the same workflow used in elite sports environments.": "Cobertura de torneos, presentaciones, activaciones de marca y encargos especiales con el mismo flujo de trabajo utilizado en entornos deportivos de élite.", "Based in Bilbao, Spain": "Con base en Bilbao, España", "· Available across Europe and internationally": "· Disponible en Europa e internacionalmente", "Let's work": "Trabajemos", "together.": "juntos.", "Available for clubs, agencies and elite sports events — in Spain and internationally. I respond within 24 hours.": "Disponible para clubes, agencias y eventos deportivos de élite — en España y a nivel internacional. Respondo en menos de 24 horas.", "Email": "Email", "WhatsApp / Phone": "WhatsApp / Teléfono", "Instagram": "Instagram", "Client portal": "Portal de clientes", "Access private galleries →": "Acceder a galerías privadas →", "Name": "Nombre", "Club / Agency": "Club / Agencia", "Message": "Mensaje", "Send message": "Enviar mensaje", "Message sent. I'll reply within 24 hours.": "Mensaje enviado. Responderé en menos de 24 horas.", "Professional sports photography for clubs, athletes, agencies and media.": "Fotografía deportiva profesional para clubes, deportistas, agencias y medios.", "Bilbao, Spain · Available Worldwide": "Bilbao, España · Disponible en todo el mundo", "Navigation": "Navegación", "WhatsApp": "WhatsApp", "↑ Back to Top": "↑ Volver arriba", "© 2026 Ibai Tudanca. All rights reserved.": "© 2026 Ibai Tudanca. Todos los derechos reservados.", "Sports photography · Editorial coverage · Client galleries": "Fotografía deportiva · Cobertura editorial · Galerías privadas", "Close ✕": "Cerrar ✕", "← Back to Portfolio": "← Volver al portfolio", "Aymeric Laporte · Athletic Club": "Aymeric Laporte · Athletic Club", "Client Access": "Acceso clientes", "Private": "Galerías", "Galleries": "privadas", "Secure access for clubs, athletes, agencies and media partners to review and download private photography galleries.": "Acceso seguro para clubes, deportistas, agencias y medios para revisar y descargar galerías fotográficas privadas.", "Email address": "Email", "Password": "Contraseña", "Access Gallery": "Acceder a la galería", "Private galleries are only available to authorised clients.": "Las galerías privadas solo están disponibles para clientes autorizados.", "Client login will be activated when the private gallery system is connected.": "El acceso de clientes se activará cuando el sistema de galerías privadas esté conectado.", "Need access to a private gallery or want to commission work?": "¿Necesitas acceso a una galería privada o quieres contratar un trabajo?", "Request access or contact me →": "Solicitar acceso o contactar →", "Are you the administrator?": "¿Eres administrador?", "Access the admin area →": "Acceder al área de administración →", "Trusted by clubs, athletes, agencies and media outlets.": "Confianza de clubes, deportistas, agencias y medios de comunicación.", "Sander Svendsen · Viking FK": "Sander Svendsen · Viking FK", "© 2026 Ibai Tudanca · All rights reserved": "© 2026 Ibai Tudanca · Todos los derechos reservados", "Admin Access": "Acceso administrador", "Manage": "Gestionar", "Secure administrator access to create clients, manage private galleries, customise access and organise professional photo delivery.": "Acceso seguro de administrador para crear clientes, gestionar galerías privadas, personalizar accesos y organizar la entrega profesional de fotografías.", "Access Admin Panel": "Acceder al panel admin", "Admin tools are only available to authorised team members.": "Las herramientas de administración solo están disponibles para miembros autorizados.", "Admin login will be activated when the private gallery management system is connected.": "El acceso de administración se activará cuando el sistema de gestión de galerías privadas esté conectado.", "Looking for the client access page?": "¿Buscas la página de acceso para clientes?", "Return to client access →": "Volver al acceso de clientes →", "Manage clients, galleries and private photo delivery.": "Gestiona clientes, galerías y entrega privada de fotografías.", "Ibai Tudanca": "Ibai Tudanca", "QualitySportImages": "QualitySportImages", "LOF": "LOF", "Getty Images": "Getty Images", "Imago": "Imago", "La Voz de Galicia": "La Voz de Galicia", "Diario de Cádiz": "Diario de Cádiz", "Diario Noticias": "Diario Noticias", "El Chiringuito": "El Chiringuito", "Estadio Deportivo": "Estadio Deportivo", "‹": "‹", "›": "›", "✓": "✓"} }
+  };
+
+  (function () {
+    const i18n = window.IBAI_I18N;
+    const textMap = new Map();
+    const attrMap = new Map();
+
+    function isTranslatableNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      return !['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parent.tagName);
+    }
+
+    function captureOriginals() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!isTranslatableNode(node)) return NodeFilter.FILTER_REJECT;
+          if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      let node;
+      while ((node = walker.nextNode())) textMap.set(node, node.nodeValue);
+
+      document.querySelectorAll('[placeholder]').forEach((el) => attrMap.set(el, el.getAttribute('placeholder')));
+    }
+
+    function translateString(original, lang) {
+      if (lang === 'en') return original;
+      const trimmed = original.trim();
+      const translated = i18n.es.translations[trimmed];
+      if (!translated) return original;
+      return original.replace(trimmed, translated);
+    }
+
+    function setLanguage(lang) {
+      const safeLang = lang === 'es' ? 'es' : 'en';
+      localStorage.setItem('ibaiLanguage', safeLang);
+      document.documentElement.lang = safeLang;
+      document.title = i18n[safeLang].title;
+      const description = document.querySelector('meta[name="description"]');
+      if (description) description.setAttribute('content', i18n[safeLang].description);
+
+      textMap.forEach((original, node) => { node.nodeValue = translateString(original, safeLang); });
+      attrMap.forEach((original, el) => { el.setAttribute('placeholder', translateString(original, safeLang)); });
+
+      document.querySelectorAll('[data-lang]').forEach((button) => {
+        button.classList.toggle('is-active', button.dataset.lang === safeLang);
+        button.setAttribute('aria-pressed', button.dataset.lang === safeLang ? 'true' : 'false');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      captureOriginals();
+      document.querySelectorAll('[data-lang]').forEach((button) => {
+        button.addEventListener('click', () => setLanguage(button.dataset.lang));
+      });
+      setLanguage(localStorage.getItem('ibaiLanguage') || 'en');
+    });
+  })();
+</script>
+</body>
+</html>

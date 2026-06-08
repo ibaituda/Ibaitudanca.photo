@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Client Access | Ibai Tudanca</title>
+<meta content="Private client access for clubs, athletes, agencies and media partners working with Ibai Tudanca." name="description"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: #080808;
+      color: #f5f5f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font-family: inherit; }
+
+    .client-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .client-logo {
+      pointer-events: auto;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+      transition: color 0.2s ease;
+    }
+    .client-logo:hover { color: #fff; }
+    .back-portfolio {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid rgba(255,255,255,0.28);
+      padding: 9px 22px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.82);
+      border-radius: 2px;
+      transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+    }
+    .back-portfolio:hover {
+      border-color: #fff;
+      color: #080808;
+      background: #fff;
+    }
+
+    .client-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.82fr);
+      background: #080808;
+      isolation: isolate;
+    }
+    .client-visual {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      background: #111;
+    }
+    .client-visual img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      transform: scale(1.01);
+    }
+    .client-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right, rgba(8,8,8,0.10) 0%, rgba(8,8,8,0.00) 42%, rgba(8,8,8,0.88) 100%),
+        linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.04) 42%, rgba(8,8,8,0.72) 100%);
+    }
+    .photo-credit {
+      position: absolute;
+      left: 40px;
+      bottom: 32px;
+      z-index: 3;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.36);
+    }
+
+    .client-panel {
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 40px 70px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.055), transparent 32%),
+        linear-gradient(to bottom, rgba(255,255,255,0.020), rgba(255,255,255,0.004));
+      border-left: 1px solid rgba(255,255,255,0.07);
+    }
+    .access-box {
+      width: 100%;
+      max-width: 430px;
+    }
+    .client-kicker {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .client-kicker::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: rgba(255,255,255,0.58);
+    }
+    .client-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 300;
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+    .client-title strong { font-weight: 600; }
+    .client-subtitle {
+      font-size: 14px;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.50);
+      margin-bottom: 40px;
+      max-width: 390px;
+      text-align: justify;
+      text-align-last: left;
+      hyphens: auto;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 28px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+    }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+    }
+    .field input {
+      width: 100%;
+      background: rgba(8,8,8,0.72);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: #fff;
+      padding: 14px 15px;
+      font-size: 14px;
+      outline: none;
+      border-radius: 0;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .field input:focus {
+      border-color: rgba(255,255,255,0.36);
+      background: rgba(8,8,8,0.92);
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.18); }
+    .access-button {
+      margin-top: 8px;
+      width: 100%;
+      border: 0;
+      background: #fff;
+      color: #080808;
+      padding: 15px 22px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .access-button:hover { opacity: 0.88; transform: translateY(-1px); }
+    .form-note {
+      font-size: 11px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.34);
+      text-align: center;
+      margin-top: 8px;
+    }
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.035);
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.56);
+    }
+    .status-message.show { display: block; }
+
+    .request-access {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+    .request-access p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.44);
+      margin-bottom: 12px;
+    }
+    .request-link {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.32);
+      padding-bottom: 5px;
+      transition: border-color 0.2s ease;
+    }
+    .request-link:hover { border-color: #fff; }
+    .admin-access-link {
+      margin-top: 18px;
+      text-align: center;
+    }
+    .admin-access-link p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.30);
+      margin-bottom: 8px;
+    }
+    .admin-access-link a {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.58);
+      border-bottom: 1px solid rgba(255,255,255,0.20);
+      padding-bottom: 4px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .admin-access-link a:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,0.70);
+    }
+    .trust-line {
+      margin-top: 34px;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      line-height: 1.7;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.30);
+      text-align: center;
+    }
+
+
+
+    .mobile-closing-visual {
+      display: none;
+    }
+    .client-footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 30px 22px;
+      text-align: center;
+      background: #080808;
+    }
+    .client-footer-brand {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.40);
+      margin-bottom: 10px;
+    }
+    .client-footer-copy {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.22);
+    }
+
+    @media (orientation: portrait), (max-width: 820px) {
+      .client-nav { padding: 22px; }
+      .client-logo { font-size: 13px; }
+      .back-portfolio { font-size: 10px; padding: 8px 14px; }
+      .client-page { display: block; min-height: 100vh; }
+      .client-visual {
+        position: relative;
+        min-height: 42vh;
+        height: 42vh;
+      }
+      .client-visual img {
+        object-position: center center;
+      }
+      .client-visual::after {
+        background:
+          linear-gradient(to bottom, rgba(8,8,8,0.10) 0%, rgba(8,8,8,0.26) 52%, #080808 100%);
+      }
+      .photo-credit { display: none; }
+      .client-panel {
+        min-height: 58vh;
+        padding: 42px 22px 46px;
+        border-left: 0;
+        background: #080808;
+      }
+      .access-box { max-width: 430px; }
+      .client-title { font-size: clamp(38px, 12vw, 56px); }
+      .client-subtitle { margin-bottom: 28px; }
+      .login-form { padding: 22px; }
+
+      .mobile-closing-visual {
+        display: block;
+        position: relative;
+        height: 42vh;
+        min-height: 320px;
+        overflow: hidden;
+        background: #111;
+      }
+      .mobile-closing-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* Prioriza la parte alta de la foto para que se vea la cara del jugador en móvil */
+        object-position: center 18%;
+        display: block;
+      }
+      .mobile-closing-visual::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(to bottom, #080808 0%, rgba(8,8,8,0.38) 25%, rgba(8,8,8,0.08) 52%, rgba(8,8,8,0.72) 100%);
+        z-index: 1;
+      }
+      .mobile-closing-credit {
+        position: absolute;
+        left: 22px;
+        bottom: 22px;
+        z-index: 2;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.46);
+      }
+
+    }
+
+    @media (max-width: 430px) {
+      .client-nav { padding: 18px 18px; }
+      .client-logo { letter-spacing: 0.14em; }
+      .back-portfolio { letter-spacing: 0.10em; padding: 8px 12px; }
+      .client-visual { min-height: 38vh; height: 38vh; }
+      .client-panel { padding: 34px 18px 42px; }
+
+      .mobile-closing-visual {
+        height: 38vh;
+        min-height: 280px;
+      }
+      .mobile-closing-visual img {
+        object-position: center 6%;
+      }
+      .mobile-closing-credit {
+        left: 18px;
+        bottom: 18px;
+      }
+
+      .client-kicker { margin-bottom: 22px; }
+      .client-title { margin-bottom: 20px; }
+    }
+  
+    .language-switch {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 18px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(8,8,8,0.34);
+      backdrop-filter: blur(12px);
+    }
+    .lang-btn {
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,0.48);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 8px;
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .lang-btn.is-active {
+      background: #fff;
+      color: #080808;
+    }
+    .lang-btn:not(.is-active):hover { color: #fff; }
+</style>
+</head>
+<body>
+<nav aria-label="Client access navigation" class="client-nav">
+<a class="client-logo" href="index.html">Ibai Tudanca</a>
+
+<div style="pointer-events:auto;display:flex;align-items:center;gap:14px;"><a class="back-portfolio" href="index.html">← Back to Portfolio</a><div aria-label="Language selector" class="language-switch"><button aria-pressed="true" class="lang-btn is-active" data-lang="en" type="button">EN</button><button aria-pressed="false" class="lang-btn" data-lang="es" type="button">ES</button></div></div></nav>
+<main class="client-page">
+<section aria-hidden="true" class="client-visual">
+<img alt="" decoding="async" loading="eager" src="img/work_F.JPG"/>
+<div class="photo-credit">Aymeric Laporte · Athletic Club</div>
+</section>
+<section class="client-panel">
+<div class="access-box">
+<div class="client-kicker">Client Access</div>
+<h1 class="client-title">Private<br/><strong>Galleries</strong></h1>
+<p class="client-subtitle">
+          Secure access for clubs, athletes, agencies and media partners to review and download private photography galleries.
+        </p>
+<form class="login-form" id="client-login-form">
+<div class="field">
+<label for="email">Email address</label>
+<input autocomplete="email" id="email" name="email" placeholder="client@email.com" required="" type="email"/>
+</div>
+<div class="field">
+<label for="password">Password</label>
+<input autocomplete="current-password" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<button class="access-button" type="submit">Access Gallery</button>
+<p class="form-note">Private galleries are only available to authorised clients.</p>
+<div class="status-message" id="status-message">
+            Client login will be activated when the private gallery system is connected.
+          </div>
+</form>
+<div class="request-access">
+<p>Need access to a private gallery or want to commission work?</p>
+<a class="request-link" href="index.html#contact">Request access or contact me →</a>
+</div>
+<div class="admin-access-link">
+<p>Are you the administrator?</p>
+<a href="admin-login.html">Access the admin area →</a>
+</div>
+<div class="trust-line">
+          Trusted by clubs, athletes, agencies and media outlets.
+        </div>
+</div>
+</section>
+</main>
+<section aria-label="Featured sports photography" class="mobile-closing-visual">
+<img alt="Sander Svendsen celebrates after scoring, Viking FK at Lyse Arena" decoding="async" loading="lazy" src="img/work_P.jpg"/>
+<div class="mobile-closing-credit">Sander Svendsen · Viking FK</div>
+</section>
+<footer class="client-footer">
+<span class="client-footer-brand">Ibai Tudanca</span>
+<span class="client-footer-copy">© 2026 Ibai Tudanca · All rights reserved</span>
+</footer>
+<script>
+    const form = document.getElementById('client-login-form');
+    const statusMessage = document.getElementById('status-message');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      statusMessage.classList.add('show');
+    });
+  </script>
+
+<script>
+  window.IBAI_I18N = {
+    en: { title: "Client Access | Ibai Tudanca", description: "Private client access for clubs, athletes, agencies and media partners working with Ibai Tudanca." },
+    es: { title: "Acceso clientes | Ibai Tudanca", description: "Acceso privado para clubes, deportistas, agencias y medios que trabajan con Ibai Tudanca.", translations: {"Work": "Trabajo", "About me": "Sobre mí", "Services": "Servicios", "Contact": "Contacto", "Client access": "Acceso clientes", "Football & Sports Photographer": "Fotógrafo de fútbol y deporte", "Bilbao, Spain": "Bilbao, España", "Available Worldwide": "Disponible en todo el mundo", "Scroll": "Desliza", "Selected work": "Trabajo seleccionado", "My": "Mi", "Photography": "Fotografía", "All": "Todo", "Telling the story of football": "Contando la historia del fútbol", "through photography.": "a través de la fotografía.", "I started photography in Norway, drawn first to landscapes, northern lights and the discipline of waiting for the right moment. That same instinct eventually brought me pitchside, where football quickly became the place where my way of seeing made the most sense.": "Empecé en la fotografía en Noruega, atraído primero por los paisajes, las auroras boreales y la disciplina de esperar el momento adecuado. Ese mismo instinto terminó llevándome a pie de campo, donde el fútbol se convirtió rápidamente en el lugar donde mi forma de mirar tenía más sentido.", "Today I work as a sports photographer covering professional football and elite competitions, including LaLiga, UEFA Champions League, Copa del Rey and Eliteserien. My work is focused on clubs, players, agencies and editorial distribution, with images created for press, social media, communication departments and international platforms.": "Actualmente trabajo como fotógrafo deportivo cubriendo fútbol profesional y competiciones de élite, incluyendo LaLiga, UEFA Champions League, Copa del Rey y Eliteserien. Mi trabajo está orientado a clubes, jugadores, agencias y distribución editorial, con imágenes pensadas para prensa, redes sociales, departamentos de comunicación y plataformas internacionales.", "I look for photographs that feel direct, clean and useful: decisive actions, emotional reactions, portraits of competition and moments that explain the game without needing too many words. For me, the job is not only taking the picture, but delivering it quickly, consistently and with the standard required while the story is still alive.": "Busco fotografías directas, limpias y útiles: acciones decisivas, reacciones emocionales, retratos de competición y momentos que expliquen el partido sin necesitar demasiadas palabras. Para mí, el trabajo no es solo hacer la foto, sino entregarla rápido, de forma constante y con el estándar necesario mientras la historia sigue viva.", "Competitions Covered": "Competiciones cubiertas", "Clubs I’ve Worked With": "Clubes con los que he trabajado", "Agencies & Distribution": "Agencias y distribución", "Published In": "Publicado en", "Featured By": "Destacado por", "My work has been shared and published by professional clubs, players, agencies and media outlets.": "Mi trabajo ha sido compartido y publicado por clubes profesionales, jugadores, agencias y medios de comunicación.", "Get in touch →": "Contactar →", "Professional photography for": "Fotografía profesional para", "sporting stories.": "historias deportivas.", "Available for clubs, athletes, agencies, media outlets and sporting events. From live match coverage to editorial assignments and special projects, every commission is approached with a professional workflow, fast delivery and a clear visual narrative.": "Disponible para clubes, deportistas, agencias, medios y eventos deportivos. Desde coberturas en directo hasta encargos editoriales y proyectos especiales, cada trabajo se aborda con un flujo profesional, entrega rápida y una narrativa visual clara.", "Match Coverage": "Cobertura de partidos", "Professional coverage of football and sporting events, from domestic leagues to international competitions, focused on decisive moments, emotion and fast delivery.": "Cobertura profesional de fútbol y eventos deportivos, desde ligas nacionales hasta competiciones internacionales, centrada en momentos decisivos, emoción y entrega rápida.", "Editorial & Media Assignments": "Encargos editoriales y medios", "Photography created for agencies, newspapers, digital publications and international distribution platforms under live editorial deadlines.": "Fotografía creada para agencias, periódicos, publicaciones digitales y plataformas de distribución internacional bajo plazos editoriales en directo.", "Clubs & Organisations": "Clubes y organizaciones", "Visual content for clubs, federations and sporting organisations, including matchdays, media activities, portraits and communication campaigns.": "Contenido visual para clubes, federaciones y organizaciones deportivas, incluyendo días de partido, actividades de medios, retratos y campañas de comunicación.", "Athletes & Personal Branding": "Deportistas y marca personal", "Photography tailored to professional athletes, helping build a strong visual identity through portraits, social media content and editorial storytelling.": "Fotografía adaptada a deportistas profesionales para construir una identidad visual sólida mediante retratos, contenido para redes y narrativa editorial.", "Events & Special Projects": "Eventos y proyectos especiales", "Coverage of tournaments, presentations, brand activations and special assignments with the same workflow used in elite sports environments.": "Cobertura de torneos, presentaciones, activaciones de marca y encargos especiales con el mismo flujo de trabajo utilizado en entornos deportivos de élite.", "Based in Bilbao, Spain": "Con base en Bilbao, España", "· Available across Europe and internationally": "· Disponible en Europa e internacionalmente", "Let's work": "Trabajemos", "together.": "juntos.", "Available for clubs, agencies and elite sports events — in Spain and internationally. I respond within 24 hours.": "Disponible para clubes, agencias y eventos deportivos de élite — en España y a nivel internacional. Respondo en menos de 24 horas.", "Email": "Email", "WhatsApp / Phone": "WhatsApp / Teléfono", "Instagram": "Instagram", "Client portal": "Portal de clientes", "Access private galleries →": "Acceder a galerías privadas →", "Name": "Nombre", "Club / Agency": "Club / Agencia", "Message": "Mensaje", "Send message": "Enviar mensaje", "Message sent. I'll reply within 24 hours.": "Mensaje enviado. Responderé en menos de 24 horas.", "Professional sports photography for clubs, athletes, agencies and media.": "Fotografía deportiva profesional para clubes, deportistas, agencias y medios.", "Bilbao, Spain · Available Worldwide": "Bilbao, España · Disponible en todo el mundo", "Navigation": "Navegación", "WhatsApp": "WhatsApp", "↑ Back to Top": "↑ Volver arriba", "© 2026 Ibai Tudanca. All rights reserved.": "© 2026 Ibai Tudanca. Todos los derechos reservados.", "Sports photography · Editorial coverage · Client galleries": "Fotografía deportiva · Cobertura editorial · Galerías privadas", "Close ✕": "Cerrar ✕", "← Back to Portfolio": "← Volver al portfolio", "Aymeric Laporte · Athletic Club": "Aymeric Laporte · Athletic Club", "Client Access": "Acceso clientes", "Private": "Galerías", "Galleries": "privadas", "Secure access for clubs, athletes, agencies and media partners to review and download private photography galleries.": "Acceso seguro para clubes, deportistas, agencias y medios para revisar y descargar galerías fotográficas privadas.", "Email address": "Email", "Password": "Contraseña", "Access Gallery": "Acceder a la galería", "Private galleries are only available to authorised clients.": "Las galerías privadas solo están disponibles para clientes autorizados.", "Client login will be activated when the private gallery system is connected.": "El acceso de clientes se activará cuando el sistema de galerías privadas esté conectado.", "Need access to a private gallery or want to commission work?": "¿Necesitas acceso a una galería privada o quieres contratar un trabajo?", "Request access or contact me →": "Solicitar acceso o contactar →", "Are you the administrator?": "¿Eres administrador?", "Access the admin area →": "Acceder al área de administración →", "Trusted by clubs, athletes, agencies and media outlets.": "Confianza de clubes, deportistas, agencias y medios de comunicación.", "Sander Svendsen · Viking FK": "Sander Svendsen · Viking FK", "© 2026 Ibai Tudanca · All rights reserved": "© 2026 Ibai Tudanca · Todos los derechos reservados", "Admin Access": "Acceso administrador", "Manage": "Gestionar", "Secure administrator access to create clients, manage private galleries, customise access and organise professional photo delivery.": "Acceso seguro de administrador para crear clientes, gestionar galerías privadas, personalizar accesos y organizar la entrega profesional de fotografías.", "Access Admin Panel": "Acceder al panel admin", "Admin tools are only available to authorised team members.": "Las herramientas de administración solo están disponibles para miembros autorizados.", "Admin login will be activated when the private gallery management system is connected.": "El acceso de administración se activará cuando el sistema de gestión de galerías privadas esté conectado.", "Looking for the client access page?": "¿Buscas la página de acceso para clientes?", "Return to client access →": "Volver al acceso de clientes →", "Manage clients, galleries and private photo delivery.": "Gestiona clientes, galerías y entrega privada de fotografías.", "Ibai Tudanca": "Ibai Tudanca", "QualitySportImages": "QualitySportImages", "LOF": "LOF", "Getty Images": "Getty Images", "Imago": "Imago", "La Voz de Galicia": "La Voz de Galicia", "Diario de Cádiz": "Diario de Cádiz", "Diario Noticias": "Diario Noticias", "El Chiringuito": "El Chiringuito", "Estadio Deportivo": "Estadio Deportivo", "‹": "‹", "›": "›", "✓": "✓"} }
+  };
+
+  (function () {
+    const i18n = window.IBAI_I18N;
+    const textMap = new Map();
+    const attrMap = new Map();
+
+    function isTranslatableNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      return !['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parent.tagName);
+    }
+
+    function captureOriginals() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!isTranslatableNode(node)) return NodeFilter.FILTER_REJECT;
+          if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      let node;
+      while ((node = walker.nextNode())) textMap.set(node, node.nodeValue);
+
+      document.querySelectorAll('[placeholder]').forEach((el) => attrMap.set(el, el.getAttribute('placeholder')));
+    }
+
+    function translateString(original, lang) {
+      if (lang === 'en') return original;
+      const trimmed = original.trim();
+      const translated = i18n.es.translations[trimmed];
+      if (!translated) return original;
+      return original.replace(trimmed, translated);
+    }
+
+    function setLanguage(lang) {
+      const safeLang = lang === 'es' ? 'es' : 'en';
+      localStorage.setItem('ibaiLanguage', safeLang);
+      document.documentElement.lang = safeLang;
+      document.title = i18n[safeLang].title;
+      const description = document.querySelector('meta[name="description"]');
+      if (description) description.setAttribute('content', i18n[safeLang].description);
+
+      textMap.forEach((original, node) => { node.nodeValue = translateString(original, safeLang); });
+      attrMap.forEach((original, el) => { el.setAttribute('placeholder', translateString(original, safeLang)); });
+
+      document.querySelectorAll('[data-lang]').forEach((button) => {
+        button.classList.toggle('is-active', button.dataset.lang === safeLang);
+        button.setAttribute('aria-pressed', button.dataset.lang === safeLang ? 'true' : 'false');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      captureOriginals();
+      document.querySelectorAll('[data-lang]').forEach((button) => {
+        button.addEventListener('click', () => setLanguage(button.dataset.lang));
+      });
+      setLanguage(localStorage.getItem('ibaiLanguage') || 'en');
+    });
+  })();
+</script>
+</body>
+</html>
