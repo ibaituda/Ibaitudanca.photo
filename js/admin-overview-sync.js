@@ -92,7 +92,7 @@
 
   function renderChecklistHtml(items){
     const priority={red:0,yellow:1,green:2};
-    const visible=items.sort((a,b)=>priority[a.severity]-priority[b.severity]).slice(0,6);
+    const visible=items.sort((a,b)=>priority[a.severity]-priority[b.severity]).slice(0,4);
     if(!visible.length){
       return '<div class="publication-check-empty"><strong>Todo al día</strong><span>No hay pendientes automáticos en clientes, galerías, tareas, retoques o calendario.</span></div>';
     }
