@@ -292,6 +292,21 @@
 
   document.querySelectorAll('.status-option').forEach(btn=>btn.addEventListener('click',()=>{const group=btn.closest('.status-switch'); if(group){group.querySelectorAll('.status-option').forEach(b=>b.classList.remove('active')); btn.classList.add('active');}}));
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.logout,[data-logout]').forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        localStorage.removeItem('ibaiAdminSession');
+        localStorage.removeItem('ibaiClientSession');
+        sessionStorage.clear();
+        window.location.href='admin-login.html';
+      });
+    });
+  });
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/admin-supabase.js?v=1151"></script>
