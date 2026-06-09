@@ -554,7 +554,7 @@
     if (!supabase || !galleryId) return [];
     const { data, error } = await supabase
       .from("photos")
-      .select("*")
+      .select("id, filename, original_url, large_url, preview_url, orientation, sort_order")
       .eq("gallery_id", galleryId)
       .order("sort_order", { ascending: true });
     const target = $(targetSelector);
@@ -714,6 +714,11 @@
     const preview = $("#upload-gallery-preview");
     if (preview) preview.innerHTML = "";
     setText("#upload-gallery-status", `Uploading 0/${files.length} photos...`);
+    const { count: existingPhotoCount } = await supabase
+      .from("photos")
+      .select("id", { count: "exact", head: true })
+      .eq("gallery_id", galleryId);
+    const baseSortOrder = Number(existingPhotoCount || 0);
     let uploaded = 0;
     for (const file of files) {
       if (!file.type.startsWith("image/")) continue;
@@ -726,11 +731,9 @@
         large_url: publicUrl,
         preview_url: publicUrl,
         orientation,
-        sort_order: uploaded + 1,
+        sort_order: baseSortOrder + uploaded + 1,
         event_date: eventDate,
-        location,
-        hidden: false,
-        is_hidden: false
+        location
       });
       if (error) {
         setText("#upload-gallery-status", "Photo uploaded, but database insert failed: " + error.message);

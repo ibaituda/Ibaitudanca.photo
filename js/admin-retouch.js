@@ -36,6 +36,10 @@
     const {data:reqs,error}=await sb.from('retouch_requests').select('*').order('created_at',{ascending:false});
     if(error){list.innerHTML=`<div class="list-row"><div><div class="row-title">${t('No se pudieron cargar las solicitudes','Could not load requests')}</div><div class="row-meta">${esc(error.message)}</div></div></div>`;return;}
     if(!reqs || !reqs.length){list.innerHTML=`<div class="list-row"><div><div class="row-title">${t('No hay retoques pendientes','No edit requests yet')}</div><div class="row-meta">${t('Cuando un cliente solicite un retoque desde una galería, aparecerá aquí.','When a client requests an edit from a gallery, it will appear here.')}</div></div></div>`;return;}
+    reqs.sort((a,b)=>{
+      const rank=(r)=>r.status==='done'||r.status==='completed'?2:r.status==='in_progress'?1:0;
+      return rank(a)-rank(b) || String(b.created_at||'').localeCompare(String(a.created_at||''));
+    });
 
     const clients=await fetchByIds(sb,'clients',reqs.map(r=>r.client_id),'id,name,username,profile_image_url');
     const galleries=await fetchByIds(sb,'galleries',reqs.map(r=>r.gallery_id),'id,title_es,title_en,event_name');

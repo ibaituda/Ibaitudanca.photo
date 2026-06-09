@@ -5,213 +5,63 @@
   const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  let realPhotos=[]; let selected=new Set(); let favs=new Set(); let reviewed=new Set(); let current=0; let lang=localStorage.getItem('ibaiLanguage')||'es'; let activeClient=null; let activeGallery=null;
-
+  const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let realPhotos=[]; let selected=new Set(); let favs=new Set(); let reviewed=new Set(); let current=0; let lang=localStorage.getItem('ibaiLanguage')||'es'; let activeClient=null; let activeGallery=null; let galleryClient=null;
   function reveal(){document.body.classList.remove('dynamic-loading');document.body.classList.add('dynamic-ready');}
-  function getClient(){if(!window.supabase||!window.IBAI_SUPABASE_URL||!window.IBAI_SUPABASE_ANON_KEY)return null; return window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);}
-  function getClientSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+  function getSb(){if(!window.supabase||!window.IBAI_SUPABASE_URL||!window.IBAI_SUPABASE_ANON_KEY)return null; return window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);}
+  function getSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+  function clearSession(){localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY);}
+  function textByLang(obj,base){return (lang==='es'?(obj?.[base+'_es']||obj?.[base+'_en']):(obj?.[base+'_en']||obj?.[base+'_es']))||'';}
   function statusLabel(s){return s==='ready'?(lang==='es'?'Lista':'Ready'):s==='in_progress'?(lang==='es'?'En proceso':'In progress'):(lang==='es'?'Creada':'Created');}
-  function dateLabel(date){if(!date)return ''; try{return new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date;}}
+  function dateLabel(date){if(!date)return '—'; try{return new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date;}}
   function photoSrc(p){return p.retouched_url||p.preview_url||p.large_url||p.original_url||'';}
-  function downloadSrc(p){return p.retouched_url||p.original_url||p.large_url||p.preview_url;}
+  function downloadSrc(p){return p.retouched_url||p.original_url||p.large_url||p.preview_url||p.src;}
   function photoDbId(index){return realPhotos[index]?.db_id;}
-  async function logDownload(kind, index=null, count=1){
-    const sb=getClient(); if(!sb||!activeClient?.id||!galleryId) return;
-    const photoId=index!==null?photoDbId(index):null;
-    const size='optimized';
-    await sb.from('download_logs').insert({client_id:activeClient.id,gallery_id:galleryId,photo_id:photoId,download_type:kind,size_label:size,photos_count:count});
-  }
-
-  async function loadSavedState(sb){
-    if(!activeClient?.id || !realPhotos.length) return;
-    const ids=realPhotos.map(p=>p.db_id).filter(Boolean);
-    if(!ids.length) return;
-    const [{data:favRows,error:favErr},{data:selRows,error:selErr}]=await Promise.all([
-      sb.from('favourites').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids),
-      sb.from('selections').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids)
-    ]);
-    if(favErr) console.warn('favourites load error',favErr);
-    if(selErr) console.warn('selections load error',selErr);
-    const favIds=new Set((favRows||[]).map(r=>r.photo_id));
-    const selIds=new Set((selRows||[]).map(r=>r.photo_id));
-    favs=new Set(); selected=new Set();
-    realPhotos.forEach((p,i)=>{ if(favIds.has(p.db_id)) favs.add(i); if(selIds.has(p.db_id)) selected.add(i); });
-  }
-
-  async function persistToggle(table,index,set){
-    const sb=getClient(); const photoId=photoDbId(index);
-    if(!sb || !activeClient?.id || !photoId) return;
-    if(set.has(index)){
-      const {error}=await sb.from(table).upsert({client_id:activeClient.id, photo_id:photoId},{onConflict:'client_id,photo_id'});
-      if(error) console.warn(table+' insert error',error);
-    }else{
-      const {error}=await sb.from(table).delete().eq('client_id',activeClient.id).eq('photo_id',photoId);
-      if(error) console.warn(table+' delete error',error);
-    }
-  }
+  async function logDownload(kind,index=null,count=1){const sb=getSb(); if(!sb||!activeClient?.id||!galleryId)return; const photoId=index!==null?photoDbId(index):null; await sb.from('download_logs').insert({client_id:activeClient.id,gallery_id:galleryId,photo_id:photoId,download_type:kind,size_label:'optimized',photos_count:count});}
+  async function loadSavedState(sb){ if(!activeClient?.id||!realPhotos.length)return; const ids=realPhotos.map(p=>p.db_id).filter(Boolean); if(!ids.length)return; const [{data:favRows},{data:selRows}]=await Promise.all([sb.from('favourites').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids),sb.from('selections').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids)]); const favIds=new Set((favRows||[]).map(r=>r.photo_id)); const selIds=new Set((selRows||[]).map(r=>r.photo_id)); favs=new Set(); selected=new Set(); realPhotos.forEach((p,i)=>{if(favIds.has(p.db_id))favs.add(i); if(selIds.has(p.db_id))selected.add(i);}); }
+  async function persistToggle(table,index,set){const sb=getSb(); const photoId=photoDbId(index); if(!sb||!activeClient?.id||!photoId)return; if(set.has(index)){await sb.from(table).upsert({client_id:activeClient.id,photo_id:photoId},{onConflict:'client_id,photo_id'});}else{await sb.from(table).delete().eq('client_id',activeClient.id).eq('photo_id',photoId);}}
 
   async function load(){
-    if(!galleryId) return;
-    const sb=getClient(); if(!sb) return;
-    activeClient=getClientSession();
-
+    if(!galleryId){reveal();return;} const sb=getSb(); if(!sb){reveal();return;}
+    activeClient=getSession();
     const {data:g,error}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
-    if(error||!g){console.warn('Gallery load error',error); document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Gallery not available</h1><p>No se pudo cargar la galería.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>'; reveal(); return;}
+    if(error||!g){document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Galería no disponible</h1><p>No se pudo cargar la galería.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>'; reveal(); return;}
     activeGallery=g;
-
-    // If a client is logged in, check that this gallery belongs to that client.
-    if(activeClient?.id && !adminPreview){
-      const {data:link,error:linkErr}=await sb.from('gallery_clients').select('id').eq('gallery_id',galleryId).eq('client_id',activeClient.id).maybeSingle();
-      if(linkErr) console.warn('gallery client check',linkErr);
-      if(!link){
-        document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Gallery not available</h1><p>This gallery is not assigned to your client account.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Return to client access</a></p></div></main>';
-        reveal();
-        return;
-      }
-    }
-
-    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
-    if(perr) console.warn(perr);
-    realPhotos=(photos||[]).filter(p=>p.hidden!==true && p.is_hidden!==true && !p.deleted_at).map((p,i)=>({
-      ...p,
-      db_id:p.id,
-      display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,
-      src:photoSrc(p),
-      file:p.filename||`photo-${i+1}.jpg`,
-      event:g.event_name||g.title_es||g.title_en||'Private gallery',
-      date:g.event_date,
-      location:g.location||'',
-      city:g.city||'',
-      gallery:g.title_es||g.title_en||'',
-      photographer:'Ibai Tudanca',
-      usage:'Client licensed use',
-      res:p.orientation==='vertical'?'Vertical file':'Horizontal file'
-    })).filter(p=>p.src);
-
-    await loadSavedState(sb);
-    updateHeader(g);
-    renderRealGallery();
-    reveal();
+    if(activeClient?.language_preference) lang=activeClient.language_preference;
+    document.documentElement.lang=lang;
+    let linkQuery=sb.from('gallery_clients').select('client_id, clients(id, username, name, language_preference, license_es, license_en)').eq('gallery_id',galleryId).limit(1);
+    if(activeClient?.id&&!adminPreview) linkQuery=linkQuery.eq('client_id',activeClient.id);
+    const {data:links,error:linkErr}=await linkQuery;
+    if(linkErr) console.warn('gallery client check',linkErr);
+    if(activeClient?.id&&!adminPreview&&(!links||!links.length)){document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Galería no disponible</h1><p>Esta galería no está asignada a tu cuenta.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>'; reveal(); return;}
+    galleryClient=(links&&links[0]?.clients)||activeClient||null; if(galleryClient?.language_preference){lang=galleryClient.language_preference;document.documentElement.lang=lang;}
+    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).order('sort_order',{ascending:true}).order('created_at',{ascending:true}); if(perr) console.warn(perr);
+    realPhotos=(photos||[]).map((p,i)=>({...p,db_id:p.id,display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,src:photoSrc(p),file:p.filename||`photo-${i+1}.jpg`,event:textByLang(g,'title')||g.event_name||'Galería',date:g.event_date,location:g.location||'',city:g.city||'',gallery:textByLang(g,'title')||'',photographer:'Ibai Tudanca',res:p.orientation==='vertical'?'Vertical':'Horizontal'})).filter(p=>p.src);
+    await loadSavedState(sb); updateHeader(g); renderRealGallery(); reveal();
   }
-
   function updateHeader(g){
-    const title=g.title_es||g.title_en||'Private gallery';
-    const hero=$('.hero'); if(hero){const img=g.cover_image_url||'img/work_A.jpg'; hero.style.setProperty('--gallery-image',`url('${img}')`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${img}')`;}
-    const h=$('.hero h1'); if(h) h.innerHTML=esc(title).replace(' vs ',' vs<br><em>')+(title.includes(' vs ')?'.</em>':'');
-    const p=$('.hero p'); if(p) p.textContent=(lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en||(lang==='es'?'Galería privada preparada para este cliente.':'Private gallery prepared for this client.');
-    const chips=$$('.hero .tag, .hero .status-pill');
-    chips.forEach(ch=>{ if(ch.textContent.match(/Ready|Lista|Created|Creada|In progress|En proceso/)) ch.innerHTML=statusLabel(g.status); });
-    const summary=$$('.summary-row');
-    if(summary[0]&&summary[0].querySelector('strong')) summary[0].querySelector('strong').textContent=statusLabel(g.status);
-    if(summary[1]&&summary[1].querySelector('strong')) summary[1].querySelector('strong').textContent=`${realPhotos.length} ${lang==='es'?'fotos':'photos'}`;
-    if(summary[2]&&summary[2].querySelector('strong')) summary[2].querySelector('strong').textContent='WebP/JPG · máx. 2 MB aprox.';
-    
-    const stats=$$('.hero .stat');
-    if(stats[0]){ const strong=stats[0].querySelector('strong'); if(strong) strong.textContent=activeClient?.name || activeClient?.username || (lang==='es'?'Cliente privado':'Private client'); }
-    if(stats[1]){ const strong=stats[1].querySelector('strong'); if(strong) strong.textContent=g.event_name || g.event_type || (lang==='es'?'Entrega privada':'Private delivery'); }
-    if(stats[2]){ const strong=stats[2].querySelector('strong'); if(strong) strong.textContent=dateLabel(g.event_date)||'—'; }
-    if(stats[3]){ const strong=stats[3].querySelector('strong'); if(strong) strong.textContent=g.publish_status==='published'?(lang==='es'?'Privado publicado':'Private published'):(lang==='es'?'Privado':'Private'); }
-    const eyebrow=$('.hero .eyebrow'); if(eyebrow) eyebrow.textContent=(lang==='es'?'Galería privada · Preparada para ':'Private gallery · Prepared for ')+(activeClient?.name || activeClient?.username || 'cliente');
-
+    const title=textByLang(g,'title')||'Galería privada'; const clientName=galleryClient?.name||galleryClient?.username||'Cliente';
+    const img=g.cover_image_url||''; const hero=$('.hero'); if(hero){hero.style.setProperty('--gallery-image', img?`url('${img}')`:'none'); hero.style.setProperty('--gallery-position',`${Number(g.cover_position_x??50)}% ${Number(g.cover_position_y??35)}%`);}
+    const h=$('.hero h1'); if(h) h.textContent=title;
+    const eyebrow=$('.hero .eyebrow'); if(eyebrow) eyebrow.textContent=(lang==='es'?'Galería privada · Preparada para ':'Private gallery · Prepared for ')+clientName;
+    const hp=$('.hero p'); const note=textByLang(g,'personal_note'); if(hp){if(note){hp.textContent=note;hp.style.display='';}else{hp.textContent='';hp.style.display='none';}}
+    const meta=$('.gallery-meta'); if(meta) meta.innerHTML=`<span class="pill"><span class="status-dot"></span>${esc(statusLabel(g.status))}</span><span class="pill" id="photoCountPill">${realPhotos.length} ${lang==='es'?'fotos':'photos'}</span><span class="pill"><span id="favPill">${favs.size}</span>&nbsp;${lang==='es'?'favoritas':'favourites'}</span>`;
+    const stats=$$('.hero-side .stat');
+    if(stats[0]) stats[0].innerHTML=`<span>${lang==='es'?'Cliente':'Client'}</span><strong>${esc(clientName)}</strong>`;
+    if(stats[1]) stats[1].innerHTML=`<span>${lang==='es'?'Evento':'Event'}</span><strong>${esc(g.event_name||textByLang(g,'title')||'—')}</strong>`;
+    if(stats[2]) stats[2].innerHTML=`<span>${lang==='es'?'Fecha':'Date'}</span><strong>${dateLabel(g.event_date)}</strong>`;
+    if(stats[3]) stats[3].innerHTML=`<span>${lang==='es'?'Acceso':'Access'}</span><strong>${g.publish_status==='published'?(lang==='es'?'Privado publicado':'Private published'):(lang==='es'?'Borrador':'Draft')}</strong>`;
+    const noteSection=$('.note'); if(noteSection){ if(note){$('p',noteSection).textContent=note; noteSection.style.display='grid';} else noteSection.style.display='none'; }
+    const summary=$$('.summary-row'); if(summary[0]?.querySelector('strong')) summary[0].querySelector('strong').textContent=statusLabel(g.status); if(summary[1]?.querySelector('strong')) summary[1].querySelector('strong').textContent=`${realPhotos.length} ${lang==='es'?'fotos':'photos'}`; if(summary[2]?.querySelector('strong')) summary[2].querySelector('strong').textContent=lang==='es'?'Entrega optimizada':'Optimized delivery';
     const panelTitle=$('.panel-title p'); if(panelTitle) panelTitle.textContent=title;
   }
-
-  function renderRealGallery(){
-    const gallery=$('#gallery'); if(!gallery) return;
-    if(!realPhotos.length){gallery.innerHTML=`<div class="photo-card" style="padding:24px;color:#aaa">${lang==='es'?'Esta galería todavía no tiene fotos subidas.':'This gallery has no uploaded photos yet.'}</div>`; updateCounts(); return;}
-    gallery.innerHTML='';
-    realPhotos.forEach((p,i)=>{
-      const card=document.createElement('article'); card.className='photo-card'; card.dataset.index=i; card.dataset.orientation=p.orientation||'horizontal';
-      card.innerHTML=`<span class="photo-id">${esc(p.display_id)}</span><img src="${esc(p.src)}" alt="${esc(p.display_id)}"><div class="photo-tools"><button class="icon-btn fav" aria-label="Favourite">♡</button><div class="tool-group"><button class="icon-btn sel" aria-label="Select">✓</button><button class="icon-btn dl" aria-label="Download">↓</button><button class="icon-btn open" aria-label="Open">↗</button></div></div><span class="fav-mark">♥</span><span class="selected-mark">✓</span><span class="reviewed-mark"></span>`;
-      gallery.appendChild(card);
-    });
-    applyFilter(); updateCounts();
-  }
-
-  function updateCounts(){
-    const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
-    setText('selectedCount',selected.size); setText('favCount',favs.size); setText('favPill',favs.size); setText('floatingCount',selected.size); setText('reviewedCount',reviewed.size); setText('totalCount',realPhotos.length);
-    const pct=realPhotos.length?Math.round((reviewed.size/realPhotos.length)*100):0; const fill=$('#progressFill'); if(fill) fill.style.width=pct+'%'; setText('progressText',pct+'%');
-    $('#selectionBar')?.classList.toggle('visible',selected.size>0); if($('#downloadSelectedTop')) $('#downloadSelectedTop').disabled=selected.size===0; if($('#downloadFavTop')) $('#downloadFavTop').disabled=favs.size===0;
-  }
-
-  function applyFilter(){
-    const filter=document.querySelector('.filter.is-active')?.dataset.filter||'all';
-    $$('.photo-card').forEach(card=>{
-      const i=+card.dataset.index; let show=true;
-      if(filter==='favourites') show=favs.has(i); if(filter==='selected') show=selected.has(i); if(filter==='horizontal') show=card.dataset.orientation==='horizontal'; if(filter==='vertical') show=card.dataset.orientation==='vertical'; if(filter==='unreviewed') show=!reviewed.has(i);
-      card.style.display=show?'':'none'; card.classList.toggle('is-fav',favs.has(i)); card.classList.toggle('is-selected',selected.has(i)); card.classList.toggle('is-reviewed',reviewed.has(i));
-      const fav=card.querySelector('.fav'); if(fav) fav.textContent=favs.has(i)?'♥':'♡';
-    });
-  }
-
-  function openLightbox(i){
-    current=i; reviewed.add(i); const p=realPhotos[i]; if(!p) return;
-    $('#lightImg').src=p.src; $('#lightTitle').textContent=p.display_id; const ptitle=$('.panel-title p'); if(ptitle) ptitle.textContent=p.gallery;
-    $('#lightFav').textContent=favs.has(i)?(lang==='es'?'Quitar favorita':'Remove favourite'):(lang==='es'?'Favorita':'Favourite'); $('#lightSel').textContent=selected.has(i)?(lang==='es'?'Quitar selección':'Remove selection'):(lang==='es'?'Seleccionar':'Select');
-    $('#exifList').innerHTML=`<div class="exif-row"><span>${lang==='es'?'Evento':'Event'}</span><strong>${esc(p.event)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fecha':'Date'}</span><strong>${esc(dateLabel(p.date))}</strong></div><div class="exif-row"><span>${lang==='es'?'Lugar':'Location'}</span><strong>${esc(p.location)}</strong></div><div class="exif-row"><span>${lang==='es'?'Galería':'Gallery'}</span><strong>${esc(p.gallery)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fotógrafo':'Photographer'}</span><strong>Ibai Tudanca</strong></div><div class="exif-row"><span>${lang==='es'?'Archivo':'File'}</span><strong>${esc(p.file)}</strong></div>`;
-    $('#lightbox').classList.add('open'); $('#lightbox').setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; updateCounts(); applyFilter();
-  }
+  function renderRealGallery(){const gallery=$('#gallery'); if(!gallery)return; if(!realPhotos.length){gallery.innerHTML=`<div class="photo-card" style="padding:24px;color:#aaa">${lang==='es'?'Esta galería todavía no tiene fotos subidas.':'This gallery has no uploaded photos yet.'}</div>`; updateCounts(); return;} gallery.innerHTML=''; realPhotos.forEach((p,i)=>{const card=document.createElement('article'); card.className='photo-card'; card.dataset.index=i; card.dataset.orientation=p.orientation||'horizontal'; card.innerHTML=`<span class="photo-id">${esc(p.display_id)}</span><img src="${esc(p.src)}" alt="${esc(p.display_id)}"><div class="photo-tools"><button class="icon-btn fav" aria-label="Favourite">♡</button><div class="tool-group"><button class="icon-btn sel" aria-label="Select">✓</button><button class="icon-btn dl" aria-label="Download">↓</button><button class="icon-btn open" aria-label="Open">↗</button></div></div><span class="fav-mark">♥</span><span class="selected-mark">✓</span><span class="reviewed-mark"></span>`; gallery.appendChild(card);}); applyFilter(); updateCounts();}
+  function updateCounts(){const set=(id,val)=>{const el=document.getElementById(id); if(el)el.textContent=val;}; set('selectedCount',selected.size); set('favCount',favs.size); set('favPill',favs.size); set('floatingCount',selected.size); set('reviewedCount',reviewed.size); set('totalCount',realPhotos.length); const pct=realPhotos.length?Math.round((reviewed.size/realPhotos.length)*100):0; const fill=$('#progressFill'); if(fill)fill.style.width=pct+'%'; set('progressText',pct+'%'); $('#selectionBar')?.classList.toggle('visible',selected.size>0); if($('#downloadSelectedTop'))$('#downloadSelectedTop').disabled=selected.size===0; if($('#downloadFavTop'))$('#downloadFavTop').disabled=favs.size===0;}
+  function applyFilter(){const filter=document.querySelector('.filter.is-active')?.dataset.filter||'all'; $$('.photo-card').forEach(card=>{const i=+card.dataset.index; let show=true; if(filter==='favourites')show=favs.has(i); if(filter==='selected')show=selected.has(i); if(filter==='horizontal')show=card.dataset.orientation==='horizontal'; if(filter==='vertical')show=card.dataset.orientation==='vertical'; if(filter==='unreviewed')show=!reviewed.has(i); card.style.display=show?'':'none'; card.classList.toggle('is-fav',favs.has(i)); card.classList.toggle('is-selected',selected.has(i)); card.classList.toggle('is-reviewed',reviewed.has(i)); const fav=card.querySelector('.fav'); if(fav)fav.textContent=favs.has(i)?'♥':'♡';});}
+  function openLightbox(i){current=i; reviewed.add(i); const p=realPhotos[i]; if(!p)return; $('#lightImg').src=p.src; $('#lightTitle').textContent=p.display_id; const ptitle=$('.panel-title p'); if(ptitle)ptitle.textContent=p.gallery; $('#lightFav').textContent=favs.has(i)?(lang==='es'?'Quitar favorita':'Remove favourite'):(lang==='es'?'Favorita':'Favourite'); $('#lightSel').textContent=selected.has(i)?(lang==='es'?'Quitar selección':'Remove selection'):(lang==='es'?'Seleccionar':'Select'); $('#exifList').innerHTML=`<div class="exif-row"><span>${lang==='es'?'Evento':'Event'}</span><strong>${esc(p.event)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fecha':'Date'}</span><strong>${esc(dateLabel(p.date))}</strong></div><div class="exif-row"><span>${lang==='es'?'Lugar':'Location'}</span><strong>${esc(p.location)}</strong></div><div class="exif-row"><span>${lang==='es'?'Galería':'Gallery'}</span><strong>${esc(p.gallery)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fotógrafo':'Photographer'}</span><strong>Ibai Tudanca</strong></div><div class="exif-row"><span>${lang==='es'?'Archivo':'File'}</span><strong>${esc(p.file)}</strong></div>`; $('#lightbox').classList.add('open'); $('#lightbox').setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; updateCounts(); applyFilter();}
   function closeLightbox(){ $('#lightbox').classList.remove('open'); $('#lightbox').setAttribute('aria-hidden','true'); document.body.style.overflow='';}
-  async function downloadPhoto(i){const p=realPhotos[i]; if(!p)return; const a=document.createElement('a'); a.href=downloadSrc(p); a.download=p.file||'photo.jpg'; document.body.appendChild(a); a.click(); a.remove(); reviewed.add(i); updateCounts(); await logDownload('single',i,1);}
-  async function downloadSet(set){const items=Array.from(set); for(const i of items){await downloadPhoto(i);} await logDownload('set',null,items.length);}
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();localStorage.removeItem('ibaiClientSession');location.href='clientes.html';}));
-    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); });
-    const globalSize=document.getElementById('globalSize'); if(globalSize) globalSize.style.display='none';
-    if(!galleryId) {reveal(); return;}
-    document.addEventListener('click',async(e)=>{
-      const card=e.target.closest('.photo-card'); if(card&&card.dataset.index){const i=+card.dataset.index; if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('favourites',i,favs); return;} if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('selections',i,selected); return;} if(e.target.closest('.dl')){downloadPhoto(i);return;} openLightbox(i);}
-      if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active')); e.target.closest('.filter').classList.add('is-active'); applyFilter();}
-    },true);
-    $('#closeLight')?.addEventListener('click',closeLightbox); $('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length)); $('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));
-    $('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current); reviewed.add(current); await persistToggle('favourites',current,favs); openLightbox(current); applyFilter();});
-    $('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current); reviewed.add(current); await persistToggle('selections',current,selected); openLightbox(current); applyFilter();});
-    $('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));
-    $('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected)); $('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs)); $('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));
-    
-    const requestBtn = $('#requestEdit');
-    if (requestBtn) {
-      const cleanBtn = requestBtn.cloneNode(true);
-      requestBtn.parentNode.replaceChild(cleanBtn, requestBtn);
-      cleanBtn.addEventListener('click', async () => {
-        const sb = getClient();
-        const photo = realPhotos[current];
-        if (!sb || !photo?.db_id || !galleryId) {
-          alert(lang === 'es' ? 'No se ha podido preparar la solicitud de retoque.' : 'Could not prepare the edit request.');
-          return;
-        }
-        if (!activeClient?.id) {
-          alert(lang === 'es' ? 'Inicia sesión como cliente para solicitar retoques.' : 'Log in as a client to request edits.');
-          return;
-        }
-        const defaultMessage = lang === 'es' ? 'Indica aquí qué retoque necesitas para esta foto.' : 'Write here the edit you need for this photo.';
-        const message = window.prompt(lang === 'es' ? 'Solicitud de retoque' : 'Edit request', defaultMessage);
-        if (message === null) return;
-        const cleanMessage = (message || '').trim() || (lang === 'es' ? 'Solicitud de retoque sin mensaje adicional.' : 'Edit request without additional message.');
-        cleanBtn.disabled = true;
-        cleanBtn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
-        const { error } = await sb.from('retouch_requests').insert({
-          client_id: activeClient.id,
-          gallery_id: galleryId,
-          photo_id: photo.db_id,
-          message: cleanMessage,
-          status: 'new'
-        });
-        cleanBtn.disabled = false;
-        cleanBtn.textContent = lang === 'es' ? 'Solicitar retoque' : 'Request edit';
-        if (error) {
-          console.warn('retouch request error', error);
-          alert((lang === 'es' ? 'No se pudo enviar la solicitud: ' : 'Could not send request: ') + error.message);
-          return;
-        }
-        alert(lang === 'es' ? 'Solicitud de retoque enviada al panel de administración.' : 'Edit request sent to the admin panel.');
-      });
-    }
-
-    document.addEventListener('keydown',e=>{if(!$('#lightbox')?.classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')openLightbox((current-1+realPhotos.length)%realPhotos.length);if(e.key==='ArrowRight')openLightbox((current+1)%realPhotos.length);if(e.key.toLowerCase()==='f'){$('#lightFav')?.click();}if(e.key.toLowerCase()==='s'){$('#lightSel')?.click();}});
-    load();
-  });
+  async function forceDownload(url,filename){const res=await fetch(url,{mode:'cors'}); const blob=await res.blob(); const object=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=object; a.download=filename||'photo.webp'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(object),1500);}
+  async function downloadPhoto(i){const p=realPhotos[i]; if(!p)return; try{await forceDownload(downloadSrc(p),p.file||'photo.webp');}catch(e){const a=document.createElement('a');a.href=downloadSrc(p);a.download=p.file||'photo.webp';a.target='_self';document.body.appendChild(a);a.click();a.remove();} reviewed.add(i); updateCounts(); await logDownload('single',i,1);}
+  async function downloadSet(set){const items=Array.from(set); for(const i of items) await downloadPhoto(i); if(items.length) await logDownload('set',null,items.length);}
+  document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.logout,[data-logout],a,button').forEach(el=>{const label=(el.textContent||'').trim().toLowerCase(); if(label==='log out'||label==='cerrar sesión'||label==='salir'||el.matches('.logout,[data-logout]')) el.addEventListener('click',(e)=>{e.preventDefault();clearSession();location.href='clientes.html';});}); document.querySelectorAll('.download-option').forEach((b,i)=>{if(i>0)b.remove();}); const globalSize=document.getElementById('globalSize'); if(globalSize)globalSize.style.display='none'; if(!galleryId){reveal();return;} document.addEventListener('click',async(e)=>{const card=e.target.closest('.photo-card'); if(card&&card.dataset.index){const i=+card.dataset.index; if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('favourites',i,favs); return;} if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('selections',i,selected); return;} if(e.target.closest('.dl')){downloadPhoto(i); return;} openLightbox(i);} if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active')); e.target.closest('.filter').classList.add('is-active'); applyFilter();}},true); $('#closeLight')?.addEventListener('click',closeLightbox); $('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length)); $('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length)); $('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current); reviewed.add(current); await persistToggle('favourites',current,favs); openLightbox(current); applyFilter();}); $('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current); reviewed.add(current); await persistToggle('selections',current,selected); openLightbox(current); applyFilter();}); $('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current)); $('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected)); $('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs)); $('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected)); const requestBtn=$('#requestEdit'); if(requestBtn){const cleanBtn=requestBtn.cloneNode(true); requestBtn.parentNode.replaceChild(cleanBtn,requestBtn); cleanBtn.addEventListener('click',async()=>{const sb=getSb(); const photo=realPhotos[current]; if(!sb||!photo?.db_id||!galleryId){alert(lang==='es'?'No se ha podido preparar la solicitud de retoque.':'Could not prepare the edit request.'); return;} if(!activeClient?.id){alert(lang==='es'?'Inicia sesión como cliente para solicitar retoques.':'Log in as a client to request edits.'); return;} const message=window.prompt(lang==='es'?'Solicitud de retoque':'Edit request',lang==='es'?'Indica aquí qué retoque necesitas para esta foto.':'Write here the edit you need for this photo.'); if(message===null)return; cleanBtn.disabled=true; cleanBtn.textContent=lang==='es'?'Enviando...':'Sending...'; const {error}=await sb.from('retouch_requests').insert({client_id:activeClient.id,gallery_id:galleryId,photo_id:photo.db_id,message:(message||'').trim()||'Solicitud de retoque',status:'new'}); cleanBtn.disabled=false; cleanBtn.textContent=lang==='es'?'Solicitar retoque':'Request edit'; if(error){alert(error.message);return;} alert(lang==='es'?'Solicitud de retoque enviada.':'Edit request sent.');});} document.addEventListener('keydown',e=>{if(!$('#lightbox')?.classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')openLightbox((current-1+realPhotos.length)%realPhotos.length);if(e.key==='ArrowRight')openLightbox((current+1)%realPhotos.length);}); load();});
 })();
