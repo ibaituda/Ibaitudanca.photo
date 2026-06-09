@@ -292,7 +292,8 @@
   document.querySelectorAll('.crop-editor').forEach(editor=>{const prev=editor.querySelector('.crop-preview'); const xs=editor.querySelector('[data-crop="x"]'); const ys=editor.querySelector('[data-crop="y"]'); function upd(){prev.style.setProperty('--pos-x',(xs?xs.value:50)+'%'); prev.style.setProperty('--pos-y',(ys?ys.value:50)+'%')} if(xs)xs.addEventListener('input',upd); if(ys)ys.addEventListener('input',upd); upd();});
 
   document.querySelectorAll('.status-option').forEach(btn=>btn.addEventListener('click',()=>{const group=btn.closest('.status-switch'); if(group){group.querySelectorAll('.status-option').forEach(b=>b.classList.remove('active')); btn.classList.add('active');}}));
-);});}
+}
+document.addEventListener('DOMContentLoaded', initAdminUi);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
@@ -308,6 +309,5 @@
 <script src="js/admin-beta-tools.js"></script>
 <script src="js/admin-overview-sync.js?v=overview-layout-final-20260609"></script>
 <script src="js/v11-admin-critical.js"></script>
-<script src="js/v11_1_1_fix.js"></script>
 </body>
 </html>
