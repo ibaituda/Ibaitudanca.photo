@@ -71,9 +71,9 @@
       }
     }
 
-    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if(perr) console.warn(perr);
-    realPhotos=(photos||[]).map((p,i)=>({
+    realPhotos=(photos||[]).filter(p=>p.hidden!==true && p.is_hidden!==true && !p.deleted_at).map((p,i)=>({
       ...p,
       db_id:p.id,
       display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,
@@ -97,14 +97,23 @@
 
   function updateHeader(g){
     const title=g.title_es||g.title_en||'Private gallery';
-    const hero=$('.hero'); if(hero){const img=g.cover_image_url||'img/work_A.jpg'; hero.style.setProperty('--gallery-image',`url('${img}')`); hero.style.setProperty('--gallery-position',`${g.cover_position_x||50}% ${g.cover_position_y||35}%`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${img}')`; hero.style.backgroundPosition=`${g.cover_position_x||50}% ${g.cover_position_y||35}%`; }
+    const hero=$('.hero'); if(hero){const img=g.cover_image_url||'img/work_A.jpg'; hero.style.setProperty('--gallery-image',`url('${img}')`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${img}')`;}
     const h=$('.hero h1'); if(h) h.innerHTML=esc(title).replace(' vs ',' vs<br><em>')+(title.includes(' vs ')?'.</em>':'');
-    const p=$('.hero p'); if(p) p.textContent=(lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en||p.textContent;
+    const p=$('.hero p'); if(p) p.textContent=(lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en||(lang==='es'?'Galería privada preparada para este cliente.':'Private gallery prepared for this client.');
     const chips=$$('.hero .tag, .hero .status-pill');
     chips.forEach(ch=>{ if(ch.textContent.match(/Ready|Lista|Created|Creada|In progress|En proceso/)) ch.innerHTML=statusLabel(g.status); });
     const summary=$$('.summary-row');
     if(summary[0]&&summary[0].querySelector('strong')) summary[0].querySelector('strong').textContent=statusLabel(g.status);
     if(summary[1]&&summary[1].querySelector('strong')) summary[1].querySelector('strong').textContent=`${realPhotos.length} ${lang==='es'?'fotos':'photos'}`;
+    if(summary[2]&&summary[2].querySelector('strong')) summary[2].querySelector('strong').textContent='WebP/JPG · máx. 2 MB aprox.';
+    
+    const stats=$$('.hero .stat');
+    if(stats[0]){ const strong=stats[0].querySelector('strong'); if(strong) strong.textContent=activeClient?.name || activeClient?.username || (lang==='es'?'Cliente privado':'Private client'); }
+    if(stats[1]){ const strong=stats[1].querySelector('strong'); if(strong) strong.textContent=g.event_name || g.event_type || (lang==='es'?'Entrega privada':'Private delivery'); }
+    if(stats[2]){ const strong=stats[2].querySelector('strong'); if(strong) strong.textContent=dateLabel(g.event_date)||'—'; }
+    if(stats[3]){ const strong=stats[3].querySelector('strong'); if(strong) strong.textContent=g.publish_status==='published'?(lang==='es'?'Privado publicado':'Private published'):(lang==='es'?'Privado':'Private'); }
+    const eyebrow=$('.hero .eyebrow'); if(eyebrow) eyebrow.textContent=(lang==='es'?'Galería privada · Preparada para ':'Private gallery · Prepared for ')+(activeClient?.name || activeClient?.username || 'cliente');
+
     const panelTitle=$('.panel-title p'); if(panelTitle) panelTitle.textContent=title;
   }
 
@@ -150,7 +159,7 @@
 
   document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();localStorage.removeItem('ibaiClientSession');location.href='clientes.html';}));
-    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); else { const strong=b.querySelector('strong'); const span=b.querySelector('span'); if(strong) strong.textContent='Descarga optimizada'; if(span) span.textContent='Archivo único preparado por Ibai para uso digital y profesional.'; }});
+    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); });
     const globalSize=document.getElementById('globalSize'); if(globalSize) globalSize.style.display='none';
     if(!galleryId) {reveal(); return;}
     document.addEventListener('click',async(e)=>{

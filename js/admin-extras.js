@@ -9,9 +9,11 @@
   function simpleDate(value){ if(!value) return ''; try{return new Date(value+'T12:00:00').toLocaleDateString(lang()==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch{return value;} }
   function localKey(date){ const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
   function statusDot(status){
-    if(['completed','done'].includes(status)) return 'green';
-    if(['confirmed','covering','in_progress'].includes(status)) return 'yellow';
-    return 'red';
+    if(['completed','done','finalizado'].includes(status)) return 'green';
+    if(['confirmed','confirmado'].includes(status)) return 'green';
+    if(['covering','in_coverage','en_cobertura'].includes(status)) return 'blue';
+    if(['cancelled','canceled','cancelado'].includes(status)) return 'red';
+    return 'yellow';
   }
   function statusText(status){return {pending:t('Pendiente','Pending'),confirmed:t('Confirmado','Confirmed'),covering:t('En cobertura','In coverage'),completed:t('Finalizado','Completed'),cancelled:t('Cancelado','Cancelled')}[status]||status;}
 
@@ -88,7 +90,7 @@
         </div><br>
         <div class="row-actions"><button class="btn primary" id="cal-save">${t('Guardar evento','Save event')}</button><button class="btn" id="cal-clear">${t('Limpiar','Clear')}</button></div>
         <p class="row-meta" id="cal-status-msg" style="margin-top:12px"></p>
-        <div class="divider-line"></div><div class="status-legend" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px"><div class="status-legend-card"><strong><span class="dot red"></span>${t('Pendiente / Cancelado','Pending / Cancelled')}</strong></div><div class="status-legend-card"><strong><span class="dot yellow"></span>${t('Confirmado / En cobertura','Confirmed / Covering')}</strong></div><div class="status-legend-card"><strong><span class="dot green"></span>${t('Finalizado','Completed')}</strong></div></div>
+        <div class="divider-line"></div><div class="calendar-legend-v114"><div class="legend-row"><i class="legend-dot yellow"></i><div><strong>${t('Pendiente','Pending')}</strong><span>${t('Evento creado, pendiente de confirmar o preparar.','Event created, pending confirmation or preparation.')}</span></div></div><div class="legend-row"><i class="legend-dot green"></i><div><strong>${t('Confirmado','Confirmed')}</strong><span>${t('Evento confirmado y listo para cubrir.','Event confirmed and ready to cover.')}</span></div></div><div class="legend-row"><i class="legend-dot blue"></i><div><strong>${t('En cobertura','In coverage')}</strong><span>${t('Trabajo activo: evento en curso o fotos en proceso.','Active work: event in progress or photos being processed.')}</span></div></div><div class="legend-row"><i class="legend-dot green"></i><div><strong>${t('Finalizado','Completed')}</strong><span>${t('Cobertura terminada y entregada.','Coverage finished and delivered.')}</span></div></div><div class="legend-row"><i class="legend-dot red"></i><div><strong>${t('Cancelado','Cancelled')}</strong><span>${t('Evento cancelado o descartado.','Event cancelled or discarded.')}</span></div></div></div>
         <h3>${t('Próximos eventos','Upcoming events')}</h3>
         <div class="list" id="calendar-events-list" style="margin-top:12px"></div>
       </div>`;

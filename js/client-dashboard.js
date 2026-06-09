@@ -24,8 +24,9 @@
     try{return new Date(date+'T12:00:00').toLocaleDateString(document.documentElement.lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date;}
   }
   async function countPhotos(sb,galleryId){
-    const {count}=await sb.from('photos').select('id',{count:'exact',head:true}).eq('gallery_id',galleryId).eq('hidden',false);
-    return count||0;
+    const {data,error}=await sb.from('photos').select('id,hidden,is_hidden,deleted_at').eq('gallery_id',galleryId);
+    if(error){ console.warn('photo count error', error); return 0; }
+    return (data||[]).filter(p=>p.hidden!==true && p.is_hidden!==true && !p.deleted_at).length;
   }
   async function load(){
     const sb=getClient(); if(!sb) return;
@@ -45,16 +46,16 @@
     const first=(name||'Client').split(' ')[0];
     const hero=client.hero_image_url||'img/work_O.jpg';
     const profile=client.profile_image_url||hero;
-    $('.hero')?.style.setProperty('--hero-image',`url('${hero}')`); $('.hero')?.style.setProperty('--hero-position',`${client.hero_position_x||50}% ${client.hero_position_y||28}%`);
+    $('.hero')?.style.setProperty('--hero-image',`url('${hero}')`);
     const avatar=$('.hero-avatar img'); if(avatar){avatar.src=profile; avatar.alt=name;}
     const prepared=$('.prepared'); if(prepared) prepared.textContent=(lang==='es'?'Preparado exclusivamente para ':'Prepared exclusively for ')+name;
     const eyebrow=$('.eyebrow'); if(eyebrow) eyebrow.textContent=client.client_type==='player'?(lang==='es'?'Experiencia privada para jugador':'Private player experience'):(lang==='es'?'Experiencia privada personalizada':'Private personalised experience');
-    const h1=$('.hero h1'); if(h1){ const customTitle=(lang==='es'?(client.welcome_title_es||client.welcome_title_en):(client.welcome_title_en||client.welcome_title_es)); h1.innerHTML= customTitle ? esc(customTitle) : ((lang==='es'?'Bienvenido de nuevo,':'Welcome back,')+'<br><em>'+esc(first)+'.</em>'); }
-    const p=$('.hero p'); if(p) p.textContent=(lang==='es'?(client.welcome_message_es||client.welcome_message_en):(client.welcome_message_en||client.welcome_message_es))||p.textContent;
+    const h1=$('.hero h1'); if(h1) h1.innerHTML=(lang==='es'?'Bienvenido de nuevo,':'Welcome back,')+'<br><em>'+esc(first)+'.</em>';
+    const p=$('.hero p'); if(p) p.textContent=(lang==='es'?(client.welcome_message_es||client.welcome_message_en):(client.welcome_message_en||client.welcome_message_es)) || (lang==='es'?'Tus galerías privadas aparecerán aquí cuando estén publicadas.':'Your private galleries will appear here when they are published.');
     const mini=$$('.mini-card');
     if(mini[0]) mini[0].innerHTML=`<span>${lang==='es'?'Cliente':'Client'}</span><strong>${esc(name)}</strong>`;
     if(mini[1]) mini[1].innerHTML=`<span>${lang==='es'?'Perfil':'Profile'}</span><strong>${esc(client.client_type||'client')}</strong>`;
-    const note=$('.personal-note p'); if(note) note.textContent=(lang==='es'?(client.welcome_message_es||client.welcome_message_en):(client.welcome_message_en||client.welcome_message_es))||note.textContent;
+    const note=$('.personal-note p'); if(note) note.textContent=(lang==='es'?(client.welcome_message_es||client.welcome_message_en):(client.welcome_message_en||client.welcome_message_es)) || (lang==='es'?'Nota personalizada pendiente de completar desde el panel de administración.':'Personal note pending from the admin panel.');
 
     const {data:links,error:linksErr}=await sb.from('gallery_clients').select('gallery_id').eq('client_id',client.id);
     if(linksErr){console.warn(linksErr); return;}
@@ -68,7 +69,8 @@
     await Promise.all(galleries.map(async g=>{photoCounts[g.id]=await countPhotos(sb,g.id);}));
     if(mini[2]) mini[2].innerHTML=`<span>${lang==='es'?'Galerías':'Galleries'}</span><strong>${galleries.length} ${lang==='es'?'activas':'active'}</strong>`;
     renderFeatured(galleries,photoCounts,lang);
-    renderGalleries(galleries,photoCounts,lang); renderTimeline(galleries,lang);
+    renderGalleries(galleries,photoCounts,lang);
+    renderTimeline(galleries, photoCounts, lang);
     const license=$('.license-box p'); if(license){const custom=lang==='es'?(client.license_es||client.license_en):(client.license_en||client.license_es); if(custom) license.textContent=custom;}
     const licensePills=$$('.license-pill');
     if(licensePills[0]) licensePills[0].innerHTML=`<span>${lang==='es'?'Tipo de cliente':'Client type'}</span><strong>${esc(client.client_type||'client')}</strong>`;
@@ -98,12 +100,22 @@
     }).join('');
   }
 
-  function renderTimeline(galleries,lang){
-    const list=$('.timeline-list'); if(!list) return;
-    const items=(galleries||[]).slice(0,4);
-    if(!items.length){ list.innerHTML=`<div class="timeline-item"><span>${lang==='es'?'Sin entregas':'No deliveries'}</span><strong>${lang==='es'?'Aún no hay galerías publicadas':'No published galleries yet'}</strong></div>`; return; }
-    list.innerHTML=items.map(g=>`<div class="timeline-item"><span>${dateLabel(g.event_date)}</span><strong>${esc((lang==='es'?g.title_es:g.title_en)||g.title_es||g.title_en||'Gallery')}</strong></div>`).join('');
+  function renderTimeline(galleries, counts, lang){
+    const list=document.querySelector('.timeline-list');
+    if(!list) return;
+    const ordered=[...(galleries||[])].sort((a,b)=>String(b.event_date||b.created_at||'').localeCompare(String(a.event_date||a.created_at||''))).slice(0,4);
+    if(!ordered.length){
+      list.innerHTML=`<div class="timeline-item"><span>${lang==='es'?'Sin entregas':'No deliveries'}</span><strong>${lang==='es'?'Pendiente':'Pending'}</strong></div>`;
+      return;
+    }
+    list.innerHTML=ordered.map(g=>{
+      const title=(lang==='es'?g.title_es:g.title_en)||g.title_es||g.title_en||'Galería';
+      const date=dateLabel(g.event_date)|| (lang==='es'?'Sin fecha':'No date');
+      const n=counts?.[g.id]||0;
+      return `<div class="timeline-item"><span>${esc(date)} · ${n} ${lang==='es'?'fotos':'photos'}</span><strong>${esc(title)}</strong></div>`;
+    }).join('');
   }
+
   document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('a,button').forEach(el=>{
       const label=(el.textContent||'').trim().toLowerCase();

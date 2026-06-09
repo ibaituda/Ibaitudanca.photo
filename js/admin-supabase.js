@@ -554,7 +554,7 @@
     if (!supabase || !galleryId) return [];
     const { data, error } = await supabase
       .from("photos")
-      .select("id, filename, original_url, large_url, preview_url, orientation, sort_order")
+      .select("*")
       .eq("gallery_id", galleryId)
       .order("sort_order", { ascending: true });
     const target = $(targetSelector);
@@ -726,9 +726,11 @@
         large_url: publicUrl,
         preview_url: publicUrl,
         orientation,
-        sort_order: Date.now() + uploaded,
+        sort_order: uploaded + 1,
         event_date: eventDate,
-        location
+        location,
+        hidden: false,
+        is_hidden: false
       });
       if (error) {
         setText("#upload-gallery-status", "Photo uploaded, but database insert failed: " + error.message);
