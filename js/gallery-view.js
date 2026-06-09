@@ -97,7 +97,7 @@
 
   function updateHeader(g){
     const title=g.title_es||g.title_en||'Private gallery';
-    const hero=$('.hero'); if(hero){const img=g.cover_image_url||'img/work_A.jpg'; hero.style.setProperty('--gallery-image',`url('${img}')`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${img}')`;}
+    const hero=$('.hero'); if(hero){const img=g.cover_image_url||'img/work_A.jpg'; hero.style.setProperty('--gallery-image',`url('${img}')`); hero.style.setProperty('--gallery-position',`${g.cover_position_x||50}% ${g.cover_position_y||35}%`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${img}')`; hero.style.backgroundPosition=`${g.cover_position_x||50}% ${g.cover_position_y||35}%`; }
     const h=$('.hero h1'); if(h) h.innerHTML=esc(title).replace(' vs ',' vs<br><em>')+(title.includes(' vs ')?'.</em>':'');
     const p=$('.hero p'); if(p) p.textContent=(lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en||p.textContent;
     const chips=$$('.hero .tag, .hero .status-pill');
@@ -150,7 +150,7 @@
 
   document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();localStorage.removeItem('ibaiClientSession');location.href='clientes.html';}));
-    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); });
+    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); else { const strong=b.querySelector('strong'); const span=b.querySelector('span'); if(strong) strong.textContent='Descarga optimizada'; if(span) span.textContent='Archivo único preparado por Ibai para uso digital y profesional.'; }});
     const globalSize=document.getElementById('globalSize'); if(globalSize) globalSize.style.display='none';
     if(!galleryId) {reveal(); return;}
     document.addEventListener('click',async(e)=>{

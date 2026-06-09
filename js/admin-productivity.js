@@ -177,7 +177,7 @@
     const sb=supabaseClient(); const list=$('#trash-list'); if(!list) return;
     if(!sb){list.innerHTML='<div class="empty-state">Supabase config missing.</div>';return;}
     const items=[];
-    for(const table of ['clients','galleries','photos','calendar_events','tasks']){
+    for(const table of ['clients','galleries','photos','calendar_events','app_tasks']){
       const {data,error}=await sb.from(table).select('*').not('deleted_at','is',null).order('deleted_at',{ascending:false}).limit(50);
       if(!error && data){ data.forEach(row=>items.push({table,row})); }
     }
@@ -206,7 +206,7 @@
       const t=e.target.closest('[data-task-status]'); if(t){ const row=t.closest('[data-task-id]'); updateTaskStatus(row?.dataset.taskId,t.dataset.taskStatus); }
       const del=e.target.closest('[data-task-delete]'); if(del){ const row=del.closest('[data-task-id]'); deleteTask(row?.dataset.taskId); }
       const rest=e.target.closest('[data-restore]'); if(rest){ const row=rest.closest('[data-trash-id]'); restoreTrash(row?.dataset.trashTable,row?.dataset.trashId); }
-      const del=e.target.closest('[data-delete-forever]'); if(del){ const row=del.closest('[data-trash-id]'); deleteForever(row?.dataset.trashTable,row?.dataset.trashId); }
+      const delForever=e.target.closest('[data-delete-forever]'); if(delForever){ const row=delForever.closest('[data-trash-id]'); deleteForever(row?.dataset.trashTable,row?.dataset.trashId); }
       const btn=e.target.closest('button');
       if(btn && /duplicar|duplicate/i.test(btn.innerText||'') && !btn.dataset.ibaiDuplicateBound){
         const clientRow=btn.closest('[data-client-id]'); const galleryRow=btn.closest('[data-gallery-id]');
