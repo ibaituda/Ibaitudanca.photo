@@ -55,9 +55,9 @@
       .mobile-download-panel .download-row span{display:block;font-size:8px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;color:rgba(255,255,255,.38)}
       .mobile-download-panel .download-row strong{display:block;font-size:10px}
     }
-  </style>
+  body.dynamic-loading main{visibility:hidden}body.dynamic-loading::before{content:"";position:fixed;inset:0;background:#080808;z-index:9999}</style>
 </head>
-<body>
+<body class="dynamic-loading">
   <div class="page-grain"></div>
   <nav class="dashboard-nav" aria-label="Client dashboard navigation">
     <a class="brand" href="index.html">Ibai Tudanca</a>
@@ -142,6 +142,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/client-dashboard.js"></script>
+<script src="js/client-password-dashboard.js"></script>
 <script src="js/client-privacy.js"></script>
 </body>
 </html>

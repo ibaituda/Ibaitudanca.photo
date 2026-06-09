@@ -7,11 +7,13 @@
   function getSb(){ if(!window.supabase||!window.IBAI_SUPABASE_URL||!window.IBAI_SUPABASE_ANON_KEY) return null; return window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY); }
   function fmtDate(value){ if(!value) return ''; try{return new Date(value).toLocaleString(lang()==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return value;} }
   function simpleDate(value){ if(!value) return ''; try{return new Date(value+'T12:00:00').toLocaleDateString(lang()==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch{return value;} }
+  function localKey(date){ const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
   function statusDot(status){
-    if(['completed','done','ready','published'].includes(status)) return 'green';
-    if(['confirmed','covering','in_progress','draft'].includes(status)) return 'yellow';
+    if(['completed','done'].includes(status)) return 'green';
+    if(['confirmed','covering','in_progress'].includes(status)) return 'yellow';
     return 'red';
   }
+  function statusText(status){return {pending:t('Pendiente','Pending'),confirmed:t('Confirmado','Confirmed'),covering:t('En cobertura','In coverage'),completed:t('Finalizado','Completed'),cancelled:t('Cancelado','Cancelled')}[status]||status;}
 
   async function loadDownloads(){
     const section=$('#downloads'); if(!section) return;
@@ -66,7 +68,7 @@
           ${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map((es,i)=>`<div class="day-name">${lang()==='es'?es:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]}</div>`).join('')}
           ${days.map(day=>{
             if(!day) return '<div class="day past"></div>';
-            const key=day.toISOString().slice(0,10); const evs=byDate.get(key)||[];
+            const key=localKey(day); const evs=byDate.get(key)||[];
             const past=day < new Date(today.getFullYear(),today.getMonth(),today.getDate()); const isToday=key===today.toISOString().slice(0,10);
             return `<div class="day ${past?'past':''} ${isToday?'today':''}"><span class="day-num">${day.getDate()}</span>${evs.slice(0,2).map(ev=>`<div class="event-chip ${statusDot(ev.status)}" data-edit-event="${esc(ev.id)}">${esc(ev.title)}${ev.event_time?' · '+esc(ev.event_time.slice(0,5)):''}</div>`).join('')}</div>`;
           }).join('')}
@@ -86,23 +88,24 @@
         </div><br>
         <div class="row-actions"><button class="btn primary" id="cal-save">${t('Guardar evento','Save event')}</button><button class="btn" id="cal-clear">${t('Limpiar','Clear')}</button></div>
         <p class="row-meta" id="cal-status-msg" style="margin-top:12px"></p>
-        <div class="divider-line"></div>
+        <div class="divider-line"></div><div class="status-legend" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px"><div class="status-legend-card"><strong><span class="dot red"></span>${t('Pendiente / Cancelado','Pending / Cancelled')}</strong></div><div class="status-legend-card"><strong><span class="dot yellow"></span>${t('Confirmado / En cobertura','Confirmed / Covering')}</strong></div><div class="status-legend-card"><strong><span class="dot green"></span>${t('Finalizado','Completed')}</strong></div></div>
         <h3>${t('Próximos eventos','Upcoming events')}</h3>
         <div class="list" id="calendar-events-list" style="margin-top:12px"></div>
       </div>`;
     const upcoming=$('#calendar-events-list');
     const sorted=[...events].sort((a,b)=>(a.event_date+a.event_time||'').localeCompare(b.event_date+b.event_time||''));
-    upcoming.innerHTML=sorted.slice(0,8).map(ev=>`<div class="list-row" style="grid-template-columns:1fr auto"><div><div class="row-title">${esc(ev.title)}</div><div class="row-meta">${simpleDate(ev.event_date)} ${ev.event_time?ev.event_time.slice(0,5):''} · ${esc(ev.location||'')} · ${esc(ev.assigned_photographer||'')}</div></div><div class="row-actions"><span class="pill"><span class="dot ${statusDot(ev.status)}"></span>${esc(ev.status)}</span><button class="btn" data-edit-event="${esc(ev.id)}">${t('Editar','Edit')}</button></div></div>`).join('') || `<div class="row-meta">${t('No hay eventos todavía.','No events yet.')}</div>`;
+    upcoming.innerHTML=sorted.slice(0,8).map(ev=>`<div class="list-row" style="grid-template-columns:1fr auto"><div><div class="row-title">${esc(ev.title)}</div><div class="row-meta">${simpleDate(ev.event_date)} ${ev.event_time?ev.event_time.slice(0,5):''} · ${esc(ev.location||'')} · ${esc(ev.assigned_photographer||'')}</div></div><div class="row-actions"><span class="pill"><span class="dot ${statusDot(ev.status)}"></span>${esc(statusText(ev.status))}</span><button class="btn" data-edit-event="${esc(ev.id)}">${t('Editar','Edit')}</button><button class="btn danger" data-delete-event="${esc(ev.id)}">${t('Borrar','Delete')}</button></div></div>`).join('') || `<div class="row-meta">${t('No hay eventos todavía.','No events yet.')}</div>`;
     $('#cal-prev')?.addEventListener('click',()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar(cachedEvents);});
     $('#cal-next')?.addEventListener('click',()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar(cachedEvents);});
     $('#cal-save')?.addEventListener('click',saveCalendarEvent);
     $('#cal-clear')?.addEventListener('click',clearCalendarForm);
     $$('[data-edit-event]',wrap).forEach(btn=>btn.addEventListener('click',()=>fillCalendarForm(btn.dataset.editEvent)));
+    $$('[data-delete-event]',wrap).forEach(btn=>btn.addEventListener('click',async()=>{ if(!confirm(t('Enviar evento a la papelera?','Move event to trash?'))) return; const sb=getSb(); if(!sb) return; await sb.from('calendar_events').update({deleted_at:new Date().toISOString()}).eq('id',btn.dataset.deleteEvent); await loadCalendar(); }));
   }
 
   function clearCalendarForm(){ ['#cal-event-id','#cal-title','#cal-date','#cal-time','#cal-location','#cal-notes'].forEach(s=>{const el=$(s); if(el) el.value='';}); const ph=$('#cal-photographer'); if(ph) ph.value='Ibai Tudanca'; const st=$('#cal-status'); if(st) st.value='pending'; }
   function fillCalendarForm(id){ const ev=cachedEvents.find(e=>e.id===id); if(!ev) return; $('#cal-event-id').value=ev.id; $('#cal-title').value=ev.title||''; $('#cal-date').value=ev.event_date||''; $('#cal-time').value=ev.event_time?ev.event_time.slice(0,5):''; $('#cal-location').value=ev.location||''; $('#cal-photographer').value=ev.assigned_photographer||'Ibai Tudanca'; $('#cal-status').value=ev.status||'pending'; $('#cal-notes').value=ev.notes||''; $('#cal-title').scrollIntoView({behavior:'smooth',block:'center'}); }
-  async function loadCalendar(){ const sb=getSb(); if(!sb) return; const {data,error}=await sb.from('calendar_events').select('*').order('event_date',{ascending:true}); if(error){console.warn(error); return;} cachedEvents=data||[]; renderCalendar(cachedEvents); }
+  async function loadCalendar(){ const sb=getSb(); if(!sb) return; const {data,error}=await sb.from('calendar_events').select('*').is('deleted_at',null).order('event_date',{ascending:true}); if(error){console.warn(error); return;} cachedEvents=data||[]; renderCalendar(cachedEvents); }
   async function saveCalendarEvent(){
     const sb=getSb(); if(!sb)return; const title=$('#cal-title')?.value.trim(); const date=$('#cal-date')?.value;
     if(!title||!date){$('#cal-status-msg').textContent=t('Añade título y fecha.','Add title and date.');return;}

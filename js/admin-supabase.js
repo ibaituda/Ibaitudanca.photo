@@ -47,28 +47,60 @@
   const STORAGE_BUCKET = "portfolio-images";
 
   function fileExtension(file) {
-    const name = file?.name || "image.jpg";
-    const ext = name.split(".").pop()?.toLowerCase() || "jpg";
-    return ext.replace(/[^a-z0-9]/g, "") || "jpg";
+    return "webp";
+  }
+
+  async function compressImageForWeb(file, maxBytes = 2 * 1024 * 1024) {
+    if (!file || !file.type?.startsWith("image/")) return file;
+    const img = await new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => { URL.revokeObjectURL(url); resolve(image); };
+      image.onerror = reject;
+      image.src = url;
+    });
+    const shortEdgeTarget = 3000;
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    const shortEdge = Math.min(w, h);
+    const scale = shortEdge > shortEdgeTarget ? shortEdgeTarget / shortEdge : 1;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(w * scale));
+    canvas.height = Math.max(1, Math.round(h * scale));
+    const ctx = canvas.getContext("2d", { alpha: false });
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    async function toBlob(q) {
+      return await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", q));
+    }
+    let quality = 0.86;
+    let blob = await toBlob(quality);
+    while (blob && blob.size > maxBytes && quality > 0.46) {
+      quality -= 0.08;
+      blob = await toBlob(quality);
+    }
+    if (!blob) return file;
+    const base = (file.name || "photo").replace(/\.[^.]+$/, "");
+    return new File([blob], `${base}.webp`, { type: "image/webp", lastModified: Date.now() });
   }
 
   async function uploadImage(supabase, file, folder, statusSelector) {
     if (!file) return null;
     const safeFolder = slugify(folder || "uploads") || "uploads";
-    const ext = fileExtension(file);
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+    setText(statusSelector, `Optimising ${file.name}...`);
+    const uploadFile = await compressImageForWeb(file);
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.webp`;
     const path = `${safeFolder}/${filename}`;
 
-    setText(statusSelector, `Uploading ${file.name}...`);
+    setText(statusSelector, `Uploading optimised file...`);
 
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { cacheControl: "3600", upsert: true });
+      .upload(path, uploadFile, { cacheControl: "3600", upsert: true, contentType: uploadFile.type || "image/webp" });
 
     if (error) throw error;
 
     const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    setText(statusSelector, `Uploaded: ${file.name}`);
+    setText(statusSelector, `Uploaded optimised WebP · ${(uploadFile.size / 1024 / 1024).toFixed(2)} MB`);
     return data.publicUrl;
   }
 
@@ -143,6 +175,7 @@
             <button class="btn" data-edit-client="${client.id}"><span data-en>Edit client</span><span data-es>Editar cliente</span></button>
             <button class="btn"><span data-en>Change password</span><span data-es>Cambiar contraseña</span></button>
             <button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button>
+            <button class="btn danger" data-trash-client="${client.id}"><span data-en>Delete</span><span data-es>Borrar</span></button>
           </div>
         </div>
       `;
@@ -220,7 +253,7 @@
 
   function previewClientPage(username) {
     const user = username || $("#edit-client-username")?.value.trim() || $("#client-username")?.value.trim() || slugify($("#client-name")?.value.trim());
-    const url = user ? `client-dashboard.html?client=${encodeURIComponent(user)}` : "client-dashboard.html";
+    const url = user ? `client-dashboard.html?client=${encodeURIComponent(user)}&adminPreview=1` : "client-dashboard.html";
     window.open(url, "_blank");
   }
 
@@ -334,6 +367,7 @@
     const { data, error } = await client
       .from("clients")
       .select("*")
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -458,6 +492,7 @@
             <button class="btn" data-upload-gallery="${gallery.id}"><span data-en>Upload photos</span><span data-es>Subir fotos</span></button>
             <button class="btn" data-preview-gallery="${gallery.id}"><span data-en>Preview</span><span data-es>Previsualizar</span></button>
             <button class="btn"><span data-en>Duplicate</span><span data-es>Duplicar</span></button>
+            <button class="btn danger" data-trash-gallery="${gallery.id}"><span data-en>Delete</span><span data-es>Borrar</span></button>
           </div>
         </div>
       `;
@@ -483,6 +518,7 @@
     const { data, error } = await supabase
       .from("galleries")
       .select("*, gallery_clients(clients(id, username, name))")
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -711,7 +747,7 @@
   }
 
   function previewGallery(galleryId) {
-    const url = galleryId ? `gallery-view.html?gallery=${encodeURIComponent(galleryId)}` : "gallery-view.html";
+    const url = galleryId ? `gallery-view.html?gallery=${encodeURIComponent(galleryId)}&adminPreview=1` : "gallery-view.html";
     window.open(url, "_blank");
   }
 

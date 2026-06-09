@@ -177,12 +177,18 @@
     const sb=supabaseClient(); const list=$('#trash-list'); if(!list) return;
     if(!sb){list.innerHTML='<div class="empty-state">Supabase config missing.</div>';return;}
     const items=[];
-    for(const table of ['clients','galleries','photos']){
+    for(const table of ['clients','galleries','photos','calendar_events','tasks']){
       const {data,error}=await sb.from(table).select('*').not('deleted_at','is',null).order('deleted_at',{ascending:false}).limit(50);
       if(!error && data){ data.forEach(row=>items.push({table,row})); }
     }
     if(!items.length){list.innerHTML='<div class="empty-state">La papelera está vacía.</div>';return;}
-    list.innerHTML=items.map(({table,row})=>`<div class="trash-row" data-trash-table="${table}" data-trash-id="${row.id}"><div><div class="row-title">${escapeHtml(row.name||row.title_es||row.filename||row.username||'Elemento')}</div><div class="row-meta">${table} · ${escapeHtml(row.deleted_at||'')}</div></div><button class="btn primary" data-restore>Restaurar</button></div>`).join('');
+    list.innerHTML=items.map(({table,row})=>`<div class="trash-row" data-trash-table="${table}" data-trash-id="${row.id}"><div><div class="row-title">${escapeHtml(row.name||row.title_es||row.filename||row.username||'Elemento')}</div><div class="row-meta">${table} · ${escapeHtml(row.deleted_at||'')}</div></div><button class="btn primary" data-restore>Restaurar</button><button class="btn danger" data-delete-forever>Borrar definitivamente</button></div>`).join('');
+  }
+  async function deleteForever(table,id){
+    if(!table||!id||!confirm('Borrar definitivamente de Supabase? Esta acción no se puede deshacer.')) return;
+    const sb=supabaseClient();
+    await sb.from(table).delete().eq('id',id);
+    loadTrash(); logActivity('trash_deleted','Elemento borrado definitivamente',table);
   }
   async function restoreTrash(table,id){
     const sb=supabaseClient(); if(!sb) return;
@@ -200,6 +206,7 @@
       const t=e.target.closest('[data-task-status]'); if(t){ const row=t.closest('[data-task-id]'); updateTaskStatus(row?.dataset.taskId,t.dataset.taskStatus); }
       const del=e.target.closest('[data-task-delete]'); if(del){ const row=del.closest('[data-task-id]'); deleteTask(row?.dataset.taskId); }
       const rest=e.target.closest('[data-restore]'); if(rest){ const row=rest.closest('[data-trash-id]'); restoreTrash(row?.dataset.trashTable,row?.dataset.trashId); }
+      const del=e.target.closest('[data-delete-forever]'); if(del){ const row=del.closest('[data-trash-id]'); deleteForever(row?.dataset.trashTable,row?.dataset.trashId); }
       const btn=e.target.closest('button');
       if(btn && /duplicar|duplicate/i.test(btn.innerText||'') && !btn.dataset.ibaiDuplicateBound){
         const clientRow=btn.closest('[data-client-id]'); const galleryRow=btn.closest('[data-gallery-id]');

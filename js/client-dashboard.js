@@ -1,6 +1,7 @@
 (function(){
   const qs=new URLSearchParams(location.search);
   const clientParam=qs.get('client');
+  const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
   const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
@@ -11,6 +12,7 @@
   }
   function getClientSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
   function clearClientSession(){localStorage.removeItem(SESSION_KEY);}
+  function reveal(){document.body.classList.remove('dynamic-loading');document.body.classList.add('dynamic-ready');}
   function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v||'');}
   function statusInfo(status){
     if(status==='ready') return {cls:'ready',en:'Ready',es:'Lista',copyEn:'All files available',copyEs:'Todos los archivos disponibles',button:false};
@@ -30,13 +32,13 @@
     const session=getClientSession();
     const effectiveClient=clientParam || session?.id;
     if(!effectiveClient){ window.location.href='clientes.html'; return; }
-    if(!clientParam && !session?.id){ window.location.href='clientes.html'; return; }
+    if(!adminPreview && !clientParam && !session?.id){ window.location.href='clientes.html'; return; }
     const q=sb.from('clients').select('*').limit(1);
     if(isUuid(effectiveClient)) q.eq('id',effectiveClient); else q.eq('username',effectiveClient);
     const {data, error}=await q.maybeSingle();
-    if(error||!data){console.warn('Client dashboard load error',error);return;}
+    if(error||!data){console.warn('Client dashboard load error',error); document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Client not available</h1><p>No se pudo cargar el cliente.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>'; reveal(); return;}
     const client=data;
-    if(!clientParam && session?.id && session.id!==client.id){ window.location.href='clientes.html'; return; }
+    if(!adminPreview && !clientParam && session?.id && session.id!==client.id){ window.location.href='clientes.html'; return; }
     const lang=localStorage.getItem('ibaiLanguage')||client.language_preference||'es';
     document.documentElement.lang=lang;
     const name=client.name||client.username;
@@ -60,7 +62,7 @@
     let galleries=[];
     if(ids.length){
       const {data:gals,error:gerr}=await sb.from('galleries').select('*').in('id',ids).order('event_date',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false});
-      if(gerr) console.warn(gerr); else galleries=gals||[];
+      if(gerr) console.warn(gerr); else galleries=(gals||[]).filter(g=>!g.deleted_at && (adminPreview || g.publish_status!=='draft'));
     }
     const photoCounts={};
     await Promise.all(galleries.map(async g=>{photoCounts[g.id]=await countPhotos(sb,g.id);}));
@@ -70,6 +72,7 @@
     const license=$('.license-box p'); if(license){const custom=lang==='es'?(client.license_es||client.license_en):(client.license_en||client.license_es); if(custom) license.textContent=custom;}
     const licensePills=$$('.license-pill');
     if(licensePills[0]) licensePills[0].innerHTML=`<span>${lang==='es'?'Tipo de cliente':'Client type'}</span><strong>${esc(client.client_type||'client')}</strong>`;
+    reveal();
   }
   function renderFeatured(galleries,counts,lang){
     const featured=$('.featured'); if(!featured) return;

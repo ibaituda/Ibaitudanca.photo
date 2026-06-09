@@ -1,23 +1,25 @@
 (function(){
   const qs=new URLSearchParams(location.search);
   const galleryId=qs.get('gallery');
+  const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
   const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   let realPhotos=[]; let selected=new Set(); let favs=new Set(); let reviewed=new Set(); let current=0; let lang=localStorage.getItem('ibaiLanguage')||'es'; let activeClient=null; let activeGallery=null;
 
+  function reveal(){document.body.classList.remove('dynamic-loading');document.body.classList.add('dynamic-ready');}
   function getClient(){if(!window.supabase||!window.IBAI_SUPABASE_URL||!window.IBAI_SUPABASE_ANON_KEY)return null; return window.supabase.createClient(window.IBAI_SUPABASE_URL, window.IBAI_SUPABASE_ANON_KEY);}
   function getClientSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
   function statusLabel(s){return s==='ready'?(lang==='es'?'Lista':'Ready'):s==='in_progress'?(lang==='es'?'En proceso':'In progress'):(lang==='es'?'Creada':'Created');}
   function dateLabel(date){if(!date)return ''; try{return new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date;}}
   function photoSrc(p){return p.retouched_url||p.preview_url||p.large_url||p.original_url||'';}
-  function downloadSrc(p){const size=$('#globalSize')?.value||document.querySelector('.download-option.active')?.dataset.size||'original'; return size==='preview'?(p.retouched_url||p.preview_url||p.large_url||p.original_url):size==='large'?(p.retouched_url||p.large_url||p.original_url||p.preview_url):(p.retouched_url||p.original_url||p.large_url||p.preview_url);}
+  function downloadSrc(p){return p.retouched_url||p.original_url||p.large_url||p.preview_url;}
   function photoDbId(index){return realPhotos[index]?.db_id;}
   async function logDownload(kind, index=null, count=1){
     const sb=getClient(); if(!sb||!activeClient?.id||!galleryId) return;
     const photoId=index!==null?photoDbId(index):null;
-    const size=$('#globalSize')?.value||document.querySelector('.download-option.active')?.dataset.size||'original';
+    const size='optimized';
     await sb.from('download_logs').insert({client_id:activeClient.id,gallery_id:galleryId,photo_id:photoId,download_type:kind,size_label:size,photos_count:count});
   }
 
@@ -55,15 +57,16 @@
     activeClient=getClientSession();
 
     const {data:g,error}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
-    if(error||!g){console.warn('Gallery load error',error);return;}
+    if(error||!g){console.warn('Gallery load error',error); document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Gallery not available</h1><p>No se pudo cargar la galería.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>'; reveal(); return;}
     activeGallery=g;
 
     // If a client is logged in, check that this gallery belongs to that client.
-    if(activeClient?.id){
+    if(activeClient?.id && !adminPreview){
       const {data:link,error:linkErr}=await sb.from('gallery_clients').select('id').eq('gallery_id',galleryId).eq('client_id',activeClient.id).maybeSingle();
       if(linkErr) console.warn('gallery client check',linkErr);
       if(!link){
         document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Gallery not available</h1><p>This gallery is not assigned to your client account.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Return to client access</a></p></div></main>';
+        reveal();
         return;
       }
     }
@@ -89,6 +92,7 @@
     await loadSavedState(sb);
     updateHeader(g);
     renderRealGallery();
+    reveal();
   }
 
   function updateHeader(g){
@@ -145,7 +149,10 @@
   async function downloadSet(set){const items=Array.from(set); for(const i of items){await downloadPhoto(i);} await logDownload('set',null,items.length);}
 
   document.addEventListener('DOMContentLoaded',()=>{
-    if(!galleryId) return;
+    document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();localStorage.removeItem('ibaiClientSession');location.href='clientes.html';}));
+    document.querySelectorAll('.download-option').forEach((b,i)=>{ if(i>0) b.remove(); });
+    const globalSize=document.getElementById('globalSize'); if(globalSize) globalSize.style.display='none';
+    if(!galleryId) {reveal(); return;}
     document.addEventListener('click',async(e)=>{
       const card=e.target.closest('.photo-card'); if(card&&card.dataset.index){const i=+card.dataset.index; if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('favourites',i,favs); return;} if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i); reviewed.add(i); applyFilter(); updateCounts(); await persistToggle('selections',i,selected); return;} if(e.target.closest('.dl')){downloadPhoto(i);return;} openLightbox(i);}
       if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active')); e.target.closest('.filter').classList.add('is-active'); applyFilter();}
