@@ -184,11 +184,120 @@
     if(!items.length){list.innerHTML='<div class="empty-state">La papelera está vacía.</div>';return;}
     list.innerHTML=items.map(({table,row})=>`<div class="trash-row" data-trash-table="${table}" data-trash-id="${row.id}"><div><div class="row-title">${escapeHtml(row.name||row.title_es||row.filename||row.username||'Elemento')}</div><div class="row-meta">${table} · ${escapeHtml(row.deleted_at||'')}</div></div><button class="btn primary" data-restore>Restaurar</button><button class="btn danger" data-delete-forever>Borrar definitivamente</button></div>`).join('');
   }
+
+  function storagePathFromUrl(url){
+    if(!url) return null;
+    try{
+      const raw=String(url);
+      if(!raw || raw.startsWith('img/')) return null;
+      const marker='/storage/v1/object/public/portfolio-images/';
+      const idx=raw.indexOf(marker);
+      if(idx>=0) return decodeURIComponent(raw.slice(idx+marker.length).split('?')[0]);
+      const marker2='/storage/v1/object/sign/portfolio-images/';
+      const idx2=raw.indexOf(marker2);
+      if(idx2>=0) return decodeURIComponent(raw.slice(idx2+marker2.length).split('?')[0]);
+      if(!raw.startsWith('http') && !raw.startsWith('/')) return raw;
+      return null;
+    }catch(e){return null;}
+  }
+
+  function storagePathsFromRow(row){
+    const fields=['original_url','large_url','preview_url','retouched_url','cover_image_url','hero_image_url','profile_image_url','image_url','url'];
+    return [...new Set(fields.map(f=>storagePathFromUrl(row?.[f])).filter(Boolean))];
+  }
+
+  async function removeStorageForRows(sb, rows){
+    const paths=[...new Set((rows||[]).flatMap(storagePathsFromRow))];
+    if(!paths.length) return {removed:0,error:null};
+    const {error}=await sb.storage.from('portfolio-images').remove(paths);
+    return {removed:paths.length,error};
+  }
+
+  async function hardDeletePhoto(sb, photoId){
+    const {data:photo,error:photoErr}=await sb.from('photos').select('*').eq('id',photoId).maybeSingle();
+    if(photoErr) throw photoErr;
+    if(photo){
+      await removeStorageForRows(sb,[photo]);
+      await sb.from('favourites').delete().eq('photo_id',photoId);
+      await sb.from('selections').delete().eq('photo_id',photoId);
+      await sb.from('retouch_requests').delete().eq('photo_id',photoId);
+      await sb.from('download_logs').delete().eq('photo_id',photoId);
+    }
+    const {error}=await sb.from('photos').delete().eq('id',photoId);
+    if(error) throw error;
+  }
+
+  async function hardDeleteGallery(sb, galleryId){
+    const {data:gallery,error:galleryErr}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
+    if(galleryErr) throw galleryErr;
+    const {data:photos,error:photosErr}=await sb.from('photos').select('*').eq('gallery_id',galleryId);
+    if(photosErr) throw photosErr;
+    const photoIds=(photos||[]).map(p=>p.id);
+    await removeStorageForRows(sb,[gallery, ...(photos||[])]);
+    if(photoIds.length){
+      await sb.from('favourites').delete().in('photo_id',photoIds);
+      await sb.from('selections').delete().in('photo_id',photoIds);
+      await sb.from('retouch_requests').delete().in('photo_id',photoIds);
+      await sb.from('download_logs').delete().in('photo_id',photoIds);
+    }
+    await sb.from('photos').delete().eq('gallery_id',galleryId);
+    await sb.from('retouch_requests').delete().eq('gallery_id',galleryId);
+    await sb.from('download_logs').delete().eq('gallery_id',galleryId);
+    await sb.from('gallery_clients').delete().eq('gallery_id',galleryId);
+    const {error}=await sb.from('galleries').delete().eq('id',galleryId);
+    if(error) throw error;
+  }
+
+  async function hardDeleteClient(sb, clientId){
+    const {data:clientRow,error:clientErr}=await sb.from('clients').select('*').eq('id',clientId).maybeSingle();
+    if(clientErr) throw clientErr;
+    await removeStorageForRows(sb,[clientRow]);
+    const {data:links,error:linksErr}=await sb.from('gallery_clients').select('gallery_id').eq('client_id',clientId);
+    if(linksErr) throw linksErr;
+    const candidateGalleryIds=[...new Set((links||[]).map(l=>l.gallery_id).filter(Boolean))];
+    await sb.from('favourites').delete().eq('client_id',clientId);
+    await sb.from('selections').delete().eq('client_id',clientId);
+    await sb.from('retouch_requests').delete().eq('client_id',clientId);
+    await sb.from('download_logs').delete().eq('client_id',clientId);
+    await sb.from('gallery_clients').delete().eq('client_id',clientId);
+    for(const gid of candidateGalleryIds){
+      const {count}=await sb.from('gallery_clients').select('id',{count:'exact',head:true}).eq('gallery_id',gid);
+      if(Number(count||0)===0) await hardDeleteGallery(sb,gid);
+    }
+    const {error}=await sb.from('clients').delete().eq('id',clientId);
+    if(error) throw error;
+  }
+
+  async function hardDeleteRow(sb, table, id){
+    if(table==='photos') return hardDeletePhoto(sb,id);
+    if(table==='galleries') return hardDeleteGallery(sb,id);
+    if(table==='clients') return hardDeleteClient(sb,id);
+    if(table==='calendar_events'){
+      const {error}=await sb.from('calendar_events').delete().eq('id',id);
+      if(error) throw error;
+      return;
+    }
+    if(table==='app_tasks'){
+      const {error}=await sb.from('app_tasks').delete().eq('id',id);
+      if(error) throw error;
+      return;
+    }
+    const {error}=await sb.from(table).delete().eq('id',id);
+    if(error) throw error;
+  }
+
   async function deleteForever(table,id){
-    if(!table||!id||!confirm('Borrar definitivamente de Supabase? Esta acción no se puede deshacer.')) return;
-    const sb=supabaseClient();
-    await sb.from(table).delete().eq('id',id);
-    loadTrash(); logActivity('trash_deleted','Elemento borrado definitivamente',table);
+    if(!table||!id||!confirm('Borrar definitivamente de Supabase? Esta acción eliminará también archivos asociados de Storage cuando existan. No se puede deshacer.')) return;
+    const sb=supabaseClient(); if(!sb) return;
+    try{
+      await hardDeleteRow(sb,table,id);
+      await loadTrash();
+      window.IBAI_LOAD_CLIENTS?.();
+      window.IBAI_LOAD_GALLERIES?.();
+      logActivity('trash_deleted','Elemento borrado definitivamente',table);
+    }catch(e){
+      alert('No se pudo borrar definitivamente: '+(e.message||e));
+    }
   }
   async function restoreTrash(table,id){
     const sb=supabaseClient(); if(!sb) return;

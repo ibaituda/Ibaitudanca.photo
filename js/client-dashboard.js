@@ -34,7 +34,7 @@
     return null;
   }
   async function countPhotos(sb,galleryId){
-    let q=sb.from('photos').select('id',{count:'exact',head:true}).eq('gallery_id',galleryId);
+    let q=sb.from('photos').select('id',{count:'exact',head:true}).eq('gallery_id',galleryId).is('deleted_at', null);
     try{q=q.eq('hidden',false)}catch(e){}
     const {count,error}=await q;
     if(error) console.warn('count photos error',error);

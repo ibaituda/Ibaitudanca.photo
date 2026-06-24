@@ -67,7 +67,7 @@
     activeGallery=g; activeClient=await loadClientForGallery(sb,g);
     if(activeClient?.language_preference && !localStorage.getItem('ibaiLanguage') && !qs.get('lang')) lang=activeClient.language_preference||lang; setLanguage(lang,false);
     if(!adminPreview && readSession()?.id && activeClient?.id && activeClient.id!==readSession().id){location.href='clientes.html';return;}
-    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).is('deleted_at', null).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if(perr) console.warn('photos load error',perr);
     realPhotos=(photos||[]).map((p,i)=>({...p,db_id:p.id,display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,src:photoSrc(p),file:p.filename||`photo-${i+1}.jpg`,event:g.event_name||g.title_es||g.title_en||'Galería privada',date:g.event_date,location:g.location||'',city:g.city||'',gallery:g.title_es||g.title_en||'',photographer:'Ibai Tudanca'})).filter(p=>p.src);
     await loadSavedState(sb); updateHeader(g); renderRealGallery(); reveal();

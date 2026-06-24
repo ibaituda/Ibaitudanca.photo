@@ -28,7 +28,7 @@
     const sb=client(); const box=$('#edit-gallery-photo-order');
     if(!sb || !id || !box) return [];
     box.innerHTML='<p class="row-meta">Cargando fotos de la galería...</p>';
-    const {data,error}=await sb.from('photos').select('*').eq('gallery_id',id).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    const {data,error}=await sb.from('photos').select('*').eq('gallery_id',id).is('deleted_at', null).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if(error){box.innerHTML=`<p class="row-meta">No se pudieron cargar las fotos: ${esc(error.message)}</p>`; return []}
     currentPhotos=data||[]; render(data||[]); return data||[];
   }
@@ -78,10 +78,15 @@
   }
 
   async function deletePhoto(photo){
-    if(!confirm('¿Eliminar esta foto de la galería? No se borrará el archivo de Storage, pero dejará de aparecer.')) return;
+    if(!confirm('¿Mover esta foto a la papelera? Se podrá restaurar o borrar definitivamente después.')) return;
     const sb=client(); if(!sb) return;
-    const {error}=await sb.from('photos').delete().eq('id',photo.id);
-    if(error){setText('#edit-gallery-status-msg','No se pudo eliminar: '+error.message); return;}
+    const {error}=await sb.from('photos').update({
+      deleted_at:new Date().toISOString(),
+      hidden:true,
+      updated_at:new Date().toISOString()
+    }).eq('id',photo.id);
+    if(error){setText('#edit-gallery-status-msg','No se pudo mover a papelera: '+error.message); return;}
+    setText('#edit-gallery-status-msg','Foto movida a la papelera. Para liberar espacio, bórrala definitivamente desde Papelera.');
     await loadPhotos(photo.gallery_id);
   }
 
