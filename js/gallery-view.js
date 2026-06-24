@@ -95,7 +95,45 @@
   function applyFilter(){const filter=document.querySelector('.filter.is-active')?.dataset.filter||'all';$$('.photo-card').forEach(card=>{const i=+card.dataset.index;let show=true;if(filter==='favourites')show=favs.has(i);if(filter==='selected')show=selected.has(i);if(filter==='horizontal')show=card.dataset.orientation==='horizontal';if(filter==='vertical')show=card.dataset.orientation==='vertical';if(filter==='unreviewed')show=!reviewed.has(i);card.style.display=show?'':'none';card.classList.toggle('is-fav',favs.has(i));card.classList.toggle('is-selected',selected.has(i));card.classList.toggle('is-reviewed',reviewed.has(i));const fav=card.querySelector('.fav');if(fav)fav.textContent=favs.has(i)?'♥':'♡';});}
   function openLightbox(i){current=i;reviewed.add(i);const p=realPhotos[i];if(!p)return;$('#lightImg').src=p.src;$('#lightTitle').textContent=p.display_id;const ptitle=$('.panel-title p');if(ptitle)ptitle.textContent=p.gallery;$('#lightFav').textContent=favs.has(i)?(lang==='es'?'Quitar favorita':'Remove favourite'):(lang==='es'?'Favorita':'Favourite');$('#lightSel').textContent=selected.has(i)?(lang==='es'?'Quitar selección':'Remove selection'):(lang==='es'?'Seleccionar':'Select');$('#exifList').innerHTML=`<div class="exif-row"><span>${lang==='es'?'Evento':'Event'}</span><strong>${esc(p.event)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fecha':'Date'}</span><strong>${esc(dateLabel(p.date))}</strong></div><div class="exif-row"><span>${lang==='es'?'Lugar':'Location'}</span><strong>${esc(p.location)}</strong></div><div class="exif-row"><span>${lang==='es'?'Galería':'Gallery'}</span><strong>${esc(p.gallery)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fotógrafo':'Photographer'}</span><strong>Ibai Tudanca</strong></div><div class="exif-row"><span>${lang==='es'?'Archivo':'File'}</span><strong>${esc(p.file)}</strong></div>`;$('#lightbox').classList.add('open');$('#lightbox').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';updateCounts();applyFilter();}
   function closeLightbox(){$('#lightbox').classList.remove('open');$('#lightbox').setAttribute('aria-hidden','true');document.body.style.overflow='';}
-  async function downloadPhoto(i){const p=realPhotos[i];if(!p)return;const url=downloadSrc(p);reviewed.add(i);updateCounts();try{const res=await fetch(url,{mode:'cors'});if(!res.ok)throw new Error('fetch failed');const blob=await res.blob();const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=objectUrl;a.download=p.file||'photo.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);}catch(e){const a=document.createElement('a');a.href=url;a.download=p.file||'photo.jpg';a.target='_blank';document.body.appendChild(a);a.click();a.remove();}await logDownload('single',i,1);}
+
+  let watermarkSettingsCache=null;
+  async function getWatermarkSettings(){
+    if(watermarkSettingsCache) return watermarkSettingsCache;
+    const defaults={enabled:false,text:'© Ibai Tudanca Photography',position:'bottom-right',opacity:0.25,size:26};
+    try{
+      const client=getSupabase();
+      if(!client) return defaults;
+      const {data}=await client.from('app_settings').select('key,value').in('key',['watermark_enabled','watermark_text','watermark_position','watermark_opacity','watermark_size']);
+      const vals={}; (data||[]).forEach(r=>vals[r.key]=r.value);
+      watermarkSettingsCache={
+        enabled:String(vals.watermark_enabled||'false')==='true',
+        text:vals.watermark_text||defaults.text,
+        position:vals.watermark_position||defaults.position,
+        opacity:parseFloat(vals.watermark_opacity||defaults.opacity),
+        size:parseInt(vals.watermark_size||defaults.size,10)
+      };
+      return watermarkSettingsCache;
+    }catch(e){return defaults;}
+  }
+  async function applyWatermark(blob){
+    const wm=await getWatermarkSettings();
+    if(!wm.enabled || !blob || !blob.type?.startsWith('image/')) return blob;
+    const img=await new Promise((resolve,reject)=>{const u=URL.createObjectURL(blob); const im=new Image(); im.onload=()=>{URL.revokeObjectURL(u); resolve(im)}; im.onerror=reject; im.src=u;});
+    const canvas=document.createElement('canvas'); canvas.width=img.naturalWidth||img.width; canvas.height=img.naturalHeight||img.height;
+    const ctx=canvas.getContext('2d',{alpha:false}); ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    const margin=Math.round(Math.max(canvas.width,canvas.height)*0.035);
+    const fontSize=Math.max(14, Math.round(Number(wm.size||26) * (canvas.width/1600)));
+    ctx.save(); ctx.globalAlpha=Math.max(0.05,Math.min(0.85,Number(wm.opacity||0.25))); ctx.fillStyle='#ffffff'; ctx.font=`600 ${fontSize}px Inter, Arial, sans-serif`; ctx.shadowColor='rgba(0,0,0,.65)'; ctx.shadowBlur=Math.round(fontSize*.35);
+    const text=wm.text||'© Ibai Tudanca Photography'; const metrics=ctx.measureText(text); let x=margin,y=margin+fontSize;
+    if(wm.position==='top-right'){x=canvas.width-margin-metrics.width;y=margin+fontSize;}
+    else if(wm.position==='bottom-left'){x=margin;y=canvas.height-margin;}
+    else if(wm.position==='bottom-right'){x=canvas.width-margin-metrics.width;y=canvas.height-margin;}
+    else if(wm.position==='center'){x=(canvas.width-metrics.width)/2;y=canvas.height/2;}
+    ctx.fillText(text,x,y); ctx.restore();
+    return await new Promise(resolve=>canvas.toBlob(b=>resolve(b||blob),'image/jpeg',0.9));
+  }
+
+  async function downloadPhoto(i){const p=realPhotos[i];if(!p)return;const url=downloadSrc(p);reviewed.add(i);updateCounts();try{const res=await fetch(url,{mode:'cors'});if(!res.ok)throw new Error('fetch failed');let blob=await res.blob(); blob=await applyWatermark(blob); const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=objectUrl;a.download=p.file||'photo.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);}catch(e){const a=document.createElement('a');a.href=url;a.download=p.file||'photo.jpg';a.target='_blank';document.body.appendChild(a);a.click();a.remove();}await logDownload('single',i,1);}
   async function downloadSet(set){const items=Array.from(set);for(const i of items){await downloadPhoto(i)}await logDownload('set',null,items.length);}
   document.addEventListener('DOMContentLoaded',()=>{setLanguage(lang,false);document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();setLanguage(btn.dataset.lang||'es',true);}));document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();clearSession();location.href='clientes.html';}));document.querySelectorAll('.download-option').forEach((b,i)=>{if(i>0)b.remove();});const globalSize=document.getElementById('globalSize');if(globalSize)globalSize.style.display='none';if(!galleryId){reveal();return;}document.addEventListener('click',async(e)=>{const card=e.target.closest('.photo-card');if(card&&card.dataset.index){const i=+card.dataset.index;if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('favourites',i,favs);return;}if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('selections',i,selected);return;}if(e.target.closest('.dl')){downloadPhoto(i);return;}openLightbox(i);}if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active'));e.target.closest('.filter').classList.add('is-active');applyFilter();}},true);$('#closeLight')?.addEventListener('click',closeLightbox);$('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length));$('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));$('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current);reviewed.add(current);await persistToggle('favourites',current,favs);openLightbox(current);applyFilter();});$('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current);reviewed.add(current);await persistToggle('selections',current,selected);openLightbox(current);applyFilter();});$('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));$('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected));$('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs));$('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));load();});
 })();
