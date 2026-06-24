@@ -54,7 +54,11 @@ insert into app_settings (key,value) values
 on conflict (key) do nothing;
 
 -- Optional analytics views used for checking data directly inside Supabase.
-create or replace view download_stats_by_client as
+-- Drop first because PostgreSQL cannot change existing view columns with CREATE OR REPLACE.
+drop view if exists download_stats_by_client;
+drop view if exists download_stats_by_gallery;
+
+create view download_stats_by_client as
 select
   c.id as client_id,
   c.name as client_name,
@@ -65,7 +69,7 @@ from clients c
 left join download_logs dl on dl.client_id = c.id
 group by c.id, c.name;
 
-create or replace view download_stats_by_gallery as
+create view download_stats_by_gallery as
 select
   g.id as gallery_id,
   coalesce(g.title_es,g.title_en,'Untitled gallery') as gallery_title,
