@@ -1,5 +1,5 @@
--- V1.2.3 Communication center, advanced download analytics and watermark settings.
--- Run once in Supabase SQL Editor.
+select 'v1.2.3 SQL started' as status;
+
 
 create table if not exists email_outbox (
   id uuid primary key default gen_random_uuid(),
@@ -53,10 +53,8 @@ insert into app_settings (key,value) values
   ('email_webhook_url','')
 on conflict (key) do nothing;
 
--- Optional analytics views used for checking data directly inside Supabase.
--- Drop first because PostgreSQL cannot change existing view columns with CREATE OR REPLACE.
-drop view if exists download_stats_by_client;
-drop view if exists download_stats_by_gallery;
+drop view if exists download_stats_by_client cascade;
+drop view if exists download_stats_by_gallery cascade;
 
 create view download_stats_by_client as
 select
@@ -79,3 +77,5 @@ select
 from galleries g
 left join download_logs dl on dl.gallery_id = g.id
 group by g.id, g.title_es, g.title_en;
+
+select 'v1.2.3 SQL completed' as status;
