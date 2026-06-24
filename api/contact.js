@@ -12,20 +12,41 @@ function escapeHtml(value) {
   }[c]));
 }
 
+async function readBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch { return {}; }
+  }
+  return await new Promise((resolve) => {
+    let data = '';
+    req.on('data', chunk => { data += chunk; });
+    req.on('end', () => {
+      try { resolve(JSON.parse(data || '{}')); } catch { resolve({}); }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'RESEND_API_KEY is not configured' });
+  if (!apiKey) return res.status(500).json({ error: 'RESEND_API_KEY is not configured in Vercel' });
 
-  const body = req.body || {};
-  const name = clean(body.name, 120);
+  const body = await readBody(req);
+  const name = clean(body.name || body.nombre, 120);
   const club = clean(body.club, 160);
   const email = clean(body.email, 180);
-  const message = clean(body.message, 6000);
+  const message = clean(body.message || body.mensaje, 6000);
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Name, email and message are required' });

@@ -2077,5 +2077,99 @@
     });
   })();
 </script>
+
+<script id="v125-contact-real-email">
+(function(){
+  'use strict';
+  function $(s,r){return (r||document).querySelector(s);}
+  function clean(v){return String(v || '').trim();}
+  function setStatus(form, successBox, html, ok){
+    if(successBox){
+      successBox.style.display = 'block';
+      successBox.innerHTML = html;
+    }
+    if(ok && form){
+      form.reset();
+      form.style.display = 'none';
+    }
+  }
+  function installRealContactForm(){
+    var form = $('#contact-form');
+    if(!form || form.dataset.realEmailReady === '1') return;
+    form.dataset.realEmailReady = '1';
+    var btn = $('#btn-submit');
+    var successBox = $('#form-success');
+
+    form.setAttribute('action', 'javascript:void(0)');
+    form.setAttribute('method', 'post');
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      e.stopPropagation();
+
+      var fd = new FormData(form);
+      var payload = {
+        name: clean(fd.get('nombre') || fd.get('name')),
+        club: clean(fd.get('club')),
+        email: clean(fd.get('email')),
+        message: clean(fd.get('mensaje') || fd.get('message'))
+      };
+
+      if(!payload.name || !payload.email || !payload.message){
+        setStatus(form, successBox,
+          '<p style="font-size:28px; color:#fff;">!</p><p>Please complete name, email and message before sending.</p>',
+          false
+        );
+        return false;
+      }
+
+      var originalText = btn ? btn.textContent : '';
+      if(btn){
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+      }
+
+      try{
+        var res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        var out = {};
+        try { out = await res.json(); } catch(_) {}
+
+        if(!res.ok){
+          throw new Error(out.error || 'The message could not be sent.');
+        }
+
+        setStatus(form, successBox,
+          '<p style="font-size:28px; color:#fff;">✓</p><p>Message sent successfully. I will reply within 24 hours.</p>',
+          true
+        );
+      }catch(err){
+        setStatus(form, successBox,
+          '<p style="font-size:28px; color:#fff;">!</p><p>The message could not be sent automatically. Please write to <a style="color:#fff;text-decoration:underline;" href="mailto:hola@ibaitudancaphoto.com">hola@ibaitudancaphoto.com</a>.</p><p style="font-size:11px;color:rgba(255,255,255,.45);">' + String(err.message || err) + '</p>',
+          false
+        );
+      }finally{
+        if(btn){
+          btn.disabled = false;
+          btn.textContent = originalText || 'Send message';
+        }
+      }
+
+      return false;
+    }, true);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', installRealContactForm);
+  }else{
+    installRealContactForm();
+  }
+})();
+</script>
+
 </body>
 </html>
