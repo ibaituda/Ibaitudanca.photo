@@ -56,12 +56,28 @@
           if(!error) saved=true;
         }
       }catch(_){ }
-      // Free setup: open a real email draft from the visitor's device. This works without paid email provider.
-      // If Resend/Edge Function is configured later, this can be replaced by silent server-side sending.
-      window.location.href=mailto({to:CONTACT_EMAIL,subject,body});
+      let sent=false;
+      let sendError='';
+      try{
+        const res=await fetch('/api/contact',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        const out=await res.json().catch(()=>({}));
+        if(!res.ok) throw new Error(out.error||'Email service error');
+        sent=true;
+      }catch(err){
+        sendError=err?.message||String(err);
+      }
       if(success){
-        success.innerHTML='<p style="font-size:28px; color:#fff;">✓</p><p>'+esc(t('Se ha abierto tu correo con el mensaje preparado. Pulsa enviar para contactar conmigo.','Your email app opened with the message prepared. Press send to contact me.'))+'</p>'+(saved?'<p>'+esc(t('También queda registrado en el panel privado.','It has also been registered in the private panel.'))+'</p>':'');
-        form.style.display='none'; success.style.display='block';
+        if(sent){
+          success.innerHTML='<p style="font-size:28px; color:#fff;">✓</p><p>'+esc(t('Mensaje enviado correctamente. Responderé en menos de 24 horas.','Message sent successfully. I will reply within 24 hours.'))+'</p>'+(saved?'<p>'+esc(t('También queda registrado en el panel privado.','It has also been registered in the private panel.'))+'</p>':'');
+          form.reset(); form.style.display='none'; success.style.display='block';
+        }else{
+          success.innerHTML='<p style="font-size:28px; color:#fff;">!</p><p>'+esc(t('El mensaje se ha guardado, pero el email no se ha podido enviar. Escríbeme directamente a hola@ibaitudancaphoto.com.','The message was saved, but the email could not be sent. Please email me directly at hola@ibaitudancaphoto.com.'))+'</p><p style="font-size:11px;color:var(--muted)">'+esc(sendError)+'</p>';
+          success.style.display='block';
+        }
       }
       if(btn){btn.disabled=false; btn.textContent=t('Enviar mensaje','Send message');}
     });

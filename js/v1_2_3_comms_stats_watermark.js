@@ -89,22 +89,25 @@
     }finally{if(btn) btn.disabled=false;}
   }
   async function sendEmailRow(row){
-    const client=sb(); if(!client) return;
-    const {data:settings}=await client.from('app_settings').select('key,value').in('key',['email_webhook_url']);
-    const webhook=(settings||[]).find(s=>s.key==='email_webhook_url')?.value;
-    if(webhook){
-      const res=await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(row)});
-      if(!res.ok) throw new Error('Webhook error '+res.status);
-      await client.from('email_outbox').update({status:'sent',sent_at:new Date().toISOString()}).eq('id',row.id);
-    }else{
-      const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1'
-        +'&to='+encodeURIComponent(row.recipient||'')
-        +'&su='+encodeURIComponent(row.subject||'')
-        +'&body='+encodeURIComponent(row.body||'');
-      window.open(gmailUrl,'_blank','noopener');
-      await client.from('email_outbox').update({status:'opened_in_gmail',sent_at:new Date().toISOString()}).eq('id',row.id);
-      alert(t('Se ha abierto Gmail con el email preparado. Revisa y pulsa Enviar desde Gmail.','Gmail opened with the email ready. Review it and press Send in Gmail.'));
+    const client=sb();
+    const payload={
+      to:row.recipient,
+      subject:row.subject||'',
+      body:row.body||'',
+      email_type:row.email_type||'manual',
+      outbox_id:row.id||null
+    };
+    const res=await fetch('/api/send-email',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const out=await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(out.error||'No se pudo enviar el email.');
+    if(client && row.id){
+      await client.from('email_outbox').update({status:'sent',sent_at:new Date().toISOString(),error_message:null}).eq('id',row.id);
     }
+    alert(t('Email enviado correctamente.','Email sent successfully.'));
   }
   function rowHtml(r){
     const dot=r.status==='sent'?'sent':r.status==='cancelled'?'cancelled':r.status==='error'?'error':'';
