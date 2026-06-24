@@ -1,0 +1,140 @@
+(function(){
+  const qs=new URLSearchParams(location.search);
+  const galleryId=qs.get('gallery');
+  const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
+  const SESSION_KEY='ibaiClientSession';
+  const $=(s,r=document)=>r.querySelector(s);
+  const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const DEMO_TEXTS=[['Antonio','Blanco'].join(' '),['duels','celebrations'].join(', '),['Personal','note','from','Ibai'].join(' ')];
+  const clean=(v)=>{const s=String(v??'').trim(); if(!s) return ''; const normalized=s.toLowerCase(); return DEMO_TEXTS.some(t=>normalized.includes(t.toLowerCase())) ? '' : s;};
+  let realPhotos=[]; let selected=new Set(); let favs=new Set(); let reviewed=new Set(); let current=0; let lang=(qs.get('lang')||localStorage.getItem('ibaiLanguage')||'es').toLowerCase(); let activeClient=null; let activeGallery=null;
+  function reveal(){document.body.classList.remove('dynamic-loading');document.body.classList.add('dynamic-ready');}
+  function getSupabase(){return window.supabase&&window.IBAI_SUPABASE_URL&&window.IBAI_SUPABASE_ANON_KEY?window.supabase.createClient(window.IBAI_SUPABASE_URL,window.IBAI_SUPABASE_ANON_KEY):null;}
+  function readSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+  function clearSession(){localStorage.removeItem(SESSION_KEY);sessionStorage.clear();}
+  function statusLabel(s){return s==='ready'||s==='published'?(lang==='es'?'Lista':'Ready'):s==='in_progress'?(lang==='es'?'En proceso':'In progress'):(lang==='es'?'Creada':'Created');}
+  function dateLabel(date){if(!date)return '—'; try{return new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-ES':'en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return date||'—';}}
+  function photoSrc(p){return p.retouched_url||p.preview_url||p.large_url||p.original_url||'';}
+  function downloadSrc(p){return p.retouched_url||p.original_url||p.large_url||p.preview_url||p.src;}
+  function photoDbId(index){return realPhotos[index]?.db_id;}
+
+  const I18N={
+    es:{
+      'Back to dashboard':'Volver al dashboard','License':'Licencia','Log out':'Cerrar sesión','Ready':'Lista','favourites':'favoritas','Client':'Cliente','Event':'Evento','Date':'Fecha','Access':'Acceso','Private':'Privado','All':'Todo','Favourites':'Favoritas','Selected':'Seleccionadas','Horizontal':'Horizontal','Vertical':'Vertical','Unreviewed':'Sin revisar','selected':'seleccionadas','reviewed':'revisadas','visible':'visibles','Download all':'Descargar todo','Download selected':'Descargar seleccionadas','Download favourites':'Descargar favoritas','Gallery selection':'Selección de galería','Your private images':'Tus imágenes privadas','Open any image to review it in detail. Favourites and selections belong only to this event, so nothing is mixed with other galleries.':'Abre cualquier imagen para revisarla en detalle. Las favoritas y selecciones pertenecen solo a esta galería.','Image usage license':'Licencia de uso de imágenes','Images in this private gallery are licensed only to the client account shown above. Personal use, portfolio archive and agreed social media publication are allowed. Third-party commercial use, agency redistribution, resale or use by representatives requires written permission from Ibai Tudanca.':'Las imágenes de esta galería privada están licenciadas solo para el cliente indicado. Se permite el uso personal, archivo y publicación acordada en redes. El uso comercial por terceros, redistribución, reventa o uso por representantes requiere autorización escrita de Ibai Tudanca.','Gallery summary':'Resumen de galería','Status':'Estado','Files':'Archivos','Sizes':'Formato','Event only':'Solo evento','Private gallery · © 2026':'Galería privada · © 2026','photos selected':'fotos seleccionadas','Add to favourites':'Añadir a favoritas','Clear selection':'Limpiar selección','Favourite':'Favorita','Select':'Seleccionar','Download this image':'Descargar imagen','Show favourites only':'Mostrar solo favoritas','Request edit':'Solicitar retoque','Keyboard: arrows to navigate · F favourite · S select · Esc close':'Teclado: flechas para navegar · F favorita · S seleccionar · Esc cerrar','Photo information':'Información de la foto','148 photos':'0 fotos',
+    },
+    en:{
+      'Back to dashboard':'Back to dashboard','License':'License','Log out':'Log out','Ready':'Ready','favourites':'favourites','Client':'Client','Event':'Event','Date':'Date','Access':'Access','Private':'Private','All':'All','Favourites':'Favourites','Selected':'Selected','Horizontal':'Horizontal','Vertical':'Vertical','Unreviewed':'Unreviewed','selected':'selected','reviewed':'reviewed','visible':'visible','Download all':'Download all','Download selected':'Download selected','Download favourites':'Download favourites','Gallery selection':'Gallery selection','Your private images':'Your private images','Open any image to review it in detail. Favourites and selections belong only to this event, so nothing is mixed with other galleries.':'Open any image to review it in detail. Favourites and selections belong only to this gallery.','Image usage license':'Image usage license','Images in this private gallery are licensed only to the client account shown above. Personal use, portfolio archive and agreed social media publication are allowed. Third-party commercial use, agency redistribution, resale or use by representatives requires written permission from Ibai Tudanca.':'Images in this private gallery are licensed only to the client account shown above. Personal use, portfolio archive and agreed social media publication are allowed. Third-party commercial use, agency redistribution, resale or use by representatives requires written permission from Ibai Tudanca.','Gallery summary':'Gallery summary','Status':'Status','Files':'Files','Sizes':'Format','Event only':'Event only','Private gallery · © 2026':'Private gallery · © 2026','photos selected':'photos selected','Add to favourites':'Add to favourites','Clear selection':'Clear selection','Favourite':'Favourite','Select':'Select','Download this image':'Download this image','Show favourites only':'Show favourites only','Request edit':'Request edit','Keyboard: arrows to navigate · F favourite · S select · Esc close':'Keyboard: arrows to navigate · F favourite · S select · Esc close','Photo information':'Photo information','148 photos':'0 photos',
+    }
+  };
+  function translateStatic(){
+    document.documentElement.lang=lang;
+    $$('.lang-btn').forEach(btn=>btn.classList.toggle('is-active',btn.dataset.lang===lang));
+    $$('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n'); const val=(I18N[lang]&&I18N[lang][key])||key; el.textContent=val;});
+    const panelLabel=$('.download-panel .panel-label'); if(panelLabel) panelLabel.textContent=lang==='es'?'Archivo optimizado':'Optimized file';
+    const optStrong=$('.download-option strong'); if(optStrong) optStrong.textContent=lang==='es'?'WebP/JPG optimizado':'Optimized WebP/JPG';
+    const optSpan=$('.download-option span'); if(optSpan) optSpan.textContent=lang==='es'?'Máx. 3000 px en borde corto · hasta 2 MB aprox.':'3000 px short edge max · up to 2 MB approx.';
+  }
+  function setLanguage(next,persist=true){
+    lang=(next||'es').toLowerCase()==='en'?'en':'es';
+    if(persist) localStorage.setItem('ibaiLanguage',lang);
+    translateStatic();
+    if(activeGallery){updateHeader(activeGallery);renderRealGallery();if($('#lightbox')?.classList.contains('open'))openLightbox(current);}
+  }
+  async function logDownload(kind,index=null,count=1){const sb=getSupabase(); if(!sb||!activeClient?.id||!galleryId)return; try{await sb.from('download_logs').insert({client_id:activeClient.id,gallery_id:galleryId,photo_id:index!==null?photoDbId(index):null,download_type:kind,size_label:'optimized',photos_count:count});}catch(e){}}
+  async function loadClientForGallery(sb,g){
+    const session=readSession();
+    if(session?.id){const {data}=await sb.from('clients').select('*').eq('id',session.id).maybeSingle(); if(data) return data;}
+    const {data:links}=await sb.from('gallery_clients').select('client_id').eq('gallery_id',g.id).limit(1);
+    const clientId=links?.[0]?.client_id;
+    if(clientId){const {data}=await sb.from('clients').select('*').eq('id',clientId).maybeSingle(); if(data) return data;}
+    return null;
+  }
+  async function loadSavedState(sb){
+    if(!activeClient?.id||!realPhotos.length) return;
+    const ids=realPhotos.map(p=>p.db_id).filter(Boolean); if(!ids.length)return;
+    const [{data:favRows},{data:selRows}]=await Promise.all([
+      sb.from('favourites').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids),
+      sb.from('selections').select('photo_id').eq('client_id',activeClient.id).in('photo_id',ids)
+    ]);
+    const favIds=new Set((favRows||[]).map(r=>r.photo_id)); const selIds=new Set((selRows||[]).map(r=>r.photo_id)); favs=new Set(); selected=new Set(); realPhotos.forEach((p,i)=>{if(favIds.has(p.db_id))favs.add(i); if(selIds.has(p.db_id))selected.add(i);});
+  }
+  async function persistToggle(table,index,set){const sb=getSupabase(); const photoId=photoDbId(index); if(!sb||!activeClient?.id||!photoId)return; if(set.has(index)){await sb.from(table).upsert({client_id:activeClient.id,photo_id:photoId},{onConflict:'client_id,photo_id'});}else{await sb.from(table).delete().eq('client_id',activeClient.id).eq('photo_id',photoId);}}
+  async function load(){
+    if(!galleryId){reveal();return;}
+    const sb=getSupabase(); if(!sb){reveal();return;}
+    const {data:g,error}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
+    if(error||!g){document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Galería no disponible</h1><p>No se pudo cargar la galería.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>';reveal();return;}
+    activeGallery=g; activeClient=await loadClientForGallery(sb,g);
+    if(activeClient?.language_preference && !localStorage.getItem('ibaiLanguage') && !qs.get('lang')) lang=activeClient.language_preference||lang; setLanguage(lang,false);
+    if(!adminPreview && readSession()?.id && activeClient?.id && activeClient.id!==readSession().id){location.href='clientes.html';return;}
+    const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).is('deleted_at', null).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    if(perr) console.warn('photos load error',perr);
+    realPhotos=(photos||[]).map((p,i)=>({...p,db_id:p.id,display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,src:photoSrc(p),file:p.filename||`photo-${i+1}.jpg`,event:g.event_name||g.title_es||g.title_en||'Galería privada',date:g.event_date,location:g.location||'',city:g.city||'',gallery:g.title_es||g.title_en||'',photographer:'Ibai Tudanca'})).filter(p=>p.src);
+    await loadSavedState(sb); updateHeader(g); renderRealGallery(); reveal();
+  }
+  function updateHeader(g){
+    const title=(lang==='es'?g.title_es:g.title_en)||g.title_es||g.title_en||'Galería privada';
+    const cover=g.cover_image_url||realPhotos[0]?.src||'';
+    const hero=$('.hero'); if(hero&&cover){hero.style.setProperty('--gallery-image',`url('${cover}')`); hero.style.backgroundImage=`linear-gradient(90deg,rgba(8,8,8,.86),rgba(8,8,8,.36)),url('${cover}')`; hero.style.setProperty('--hero-x',(g.cover_position_x??50)+'%'); hero.style.setProperty('--hero-y',(g.cover_position_y??35)+'%');}
+    if(!document.getElementById('gallery-dynamic-style')){const st=document.createElement('style');st.id='gallery-dynamic-style';st.textContent='.hero::before{background-image:var(--gallery-image)!important;background-position:var(--hero-x,50%) var(--hero-y,35%)!important}.note.is-empty{display:none!important}';document.head.appendChild(st);}
+    const h=$('.hero h1'); if(h) h.textContent=title;
+    const clientName=activeClient?.name||activeClient?.username||'—';
+    const eyebrow=$('.hero .eyebrow'); if(eyebrow) eyebrow.textContent=(lang==='es'?'Galería privada · Preparada para ':'Private gallery · Prepared for ')+clientName;
+    const desc=clean((lang==='es'?g.description_es:g.description_en)||g.description_es||g.description_en)||'';
+    const p=$('.hero p'); if(p){if(desc){p.textContent=desc;p.style.display='';}else{p.textContent='';p.style.display='none';}}
+    const meta=$('.gallery-meta'); if(meta) meta.innerHTML=`<span class="pill"><span class="status-dot"></span>${statusLabel(g.status||g.publish_status)}</span><span class="pill">${realPhotos.length} ${lang==='es'?'fotos':'photos'}</span><span class="pill"><span id="favPill">${favs.size}</span>&nbsp;${lang==='es'?'favoritas':'favourites'}</span>`;
+    const stats=$$('.hero-side .stat strong'); if(stats[0])stats[0].textContent=clientName; if(stats[1])stats[1].textContent=g.event_name||g.category||'—'; if(stats[2])stats[2].textContent=dateLabel(g.event_date); if(stats[3])stats[3].textContent=g.publish_status==='draft'?(lang==='es'?'Borrador':'Draft'):(lang==='es'?'Privado publicado':'Private published');
+    const noteText=clean((lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en);
+    const note=$('.note'); const noteP=$('.note p'); const noteSpan=$('.note span');
+    if(note&&noteP){if(noteText){note.classList.remove('is-empty');noteP.textContent=noteText;if(noteSpan)noteSpan.textContent=lang==='es'?'Nota personal de Ibai':'Personal note from Ibai';}else{note.classList.add('is-empty');}}
+    const summary=$$('.summary-row'); if(summary[0]?.querySelector('strong'))summary[0].querySelector('strong').textContent=statusLabel(g.status||g.publish_status); if(summary[1]?.querySelector('strong'))summary[1].querySelector('strong').textContent=`${realPhotos.length} ${lang==='es'?'fotos':'photos'}`; if(summary[2]?.querySelector('strong'))summary[2].querySelector('strong').textContent='WebP/JPG optimizado'; if(summary[3]?.querySelector('strong'))summary[3].querySelector('strong').textContent=`${favs.size} ${lang==='es'?'favoritas':'favourites'}`;
+    const panelTitle=$('.panel-title p'); if(panelTitle) panelTitle.textContent=title;
+  }
+  function renderRealGallery(){const gallery=$('#gallery'); if(!gallery)return; if(!realPhotos.length){gallery.innerHTML=`<div class="photo-card" style="padding:24px;color:#aaa">${lang==='es'?'Esta galería todavía no tiene fotos subidas.':'This gallery has no uploaded photos yet.'}</div>`;updateCounts();return;} gallery.innerHTML=''; realPhotos.forEach((p,i)=>{const card=document.createElement('article');card.className='photo-card';card.dataset.index=i;card.dataset.orientation=p.orientation||'horizontal';card.innerHTML=`<span class="photo-id">${esc(p.display_id)}</span><img src="${esc(p.src)}" alt="${esc(p.display_id)}"><div class="photo-tools"><button class="icon-btn fav" aria-label="Favourite">♡</button><div class="tool-group"><button class="icon-btn sel" aria-label="Select">✓</button><button class="icon-btn dl" aria-label="Download">↓</button><button class="icon-btn open" aria-label="Open">↗</button></div></div><span class="fav-mark">♥</span><span class="selected-mark">✓</span><span class="reviewed-mark"></span>`;gallery.appendChild(card);});applyFilter();updateCounts();}
+  function updateCounts(){const setText=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};setText('selectedCount',selected.size);setText('favCount',favs.size);setText('favPill',favs.size);setText('floatingCount',selected.size);setText('reviewedCount',reviewed.size);setText('totalCount',realPhotos.length);setText('visibleCount',realPhotos.length);const pct=realPhotos.length?Math.round((reviewed.size/realPhotos.length)*100):0;const fill=$('#progressFill');if(fill)fill.style.width=pct+'%';setText('progressText',pct+'%');$('#selectionBar')?.classList.toggle('visible',selected.size>0);if($('#downloadSelectedTop'))$('#downloadSelectedTop').disabled=selected.size===0;if($('#downloadFavTop'))$('#downloadFavTop').disabled=favs.size===0;}
+  function applyFilter(){const filter=document.querySelector('.filter.is-active')?.dataset.filter||'all';$$('.photo-card').forEach(card=>{const i=+card.dataset.index;let show=true;if(filter==='favourites')show=favs.has(i);if(filter==='selected')show=selected.has(i);if(filter==='horizontal')show=card.dataset.orientation==='horizontal';if(filter==='vertical')show=card.dataset.orientation==='vertical';if(filter==='unreviewed')show=!reviewed.has(i);card.style.display=show?'':'none';card.classList.toggle('is-fav',favs.has(i));card.classList.toggle('is-selected',selected.has(i));card.classList.toggle('is-reviewed',reviewed.has(i));const fav=card.querySelector('.fav');if(fav)fav.textContent=favs.has(i)?'♥':'♡';});}
+  function openLightbox(i){current=i;reviewed.add(i);const p=realPhotos[i];if(!p)return;$('#lightImg').src=p.src;$('#lightTitle').textContent=p.display_id;const ptitle=$('.panel-title p');if(ptitle)ptitle.textContent=p.gallery;$('#lightFav').textContent=favs.has(i)?(lang==='es'?'Quitar favorita':'Remove favourite'):(lang==='es'?'Favorita':'Favourite');$('#lightSel').textContent=selected.has(i)?(lang==='es'?'Quitar selección':'Remove selection'):(lang==='es'?'Seleccionar':'Select');$('#exifList').innerHTML=`<div class="exif-row"><span>${lang==='es'?'Evento':'Event'}</span><strong>${esc(p.event)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fecha':'Date'}</span><strong>${esc(dateLabel(p.date))}</strong></div><div class="exif-row"><span>${lang==='es'?'Lugar':'Location'}</span><strong>${esc(p.location)}</strong></div><div class="exif-row"><span>${lang==='es'?'Galería':'Gallery'}</span><strong>${esc(p.gallery)}</strong></div><div class="exif-row"><span>${lang==='es'?'Fotógrafo':'Photographer'}</span><strong>Ibai Tudanca</strong></div><div class="exif-row"><span>${lang==='es'?'Archivo':'File'}</span><strong>${esc(p.file)}</strong></div>`;$('#lightbox').classList.add('open');$('#lightbox').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';updateCounts();applyFilter();}
+  function closeLightbox(){$('#lightbox').classList.remove('open');$('#lightbox').setAttribute('aria-hidden','true');document.body.style.overflow='';}
+
+  let watermarkSettingsCache=null;
+  async function getWatermarkSettings(){
+    if(watermarkSettingsCache) return watermarkSettingsCache;
+    const defaults={enabled:false,text:'© Ibai Tudanca Photography',position:'bottom-right',opacity:0.25,size:26};
+    try{
+      const client=getSupabase();
+      if(!client) return defaults;
+      const {data}=await client.from('app_settings').select('key,value').in('key',['watermark_enabled','watermark_text','watermark_position','watermark_opacity','watermark_size']);
+      const vals={}; (data||[]).forEach(r=>vals[r.key]=r.value);
+      watermarkSettingsCache={
+        enabled:String(vals.watermark_enabled||'false')==='true',
+        text:vals.watermark_text||defaults.text,
+        position:vals.watermark_position||defaults.position,
+        opacity:parseFloat(vals.watermark_opacity||defaults.opacity),
+        size:parseInt(vals.watermark_size||defaults.size,10)
+      };
+      return watermarkSettingsCache;
+    }catch(e){return defaults;}
+  }
+  async function applyWatermark(blob){
+    const wm=await getWatermarkSettings();
+    if(!wm.enabled || !blob || !blob.type?.startsWith('image/')) return blob;
+    const img=await new Promise((resolve,reject)=>{const u=URL.createObjectURL(blob); const im=new Image(); im.onload=()=>{URL.revokeObjectURL(u); resolve(im)}; im.onerror=reject; im.src=u;});
+    const canvas=document.createElement('canvas'); canvas.width=img.naturalWidth||img.width; canvas.height=img.naturalHeight||img.height;
+    const ctx=canvas.getContext('2d',{alpha:false}); ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    const margin=Math.round(Math.max(canvas.width,canvas.height)*0.035);
+    const fontSize=Math.max(14, Math.round(Number(wm.size||26) * (canvas.width/1600)));
+    ctx.save(); ctx.globalAlpha=Math.max(0.05,Math.min(0.85,Number(wm.opacity||0.25))); ctx.fillStyle='#ffffff'; ctx.font=`600 ${fontSize}px Inter, Arial, sans-serif`; ctx.shadowColor='rgba(0,0,0,.65)'; ctx.shadowBlur=Math.round(fontSize*.35);
+    const text=wm.text||'© Ibai Tudanca Photography'; const metrics=ctx.measureText(text); let x=margin,y=margin+fontSize;
+    if(wm.position==='top-right'){x=canvas.width-margin-metrics.width;y=margin+fontSize;}
+    else if(wm.position==='bottom-left'){x=margin;y=canvas.height-margin;}
+    else if(wm.position==='bottom-right'){x=canvas.width-margin-metrics.width;y=canvas.height-margin;}
+    else if(wm.position==='center'){x=(canvas.width-metrics.width)/2;y=canvas.height/2;}
+    ctx.fillText(text,x,y); ctx.restore();
+    return await new Promise(resolve=>canvas.toBlob(b=>resolve(b||blob),'image/jpeg',0.9));
+  }
+
+  async function downloadPhoto(i){const p=realPhotos[i];if(!p)return;const url=downloadSrc(p);reviewed.add(i);updateCounts();try{const res=await fetch(url,{mode:'cors'});if(!res.ok)throw new Error('fetch failed');let blob=await res.blob(); blob=await applyWatermark(blob); const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=objectUrl;a.download=p.file||'photo.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);}catch(e){const a=document.createElement('a');a.href=url;a.download=p.file||'photo.jpg';a.target='_blank';document.body.appendChild(a);a.click();a.remove();}await logDownload('single',i,1);}
+  async function downloadSet(set){const items=Array.from(set);for(const i of items){await downloadPhoto(i)}await logDownload('set',null,items.length);}
+  document.addEventListener('DOMContentLoaded',()=>{setLanguage(lang,false);document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();setLanguage(btn.dataset.lang||'es',true);}));document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();clearSession();location.href='clientes.html';}));document.querySelectorAll('.download-option').forEach((b,i)=>{if(i>0)b.remove();});const globalSize=document.getElementById('globalSize');if(globalSize)globalSize.style.display='none';if(!galleryId){reveal();return;}document.addEventListener('click',async(e)=>{const card=e.target.closest('.photo-card');if(card&&card.dataset.index){const i=+card.dataset.index;if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('favourites',i,favs);return;}if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('selections',i,selected);return;}if(e.target.closest('.dl')){downloadPhoto(i);return;}openLightbox(i);}if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active'));e.target.closest('.filter').classList.add('is-active');applyFilter();}},true);$('#closeLight')?.addEventListener('click',closeLightbox);$('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length));$('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));$('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current);reviewed.add(current);await persistToggle('favourites',current,favs);openLightbox(current);applyFilter();});$('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current);reviewed.add(current);await persistToggle('selections',current,selected);openLightbox(current);applyFilter();});$('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));$('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected));$('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs));$('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));load();});
+})();
