@@ -1,14 +1,22 @@
 {
   "name": "Ibai Tudanca Photo",
   "short_name": "Ibai Tudanca",
-  "description": "Fotografía deportiva profesional para deportistas, agencias, clubes, medios y marcas.",
+  "description": "Fotografía deportiva profesional por Ibai Tudanca.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "theme_color": "#080808",
   "icons": [
-    { "src": "/img/icon-192.png?v=1356", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/img/icon-512.png?v=1356", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "/img/android-chrome-192x192.png?v=1400",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/android-chrome-512x512.png?v=1400",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
