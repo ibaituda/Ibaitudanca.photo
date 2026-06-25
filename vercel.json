@@ -132,15 +132,6 @@
       ]
     },
     {
-      "source": "/favicon-ibai.ico",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
       "source": "/favicon-ibai.svg",
       "headers": [
         {
@@ -150,7 +141,7 @@
       ]
     },
     {
-      "source": "/img/favicon-ibai-:name*",
+      "source": "/safari-pinned-tab.svg",
       "headers": [
         {
           "key": "Cache-Control",
@@ -159,7 +150,25 @@
       ]
     },
     {
-      "source": "/img/android-chrome-:name*",
+      "source": "/favicon.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/img/favicon-black-:size*.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/img/favicon-white-:size*.png",
       "headers": [
         {
           "key": "Cache-Control",
