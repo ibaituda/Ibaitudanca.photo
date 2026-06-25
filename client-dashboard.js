@@ -1,6 +1,7 @@
 (function(){
   const qs=new URLSearchParams(location.search);
-  const clientParam=qs.get('client');
+  const pathParts=location.pathname.split('/').filter(Boolean);
+  const clientParam=qs.get('client') || (pathParts[0]==='client-dashboard' ? pathParts[1] : '');
   const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
   const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
