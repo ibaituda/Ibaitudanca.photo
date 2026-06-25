@@ -85,6 +85,15 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    },
+    {
+      "source": "/(favicon.ico|favicon.svg|favicon-v1355.ico|favicon-v1355.svg|mask-icon.svg|mask-icon-v1355.svg|site.webmanifest)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
 }
