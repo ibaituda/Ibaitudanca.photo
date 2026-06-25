@@ -160,7 +160,7 @@
         localStorage.removeItem("ibaiAdminUser");
         sessionStorage.clear();
       }catch(e){}
-      location.href="admin-login.html";
+      location.href="/admin-login";
     }, true);
   }
 

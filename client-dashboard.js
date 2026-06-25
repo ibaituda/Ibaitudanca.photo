@@ -6,14 +6,17 @@
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const DEMO_TEXTS=[['Antonio','Blanco'].join(' '),['Personalised','message','for','the','client','dashboard'].join(' '),['Mensaje','personalizado','para','el','dashboard'].join(' ')];
-  const clean=(v)=>{const s=String(v??'').trim(); if(!s) return ''; const normalized=s.toLowerCase(); return DEMO_TEXTS.some(t=>normalized.includes(t.toLowerCase())) ? '' : s;};
+  const slugify=(v)=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'gallery';
+  const clientSlug=(client)=>slugify(client?.username||client?.name||client?.id||'client');
+  const gallerySlug=(g,lang='es')=>slugify((lang==='es'?g?.title_es:g?.title_en)||g?.title_es||g?.title_en||g?.event_name||g?.id||'gallery');
+  const galleryUrl=(client,g,lang='es')=>`/private-gallery/${clientSlug(client)}/${gallerySlug(g,lang)}`;
+  const clean=(v)=>{const s=String(v??'').trim(); return s && !/Antonio Blanco|Personalised message for the client dashboard|Mensaje personalizado para el dashboard/i.test(s) ? s : '';};
   function getSupabase(){return window.supabase&&window.IBAI_SUPABASE_URL&&window.IBAI_SUPABASE_ANON_KEY?window.supabase.createClient(window.IBAI_SUPABASE_URL,window.IBAI_SUPABASE_ANON_KEY):null;}
   function readSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
   function clearSession(){localStorage.removeItem(SESSION_KEY);sessionStorage.clear();}
   function reveal(){document.body.classList.remove('dynamic-loading');document.body.classList.add('dynamic-ready');}
   function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v||'');}
-  function fail(msg='No se pudo cargar el cliente.'){document.body.innerHTML=`<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Cliente no disponible</h1><p>${esc(msg)}</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>`;reveal();}
+  function fail(msg='No se pudo cargar el cliente.'){document.body.innerHTML=`<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Cliente no disponible</h1><p>${esc(msg)}</p><p><a href="/client-access" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>`;reveal();}
   function statusInfo(status){
     if(status==='ready'||status==='published') return {cls:'ready',en:'Ready',es:'Lista',copyEn:'All files available',copyEs:'Todos los archivos disponibles',button:false};
     if(status==='in_progress') return {cls:'progress',en:'In progress',es:'En proceso',copyEn:'More photos may be added',copyEs:'Pueden añadirse más fotos',button:false};
@@ -82,7 +85,7 @@
     const title=(lang==='es'?g.title_es:g.title_en)||g.title_es||g.title_en||'Galería';
     const h=$('h2',featured); if(h) h.textContent=title;
     const meta=$('.featured-meta',featured); if(meta) meta.innerHTML=`<span class="status-pill"><i class="status-dot ${st.cls}"></i>${lang==='es'?st.es:st.en}</span><span class="tag">${counts[g.id]||0} ${lang==='es'?'fotos':'photos'}</span>`;
-    const a=$('.featured-action a',featured); if(a) a.href=`gallery-view.html?gallery=${encodeURIComponent(g.id)}`;
+    const a=$('.featured-action a',featured); if(a) a.href=galleryUrl(activeClient,g,lang);
   }
   function renderGalleries(galleries,counts,lang){
     const grid=$('.gallery-grid'); if(!grid) return;
@@ -91,7 +94,7 @@
       const st=statusInfo(g.status||g.publish_status); const count=counts[g.id]||0; const cover=g.cover_image_url||'';
       const title=(lang==='es'?g.title_es:g.title_en)||g.title_es||g.title_en||'Galería';
       const note=clean((lang==='es'?g.personal_note_es:g.personal_note_en)||g.personal_note_es||g.personal_note_en);
-      return `<article class="gallery-card"><div class="gallery-image" style="--cover-pos-x:${g.cover_position_x??50}%;--cover-pos-y:${g.cover_position_y??35}%">${cover?`<img src="${esc(cover)}" alt="${esc(title)} cover">`:''}<div class="gallery-status"><span class="status-pill"><i class="status-dot ${st.cls}"></i>${lang==='es'?st.es:st.en}</span></div></div><div class="gallery-content"><h3>${esc(title)}</h3><div class="status-copy">${lang==='es'?st.copyEs:st.copyEn}</div>${note?`<p>${esc(note)}</p>`:''}<div class="meta"><div><span>${lang==='es'?'Fotos':'Photos'}</span><strong>${count}</strong></div><div><span>${lang==='es'?'Fecha':'Date'}</span><strong>${dateLabel(g.event_date,lang)}</strong></div><div><span>${lang==='es'?'Acceso':'Access'}</span><strong>${g.publish_status==='draft'?(lang==='es'?'Borrador':'Draft'):(lang==='es'?'Publicado':'Published')}</strong></div></div><div class="card-actions"><a class="btn btn-primary" href="gallery-view.html?gallery=${encodeURIComponent(g.id)}">${lang==='es'?'Abrir':'Open'}</a><a class="btn btn-ghost" href="gallery-view.html?gallery=${encodeURIComponent(g.id)}">${lang==='es'?'Detalles':'Details'}</a></div></div></article>`;
+      return `<article class="gallery-card"><div class="gallery-image" style="--cover-pos-x:${g.cover_position_x??50}%;--cover-pos-y:${g.cover_position_y??35}%">${cover?`<img src="${esc(cover)}" alt="${esc(title)} cover">`:''}<div class="gallery-status"><span class="status-pill"><i class="status-dot ${st.cls}"></i>${lang==='es'?st.es:st.en}</span></div></div><div class="gallery-content"><h3>${esc(title)}</h3><div class="status-copy">${lang==='es'?st.copyEs:st.copyEn}</div>${note?`<p>${esc(note)}</p>`:''}<div class="meta"><div><span>${lang==='es'?'Fotos':'Photos'}</span><strong>${count}</strong></div><div><span>${lang==='es'?'Fecha':'Date'}</span><strong>${dateLabel(g.event_date,lang)}</strong></div><div><span>${lang==='es'?'Acceso':'Access'}</span><strong>${g.publish_status==='draft'?(lang==='es'?'Borrador':'Draft'):(lang==='es'?'Publicado':'Published')}</strong></div></div><div class="card-actions"><a class="btn btn-primary" href="${galleryUrl(activeClient,g,lang)}">${lang==='es'?'Abrir':'Open'}</a><a class="btn btn-ghost" href="${galleryUrl(activeClient,g,lang)}">${lang==='es'?'Detalles':'Details'}</a></div></div></article>`;
     }).join('');
   }
   function renderTimeline(galleries,lang){
@@ -113,10 +116,10 @@
   async function load(){
     const sb=getSupabase(); if(!sb){reveal();return;}
     const session=readSession();
-    if(!adminPreview && !session?.id && !clientParam){location.href='clientes.html';return;}
+    if(!adminPreview && !session?.id && !clientParam){location.href='/client-access';return;}
     const client=await findClient(sb,clientParam,session);
     if(!client){fail();return;}
-    if(!adminPreview && session?.id && client.id!==session.id){location.href='clientes.html';return;}
+    if(!adminPreview && session?.id && client.id!==session.id){location.href='/client-access';return;}
     const lang=localStorage.getItem('ibaiLanguage')||client.language_preference||'es'; document.documentElement.lang=lang;
     applyClientToHero(client,lang);
     const {data:links,error:linksErr}=await sb.from('gallery_clients').select('gallery_id').eq('client_id',client.id);
@@ -139,7 +142,7 @@
     document.querySelectorAll('a,button,.logout,[data-logout]').forEach(el=>{
       const label=(el.textContent||'').trim().toLowerCase();
       if(el.matches('.logout,[data-logout]')||['log out','logout','cerrar sesión','salir'].includes(label)){
-        el.addEventListener('click',(ev)=>{ev.preventDefault();clearSession();location.href='clientes.html';});
+        el.addEventListener('click',(ev)=>{ev.preventDefault();clearSession();location.href='/client-access';});
       }
     });
     load();

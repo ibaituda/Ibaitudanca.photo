@@ -66,7 +66,7 @@
       const sec=e.target.closest('[data-section],[data-section-link]'); if(sec){ const id=sec.dataset.section||sec.dataset.sectionLink; if(id) setTimeout(()=>{ if(id==='trash') loadTrash(); if(id==='calendar') addCalendarLegend(); cleanupDecorative(); },100); }
       const r=e.target.closest('[data-restore-trash]'); if(r){const row=r.closest('[data-trash-table]'); restore(row?.dataset.trashTable,row?.dataset.trashId);}
       const d=e.target.closest('[data-delete-forever]'); if(d){const row=d.closest('[data-trash-table]'); deleteForever(row?.dataset.trashTable,row?.dataset.trashId);}
-      const logout=e.target.closest('#admin-logout,.logout,[data-admin-logout]'); if(logout && location.pathname.includes('admin-panel')){e.preventDefault();localStorage.removeItem('ibaiAdminSession');sessionStorage.clear();location.href='admin-login.html';}
+      const logout=e.target.closest('#admin-logout,.logout,[data-admin-logout]'); if(logout && location.pathname.includes('admin-panel')){e.preventDefault();localStorage.removeItem('ibaiAdminSession');sessionStorage.clear();location.href='/admin-login';}
     },true);
   }
   document.addEventListener('DOMContentLoaded',()=>{ensureTrash(); cleanupDecorative(); wire(); setTimeout(()=>{cleanupDecorative(); addCalendarLegend();},800);});

@@ -69,7 +69,8 @@
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     setStatus('Acceso correcto. Abriendo tu área privada...');
-    window.location.href = `client-dashboard.html?client=${encodeURIComponent(data.id)}`;
+    const slug = (data.username || data.name || data.id || 'client').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    window.location.href = `/client-dashboard/${encodeURIComponent(slug)}`;
   }
 
   document.addEventListener('DOMContentLoaded', () => {

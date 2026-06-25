@@ -1,6 +1,9 @@
 (function(){
   const qs=new URLSearchParams(location.search);
-  const galleryId=qs.get('gallery');
+  let galleryId=qs.get('gallery');
+  const pathParts=location.pathname.split('/').filter(Boolean);
+  const routeClientSlug=qs.get('client') || (pathParts[0]==='private-gallery' ? pathParts[1] : '');
+  const routeGallerySlug=qs.get('gallerySlug') || (pathParts[0]==='private-gallery' ? pathParts[2] : '');
   const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
   const SESSION_KEY='ibaiClientSession';
   const $=(s,r=document)=>r.querySelector(s);
@@ -60,14 +63,41 @@
     const favIds=new Set((favRows||[]).map(r=>r.photo_id)); const selIds=new Set((selRows||[]).map(r=>r.photo_id)); favs=new Set(); selected=new Set(); realPhotos.forEach((p,i)=>{if(favIds.has(p.db_id))favs.add(i); if(selIds.has(p.db_id))selected.add(i);});
   }
   async function persistToggle(table,index,set){const sb=getSupabase(); const photoId=photoDbId(index); if(!sb||!activeClient?.id||!photoId)return; if(set.has(index)){await sb.from(table).upsert({client_id:activeClient.id,photo_id:photoId},{onConflict:'client_id,photo_id'});}else{await sb.from(table).delete().eq('client_id',activeClient.id).eq('photo_id',photoId);}}
+  async function resolveGallery(sb){
+    if(galleryId){
+      const {data:g,error}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
+      return {g,error};
+    }
+    if(!routeGallerySlug) return {g:null,error:null};
+    let client=null;
+    if(routeClientSlug){
+      let cq=sb.from('clients').select('*').limit(1);
+      const {data:c}=await cq.eq('username',routeClientSlug).maybeSingle();
+      client=c;
+      if(!client){
+        const {data:allClients}=await sb.from('clients').select('*').limit(200);
+        client=(allClients||[]).find(c=>slugify(c.username||c.name||c.id)===routeClientSlug);
+      }
+    }
+    let galleries=[];
+    if(client?.id){
+      const {data:links}=await sb.from('gallery_clients').select('gallery_id').eq('client_id',client.id);
+      const ids=(links||[]).map(l=>l.gallery_id).filter(Boolean);
+      if(ids.length){const {data}=await sb.from('galleries').select('*').in('id',ids); galleries=data||[];}
+    }
+    if(!galleries.length){const {data}=await sb.from('galleries').select('*').limit(200); galleries=data||[];}
+    const g=galleries.find(g=>slugify(g.title_es||g.title_en||g.event_name||g.id)===routeGallerySlug) || galleries.find(g=>String(g.id).startsWith(routeGallerySlug));
+    if(g) galleryId=g.id;
+    return {g,error:null};
+  }
   async function load(){
-    if(!galleryId){reveal();return;}
+    if(!galleryId && !routeGallerySlug){reveal();return;}
     const sb=getSupabase(); if(!sb){reveal();return;}
-    const {data:g,error}=await sb.from('galleries').select('*').eq('id',galleryId).maybeSingle();
-    if(error||!g){document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Galería no disponible</h1><p>No se pudo cargar la galería.</p><p><a href="clientes.html" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>';reveal();return;}
+    const {g,error}=await resolveGallery(sb);
+    if(error||!g){document.body.innerHTML='<main style="min-height:100vh;background:#080808;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;padding:40px;text-align:center"><div><h1>Galería no disponible</h1><p>No se pudo cargar la galería.</p><p><a href="/client-access" style="color:#fff;text-decoration:underline">Volver</a></p></div></main>';reveal();return;}
     activeGallery=g; activeClient=await loadClientForGallery(sb,g);
     if(activeClient?.language_preference && !localStorage.getItem('ibaiLanguage') && !qs.get('lang')) lang=activeClient.language_preference||lang; setLanguage(lang,false);
-    if(!adminPreview && readSession()?.id && activeClient?.id && activeClient.id!==readSession().id){location.href='clientes.html';return;}
+    if(!adminPreview && readSession()?.id && activeClient?.id && activeClient.id!==readSession().id){location.href='/client-access';return;}
     const {data:photos,error:perr}=await sb.from('photos').select('*').eq('gallery_id',galleryId).eq('hidden',false).is('deleted_at', null).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if(perr) console.warn('photos load error',perr);
     realPhotos=(photos||[]).map((p,i)=>({...p,db_id:p.id,display_id:p.filename||`IT-${String(i+1).padStart(3,'0')}`,src:photoSrc(p),file:p.filename||`photo-${i+1}.jpg`,event:g.event_name||g.title_es||g.title_en||'Galería privada',date:g.event_date,location:g.location||'',city:g.city||'',gallery:g.title_es||g.title_en||'',photographer:'Ibai Tudanca'})).filter(p=>p.src);
@@ -136,5 +166,5 @@
 
   async function downloadPhoto(i){const p=realPhotos[i];if(!p)return;const url=downloadSrc(p);reviewed.add(i);updateCounts();try{const res=await fetch(url,{mode:'cors'});if(!res.ok)throw new Error('fetch failed');let blob=await res.blob(); blob=await applyWatermark(blob); const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=objectUrl;a.download=p.file||'photo.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);}catch(e){const a=document.createElement('a');a.href=url;a.download=p.file||'photo.jpg';a.target='_blank';document.body.appendChild(a);a.click();a.remove();}await logDownload('single',i,1);}
   async function downloadSet(set){const items=Array.from(set);for(const i of items){await downloadPhoto(i)}await logDownload('set',null,items.length);}
-  document.addEventListener('DOMContentLoaded',()=>{setLanguage(lang,false);document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();setLanguage(btn.dataset.lang||'es',true);}));document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();clearSession();location.href='clientes.html';}));document.querySelectorAll('.download-option').forEach((b,i)=>{if(i>0)b.remove();});const globalSize=document.getElementById('globalSize');if(globalSize)globalSize.style.display='none';if(!galleryId){reveal();return;}document.addEventListener('click',async(e)=>{const card=e.target.closest('.photo-card');if(card&&card.dataset.index){const i=+card.dataset.index;if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('favourites',i,favs);return;}if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('selections',i,selected);return;}if(e.target.closest('.dl')){downloadPhoto(i);return;}openLightbox(i);}if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active'));e.target.closest('.filter').classList.add('is-active');applyFilter();}},true);$('#closeLight')?.addEventListener('click',closeLightbox);$('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length));$('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));$('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current);reviewed.add(current);await persistToggle('favourites',current,favs);openLightbox(current);applyFilter();});$('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current);reviewed.add(current);await persistToggle('selections',current,selected);openLightbox(current);applyFilter();});$('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));$('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected));$('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs));$('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));load();});
+  document.addEventListener('DOMContentLoaded',()=>{setLanguage(lang,false);document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();setLanguage(btn.dataset.lang||'es',true);}));document.querySelectorAll('.logout,[data-logout]').forEach(el=>el.addEventListener('click',(e)=>{e.preventDefault();clearSession();location.href='/client-access';}));document.querySelectorAll('.download-option').forEach((b,i)=>{if(i>0)b.remove();});const globalSize=document.getElementById('globalSize');if(globalSize)globalSize.style.display='none';if(!galleryId && !routeGallerySlug){reveal();return;}document.addEventListener('click',async(e)=>{const card=e.target.closest('.photo-card');if(card&&card.dataset.index){const i=+card.dataset.index;if(e.target.closest('.fav')){favs.has(i)?favs.delete(i):favs.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('favourites',i,favs);return;}if(e.target.closest('.sel')){selected.has(i)?selected.delete(i):selected.add(i);reviewed.add(i);applyFilter();updateCounts();await persistToggle('selections',i,selected);return;}if(e.target.closest('.dl')){downloadPhoto(i);return;}openLightbox(i);}if(e.target.closest('.filter')){document.querySelectorAll('.filter').forEach(b=>b.classList.remove('is-active'));e.target.closest('.filter').classList.add('is-active');applyFilter();}},true);$('#closeLight')?.addEventListener('click',closeLightbox);$('#prevImg')?.addEventListener('click',()=>openLightbox((current-1+realPhotos.length)%realPhotos.length));$('#nextImg')?.addEventListener('click',()=>openLightbox((current+1)%realPhotos.length));$('#lightFav')?.addEventListener('click',async()=>{favs.has(current)?favs.delete(current):favs.add(current);reviewed.add(current);await persistToggle('favourites',current,favs);openLightbox(current);applyFilter();});$('#lightSel')?.addEventListener('click',async()=>{selected.has(current)?selected.delete(current):selected.add(current);reviewed.add(current);await persistToggle('selections',current,selected);openLightbox(current);applyFilter();});$('#downloadCurrent')?.addEventListener('click',()=>downloadPhoto(current));$('#downloadSelectedTop')?.addEventListener('click',()=>downloadSet(selected));$('#downloadFavTop')?.addEventListener('click',()=>downloadSet(favs));$('.selection-bar .btn-primary')?.addEventListener('click',()=>downloadSet(selected));load();});
 })();

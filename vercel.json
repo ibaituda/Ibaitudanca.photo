@@ -1,0 +1,90 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "ibaitudancaphoto.com"
+        }
+      ],
+      "destination": "https://www.ibaitudancaphoto.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/clientes.html",
+      "destination": "/client-access",
+      "permanent": true
+    },
+    {
+      "source": "/admin-login.html",
+      "destination": "/admin-login",
+      "permanent": true
+    },
+    {
+      "source": "/client-dashboard.html",
+      "destination": "/client-dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/gallery-view.html",
+      "destination": "/private-gallery",
+      "permanent": true
+    },
+    {
+      "source": "/admin-panel.html",
+      "destination": "/admin-panel",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/client-access",
+      "destination": "/clientes.html"
+    },
+    {
+      "source": "/admin-login",
+      "destination": "/admin-login.html"
+    },
+    {
+      "source": "/admin-panel",
+      "destination": "/admin-panel.html"
+    },
+    {
+      "source": "/client-dashboard/:client",
+      "destination": "/client-dashboard.html?client=:client"
+    },
+    {
+      "source": "/client-dashboard",
+      "destination": "/client-dashboard.html"
+    },
+    {
+      "source": "/private-gallery/:client/:gallery",
+      "destination": "/gallery-view.html?client=:client&gallerySlug=:gallery"
+    },
+    {
+      "source": "/private-gallery",
+      "destination": "/gallery-view.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   const qs=new URLSearchParams(location.search);
   const adminPreview=qs.get('preview')==='1'||qs.get('adminPreview')==='1';
   function read(key){try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null}}
-  function goLogin(){localStorage.removeItem(SESSION_KEY); location.replace('clientes.html');}
+  function goLogin(){localStorage.removeItem(SESSION_KEY); location.replace('/client-access');}
   document.addEventListener('DOMContentLoaded',()=>{
     const path=location.pathname;
     if(adminPreview) return;

@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Admin Panel | Ibai Tudanca Photo</title>
-<meta content="noindex, nofollow" name="robots"/>
+<meta name="description" content="Panel privado de administración de Ibai Tudanca Photo." />
+<meta name="author" content="Ibai Tudanca" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="canonical" href="https://www.ibaitudancaphoto.com/admin-panel" />
+<meta name="theme-color" content="#080808" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/img/icon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/img/icon-16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/img/icon-180.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
@@ -41,8 +50,8 @@
 <header class="nav">
 <a class="brand" href="#">IBAI TUDANCA</a>
 <div class="nav-right">
-<a class="nav-link" href="client-dashboard.html">Client View</a>
-<a class="nav-link" href="gallery-view.html">Gallery View</a>
+<a class="nav-link" href="/client-dashboard">Client View</a>
+<a class="nav-link" href="/private-gallery">Gallery View</a>
 <div class="language-switch"><button class="lang-btn is-active" data-set-lang="en">EN</button><button class="lang-btn" data-set-lang="es">ES</button></div>
 <button class="logout"><span data-en="">Logout</span><span data-es="">Salir</span></button>
 </div>
@@ -302,7 +311,7 @@
         localStorage.removeItem('ibaiAdminSession');
         localStorage.removeItem('ibaiClientSession');
         sessionStorage.clear();
-        window.location.href='admin-login.html';
+        window.location.href='/admin-login';
       });
     });
   });

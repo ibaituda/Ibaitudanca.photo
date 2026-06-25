@@ -67,7 +67,8 @@
   function addBackButton(client){
     const nav=$('.nav-right')||$('.dashboard-nav .nav-right')||$('.top-actions')||$('.nav'); if(!nav || $('.v119-back-dashboard')) return;
     const a=document.createElement('a'); a.className='v119-back-dashboard';
-    const href=client?.id?`client-dashboard.html?client=${encodeURIComponent(client.id)}`:'client-dashboard.html';
+    const slug=(client?.username||client?.name||client?.id||'client').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    const href=client?.id?`/client-dashboard/${encodeURIComponent(slug)}`:'/client-dashboard';
     a.href=href; a.textContent=lang()==='es'?'Volver al dashboard':'Back to dashboard';
     const first=nav.querySelector('.nav-link,.language-switch,.logout');
     if(first) nav.insertBefore(a,first); else nav.appendChild(a);

@@ -253,7 +253,7 @@
 
   function previewClientPage(username) {
     const user = username || $("#edit-client-username")?.value.trim() || $("#client-username")?.value.trim() || slugify($("#client-name")?.value.trim());
-    const url = user ? `client-dashboard.html?client=${encodeURIComponent(user)}&adminPreview=1` : "client-dashboard.html";
+    const url = user ? `/client-dashboard/${encodeURIComponent(user)}?adminPreview=1` : "/client-dashboard";
     window.open(url, "_blank");
   }
 
@@ -752,7 +752,7 @@
   }
 
   function previewGallery(galleryId) {
-    const url = galleryId ? `gallery-view.html?gallery=${encodeURIComponent(galleryId)}&adminPreview=1` : "gallery-view.html";
+    const url = galleryId ? `/private-gallery?gallery=${encodeURIComponent(galleryId)}&adminPreview=1` : "/private-gallery";
     window.open(url, "_blank");
   }
 
@@ -863,8 +863,8 @@
 
   function requireAdminSession() {
     const session = currentAdminSession();
-    if (!session && location.pathname.endsWith("admin-panel.html")) {
-      location.href = "admin-login.html";
+    if (!session && location.pathname.endsWith("/admin-panel")) {
+      location.href = "/admin-login";
       return null;
     }
     if (session) {
@@ -1042,10 +1042,10 @@
   }
   document.addEventListener("DOMContentLoaded", () => {
     const session = requireAdminSession();
-    if (!session && location.pathname.endsWith("admin-panel.html")) return;
+    if (!session && location.pathname.endsWith("/admin-panel")) return;
 
     const logoutBtn = $("#admin-logout");
-    if (logoutBtn) logoutBtn.addEventListener("click", () => { localStorage.removeItem("ibaiAdminSession"); location.href = "admin-login.html"; });
+    if (logoutBtn) logoutBtn.addEventListener("click", () => { localStorage.removeItem("ibaiAdminSession"); location.href = "/admin-login"; });
 
     const createClientBtn = $("#create-client-submit");
     if (createClientBtn) createClientBtn.addEventListener("click", createClient);

@@ -38,7 +38,7 @@
     if (localStorage.getItem("ibaiAdminSession")) {
       // Already logged in; keep login page available if user manually opens it, but show status.
       setStatus("Admin session already active. Opening admin panel...", true);
-      setTimeout(() => { location.href = "admin-panel.html"; }, 600);
+      setTimeout(() => { location.href = "/admin-panel"; }, 600);
       return;
     }
 
@@ -89,7 +89,7 @@
       }));
 
       setStatus("Access granted. Opening admin panel...", true);
-      setTimeout(() => { location.href = "admin-panel.html"; }, 500);
+      setTimeout(() => { location.href = "/admin-panel"; }, 500);
     });
   });
 })();
