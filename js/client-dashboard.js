@@ -4,6 +4,7 @@
   const clientParam=qs.get('client') || (pathParts[0]==='client-dashboard' ? pathParts[1] : '');
   const adminPreview=qs.get('adminPreview')==='1'||qs.get('preview')==='1';
   const SESSION_KEY='ibaiClientSession';
+  let activeClient=null;
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=(v)=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -120,6 +121,7 @@
     if(!adminPreview && !session?.id && !clientParam){location.href='/client-access';return;}
     const client=await findClient(sb,clientParam,session);
     if(!client){fail();return;}
+    activeClient=client;
     if(!adminPreview && session?.id && client.id!==session.id){location.href='/client-access';return;}
     const lang=localStorage.getItem('ibaiLanguage')||client.language_preference||'es'; document.documentElement.lang=lang;
     applyClientToHero(client,lang);
@@ -146,6 +148,9 @@
         el.addEventListener('click',(ev)=>{ev.preventDefault();clearSession();location.href='/client-access';});
       }
     });
-    load();
+    load().catch((error)=>{
+      console.error('client dashboard load error', error);
+      fail('Ha ocurrido un error cargando el panel del cliente. Recarga la página o vuelve al acceso de clientes.');
+    });
   });
 })();
