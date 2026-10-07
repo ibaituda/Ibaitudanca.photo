@@ -1,0 +1,169 @@
+media:
+  input: img
+  output: /img
+  categories: [image]
+  rename: safe
+
+content:
+  - name: portfolio_content
+    label: Portfolio · Fotos
+    type: file
+    path: content/site.json
+    format: json
+    fields:
+      - name: hero
+        label: Portada principal
+        type: object
+        fields:
+          - name: image
+            label: Foto de portada
+            type: image
+            required: true
+            description: "Recomendado: horizontal 3:2. Esta es la gran imagen de la portada."
+            options:
+              path: cover
+              extensions: [jpg, jpeg, png, webp]
+              rename: safe
+
+      - name: about
+        label: About me
+        type: object
+        fields:
+          - name: image
+            label: Retrato
+            type: image
+            required: true
+            description: "Recomendado: retrato vertical, aproximadamente 3:4."
+            options:
+              path: about
+              extensions: [jpg, jpeg, png, webp]
+              rename: safe
+
+      - name: portfolio
+        label: Fotografías seleccionadas
+        type: object
+        list:
+          min: 1
+          max: 30
+          collapsible:
+            collapsed: true
+            summary: "{id} · {name}"
+        fields:
+          - name: id
+            label: Posición / ID
+            type: string
+            required: true
+            description: "Puedes dejar A, B, C... para identificar cada hueco."
+          - name: image
+            label: Fotografía
+            type: image
+            required: true
+            options:
+              path: portfolio
+              extensions: [jpg, jpeg, png, webp]
+              rename: safe
+          - name: name
+            label: Persona / protagonista
+            type: string
+            required: true
+          - name: team
+            label: Club / equipo
+            type: string
+          - name: title
+            label: Descripción de la fotografía
+            type: text
+            required: true
+          - name: ratio
+            label: Formato del hueco
+            type: select
+            required: true
+            description: "3/4 = vertical. 3/2 = horizontal."
+            options:
+              values:
+                - name: "3/4"
+                  label: "Vertical 3:4"
+                - name: "3/2"
+                  label: "Horizontal 3:2"
+
+      - name: published
+        label: Published Work · Capturas
+        type: object
+        list:
+          min: 10
+          max: 10
+          collapsible:
+            collapsed: true
+            summary: "Captura {index}"
+        fields:
+          - name: image
+            label: Captura
+            type: image
+            required: true
+            options:
+              path: published
+              extensions: [jpg, jpeg, png, webp]
+              rename: safe
+          - name: alt
+            label: Texto alternativo
+            type: string
+
+      - name: services
+        label: Fotos de Servicios
+        type: object
+        fields:
+          - name: matchCoverage
+            label: Match Coverage
+            type: object
+            fields:
+              - name: image
+                label: Fotografía
+                type: image
+                required: true
+                options: { path: services, extensions: [jpg, jpeg, png, webp], rename: safe }
+
+          - name: editorialMedia
+            label: Editorial & Media
+            type: object
+            fields:
+              - name: image
+                label: Fotografía
+                type: image
+                required: true
+                options: { path: services, extensions: [jpg, jpeg, png, webp], rename: safe }
+
+          - name: clubsOrganisations
+            label: Clubs & Organisations
+            type: object
+            fields:
+              - name: image
+                label: Fotografía
+                type: image
+                required: true
+                options: { path: services, extensions: [jpg, jpeg, png, webp], rename: safe }
+
+          - name: athletesBranding
+            label: Athletes & Personal Branding
+            type: object
+            fields:
+              - name: image
+                label: Fotografía
+                type: image
+                required: true
+                options: { path: services, extensions: [jpg, jpeg, png, webp], rename: safe }
+
+          - name: eventsProjects
+            label: Events & Special Projects
+            type: object
+            fields:
+              - name: image
+                label: Fotografía
+                type: image
+                required: true
+                options: { path: services, extensions: [jpg, jpeg, png, webp], rename: safe }
+
+settings:
+  commit:
+    templates:
+      update: "Actualiza portfolio desde Pages CMS: {path}"
+      create: "Añade imagen al portfolio: {path}"
+      delete: "Elimina imagen del portfolio: {path}"
