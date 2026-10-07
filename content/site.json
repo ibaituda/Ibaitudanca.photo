@@ -1,0 +1,213 @@
+{
+  "hero": {
+    "image": "/img/cover/hero.jpg"
+  },
+  "about": {
+    "image": "/img/about/IMG_IBAI.jpg"
+  },
+  "portfolio": [
+    {
+      "id": "A",
+      "image": "/img/portfolio/work_A.jpg",
+      "name": "Lamine Yamal",
+      "team": "FC Barcelona",
+      "title": "Lamine Yamal celebrates, FC Barcelona at San Mamés.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "B",
+      "image": "/img/portfolio/work_B.jpg",
+      "name": "Abde Ezzalzouli",
+      "team": "Real Betis / Athletic Club",
+      "title": "Abde Ezzalzouli dribbles past Iñigo Ruiz de Galarreta, Real Betis and Athletic Club at San Mamés.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "C",
+      "image": "/img/portfolio/work_C.jpg",
+      "name": "Sergi Cardona",
+      "team": "Villarreal CF",
+      "title": "Sergi Cardona celebrates after scoring, Villarreal CF at San Mamés.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "D",
+      "image": "/img/portfolio/work_D.jpg",
+      "name": "Melwin Pantzar & Martin Krampelj",
+      "team": "Surne Bilbao Basket",
+      "title": "Melwin Pantzar and Martin Krampelj celebrate a crucial basket, Surne Bilbao Basket at Bilbao Arena.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "E",
+      "image": "/img/portfolio/work_E.JPG",
+      "name": "Darrun Hilliard",
+      "team": "Surne Bilbao Basket",
+      "title": "Darrun Hilliard poses with the FIBA Europe Cup trophy, Surne Bilbao Basket at Bilbao Arena.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "F",
+      "image": "/img/portfolio/work_F.JPG",
+      "name": "Aymeric Laporte",
+      "team": "Athletic Club",
+      "title": "Aymeric Laporte during a LaLiga match, Athletic Club at San Mamés.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "G",
+      "image": "/img/portfolio/work_G.jpg",
+      "name": "Héctor Bellerín",
+      "team": "Real Betis",
+      "title": "Héctor Bellerín with the official LaLiga match ball, Real Betis at San Mamés.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "H",
+      "image": "/img/portfolio/work_H.jpg",
+      "name": "Manuel Pellegrini",
+      "team": "Real Betis",
+      "title": "Manuel Pellegrini on the touchline, Real Betis at San Mamés.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "I",
+      "image": "/img/portfolio/work_I.jpg",
+      "name": "Gorka Guruzeta",
+      "team": "Athletic Club",
+      "title": "Gorka Guruzeta celebrates after scoring, Athletic Club at San Mamés.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "J",
+      "image": "/img/portfolio/work_J.jpg",
+      "name": "Antony",
+      "team": "Real Betis",
+      "title": "Antony in action, Real Betis at Reale Arena.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "K",
+      "image": "/img/portfolio/work_K.jpg",
+      "name": "Claudio Giráldez",
+      "team": "RC Celta",
+      "title": "Claudio Giráldez is lifted by teammates after securing European qualification, RC Celta at San Mamés.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "L",
+      "image": "/img/portfolio/work_L.jpg",
+      "name": "Antonio Blanco",
+      "team": "Deportivo Alavés",
+      "title": "Antonio Blanco celebrates after scoring, Deportivo Alavés at Mendizorroza.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "M",
+      "image": "/img/portfolio/work_M.jpg",
+      "name": "Gorka Guruzeta",
+      "team": "Athletic Club",
+      "title": "Gorka Guruzeta celebrates after scoring in the UEFA Europa League, Athletic Club at San Mamés.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "N",
+      "image": "/img/portfolio/work_N.JPG",
+      "name": "Sergio Cubero",
+      "team": "SD Eibar",
+      "title": "Sergio Cubero celebrates a defensive action, SD Eibar at Ipurua Stadium.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "O",
+      "image": "/img/portfolio/work_O.jpg",
+      "name": "Nico Williams",
+      "team": "Athletic Club",
+      "title": "Nico Williams celebrates after scoring, Athletic Club at Mendizorroza.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "P",
+      "image": "/img/portfolio/work_P.jpg",
+      "name": "Sander Svendsen",
+      "team": "Viking FK",
+      "title": "Sander Svendsen celebrates after scoring, Viking FK at Lyse Arena.",
+      "ratio": "3/2"
+    },
+    {
+      "id": "Q",
+      "image": "/img/portfolio/work_Q.jpg",
+      "name": "Héctor Bellerín",
+      "team": "Real Betis",
+      "title": "Héctor Bellerín controls the ball, Real Betis at Reale Arena.",
+      "ratio": "3/4"
+    },
+    {
+      "id": "R",
+      "image": "/img/portfolio/work_R.jpg",
+      "name": "Harald Frey",
+      "team": "Surne Bilbao Basket",
+      "title": "Harald Frey celebrates winning the FIBA Europe Cup, Surne Bilbao Basket at Bilbao Arena.",
+      "ratio": "3/2"
+    }
+  ],
+  "published": [
+    {
+      "image": "/img/published/Featured_1.jpg",
+      "alt": "Featured published work screenshot 1"
+    },
+    {
+      "image": "/img/published/Featured_2.jpg",
+      "alt": "Featured published work screenshot 2"
+    },
+    {
+      "image": "/img/published/Featured_3.jpg",
+      "alt": "Featured published work screenshot 3"
+    },
+    {
+      "image": "/img/published/Featured_4.jpg",
+      "alt": "Featured published work screenshot 4"
+    },
+    {
+      "image": "/img/published/Featured_5.jpg",
+      "alt": "Featured published work screenshot 5"
+    },
+    {
+      "image": "/img/published/Featured_6.jpg",
+      "alt": "Featured published work screenshot 6"
+    },
+    {
+      "image": "/img/published/Featured_7.jpg",
+      "alt": "Featured published work screenshot 7"
+    },
+    {
+      "image": "/img/published/Featured_8.jpg",
+      "alt": "Featured published work screenshot 8"
+    },
+    {
+      "image": "/img/published/Featured_9.jpg",
+      "alt": "Featured published work screenshot 9"
+    },
+    {
+      "image": "/img/published/Featured_10.jpg",
+      "alt": "Featured published work screenshot 10"
+    }
+  ],
+  "services": {
+    "matchCoverage": {
+      "image": "/img/services/match-coverage.jpg"
+    },
+    "editorialMedia": {
+      "image": "/img/services/editorial-media.jpg"
+    },
+    "clubsOrganisations": {
+      "image": "/img/services/clubs-organisations.jpg"
+    },
+    "athletesBranding": {
+      "image": "/img/services/athletes-branding.jpg"
+    },
+    "eventsProjects": {
+      "image": "/img/services/events-projects.jpg"
+    }
+  }
+}

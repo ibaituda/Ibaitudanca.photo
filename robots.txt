@@ -1,9 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin-login
-Disallow: /admin-panel
-Disallow: /client-dashboard
-Disallow: /private-gallery
-Disallow: /api/
 
-Sitemap: https://www.ibaitudancaphoto.com/sitemap.xml
+Sitemap: https://ibaitudanca.photo/sitemap.xml

@@ -1,0 +1,14 @@
+{
+  "name": "ibai-portfolio-technical-starter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ibai Tudanca sports photography portfolio - static frontend prepared for Vercel and future Supabase backend.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "preview": "vite --host 0.0.0.0",
+    "build": "echo 'Static HTML project: no build step required'"
+  },
+  "devDependencies": {
+    "vite": "latest"
+  }
+}
